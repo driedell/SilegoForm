@@ -7,13 +7,11 @@
         public string package_size;
         public byte PAK_family;
         public string package_weight;
-        public byte pattern_id_address;
+        public int pattern_id_address;
 
         public bool dual_supply;
         public string dual_supply_vdd_pins;
         public string dual_supply_vdd2_pins;
-        public int vdd2_pin;
-        public byte gnd_pin;
 
         public mTM vdd;
         public mTM vdd2;
@@ -54,9 +52,9 @@
 
         public struct PIN
         {
-            public byte address;
+            public int address;
             public string pin_type;
-            public byte OE;
+            public int OE;
             public byte vdd_src;
             public string name;
             public string type;
@@ -68,8 +66,8 @@
 
         public struct CNT
         {
-            public byte control;
-            public byte data;
+            public int control;
+            public int data;
             public byte length;
             public int selected;
             public bool used;
@@ -85,8 +83,10 @@
         public struct ACMP
         {
             public bool used;
-            public byte control;
+            public int control;
             public int hyst;
+            public int gain;
+            public int low_bandwidth;
             public string acmpVIH;
             public string acmpVIL;
             public string low_bw;
@@ -108,6 +108,14 @@
 
         // ### PAK4 stuff
 
+        public int PAK4_LF_osc = 1743;          //Hz
+        public int PAK4_LF_osc_pre_div = 560;
+        public int PAK4_RC_osc = 25000;         //Hz
+        public int PAK4_RC_osc_src = 565;
+        public int PAK4_RC_osc_pre_div = 568;
+        public int PAK4_RING_osc = 27250000;    //Hz
+        public int PAK4_RING_osc_pre_div = 576;
+
         // ### PAK3 stuff
 
         internal static void createPAKs()
@@ -121,9 +129,8 @@
             PAKs.SLG46531.package_size = "2mm x 3mm";
             PAKs.SLG46531.PAK_family = 5;
             PAKs.SLG46531.package_weight = "0.0090 g";
-            PAKs.SLG46531.pattern_id_address = 0xE6;
+            PAKs.SLG46531.pattern_id_address = 1840;
             PAKs.SLG46531.dual_supply = false;
-            PAKs.SLG46531.gnd_pin = 11;
             PAKs.SLG46531.pin = new PIN[] {
                 new PIN() { address = 0x00, pin_type = "NA",                 vdd_src = 0  },        // 0
                 new PIN() { address = 0x00, pin_type = "VDD",                vdd_src = 0  },        // 1
@@ -174,12 +181,10 @@
             PAKs.SLG46532.package_size = "2mm x 3mm";
             PAKs.SLG46532.PAK_family = 5;
             PAKs.SLG46532.package_weight = "0.0090 g";
-            PAKs.SLG46532.pattern_id_address = 0xE6;
+            PAKs.SLG46532.pattern_id_address = 1840;
             PAKs.SLG46532.dual_supply = true;
             PAKs.SLG46532.dual_supply_vdd_pins = "PIN2-PIN10";
             PAKs.SLG46532.dual_supply_vdd2_pins = "PIN12-PIN20";
-            PAKs.SLG46532.vdd2_pin = 14;
-            PAKs.SLG46532.gnd_pin = 11;
             PAKs.SLG46532.pin = new PIN[] {
                 new PIN() { address = 0x00, pin_type = "NA",      vdd_src = 0  },        // 0
                 new PIN() { address = 0x00, pin_type = "VDD",     vdd_src = 0  },        // 1
@@ -230,9 +235,8 @@
             PAKs.SLG46533.package_size = "2mm x 3mm";
             PAKs.SLG46533.PAK_family = 5;
             PAKs.SLG46533.package_weight = "0.0090 g";
-            PAKs.SLG46533.pattern_id_address = 0xE6;
+            PAKs.SLG46533.pattern_id_address = 1840;
             PAKs.SLG46533.dual_supply = false;
-            PAKs.SLG46533.gnd_pin = 11;
             PAKs.SLG46533.pin = new PIN[] {
                 new PIN() { address = 0x00, pin_type = "NA",      vdd_src = 0  },        // 0
                 new PIN() { address = 0x00, pin_type = "VDD",     vdd_src = 0  },        // 1
@@ -284,8 +288,7 @@
             PAKs.SLG46534.PAK_family = 5;
             PAKs.SLG46534.package_weight = "0.0067 g";
             PAKs.SLG46534.dual_supply = false;
-            PAKs.SLG46534.pattern_id_address = 0xE6;
-            PAKs.SLG46534.gnd_pin = 9;
+            PAKs.SLG46534.pattern_id_address = 1840;
             PAKs.SLG46534.pin = new PIN[] {
                 new PIN() { address = 0x00, pin_type = "NA",      vdd_src = 0  },        // 0
                 new PIN() { address = 0x00, pin_type = "VDD",     vdd_src = 0  },        // 1
@@ -330,9 +333,9 @@
             PAKs.SLG46535.PAK_family = 5;
             PAKs.SLG46535.package_weight = "0.0068 g";
             PAKs.SLG46535.dual_supply = true;
-            PAKs.SLG46535.vdd2_pin = 11;
-            PAKs.SLG46535.pattern_id_address = 0xE6;
-            PAKs.SLG46535.gnd_pin = 9;
+            PAKs.SLG46535.dual_supply_vdd_pins = "PIN2-PIN8";
+            PAKs.SLG46535.dual_supply_vdd2_pins = "PIN10-PIN14";
+            PAKs.SLG46535.pattern_id_address = 1840;
             PAKs.SLG46535.pin = new PIN[] {
                 new PIN() { address = 0x00, pin_type = "NA",      vdd_src = 0  },        // 0
                 new PIN() { address = 0x00, pin_type = "VDD",     vdd_src = 0  },        // 1
@@ -377,8 +380,7 @@
             PAKs.SLG46536.PAK_family = 5;
             PAKs.SLG46536.package_weight = "0.0066 g";
             PAKs.SLG46536.dual_supply = false;
-            PAKs.SLG46536.pattern_id_address = 0xE6;
-            PAKs.SLG46536.gnd_pin = 9;
+            PAKs.SLG46536.pattern_id_address = 1840;
             PAKs.SLG46536.pin = new PIN[] {
                 new PIN() { address = 0x00, pin_type = "NA",      vdd_src = 0  },        // 0
                 new PIN() { address = 0x00, pin_type = "VDD",     vdd_src = 0  },        // 1
@@ -412,12 +414,170 @@
                 new ACMP() { control = 0xCC, hyst = 1170 },
                 new ACMP() { control = 0xCD, hyst = 1181 },
             };
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            //  SLG46140
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            PAKs.SLG46140 = new PAK();
+            PAKs.SLG46140.base_die = "SLG46140";
+            PAKs.SLG46140.package = "STQFN-14";
+            PAKs.SLG46140.package_size = "1.6mm x 2mm";
+            PAKs.SLG46140.PAK_family = 4;
+            PAKs.SLG46140.package_weight = "0.0090 g";  //###
+            PAKs.SLG46140.pattern_id_address = 1007;
+            PAKs.SLG46140.dual_supply = false;
+            PAKs.SLG46140.pin = new PIN[] {
+                new PIN() { address = 000, pin_type = "NA",                vdd_src = 0  },        // 0
+                new PIN() { address = 000, pin_type = "VDD",               vdd_src = 0  },        // 1
+                new PIN() { address = 761, pin_type = "GPI",               vdd_src = 1  },        // 2
+                new PIN() { address = 766, pin_type = "GPIO_OE", OE = 270, vdd_src = 1  },        // 3
+                new PIN() { address = 773, pin_type = "GPIO_OE", OE = 282, vdd_src = 1  },        // 4
+                new PIN() { address = 780, pin_type = "GPIO_OE", OE = 294, vdd_src = 1  },        // 5
+                new PIN() { address = 788, pin_type = "GPIO",              vdd_src = 1  },        // 6
+                new PIN() { address = 795, pin_type = "GPIO_OE", OE = 312, vdd_src = 1  },        // 7
+                new PIN() { address = 000, pin_type = "GND",               vdd_src = 0  },        // 8
+                new PIN() { address = 802, pin_type = "SD_OE",   OE = 324, vdd_src = 1  },        // 9
+                new PIN() { address = 811, pin_type = "SD",                vdd_src = 1  },        // 10
+                new PIN() { address = 820, pin_type = "GPIO",              vdd_src = 1  },        // 11
+                new PIN() { address = 827, pin_type = "GPIO_OE", OE = 348, vdd_src = 1  },        // 12
+                new PIN() { address = 834, pin_type = "GPIO_OE", OE = 360, vdd_src = 1  },        // 13
+                new PIN() { address = 841, pin_type = "GPIO_OE", OE = 372, vdd_src = 1  },        // 14
+            };
+            PAKs.SLG46140.cnt = new CNT[]
+            {
+                new CNT() { control = 737, data = 722, length = 14, selected = 743 },    // 0
+                new CNT() { control = 714, data = 705, length = 8,  selected = 720 },    // 1
+                new CNT() { control = 695, data = 680, length = 8,  selected = 701 },    // 2
+                new CNT() { control = 670, data = 661, length = 8,  selected = 676 },    // 3
+            };
+            PAKs.SLG46140.acmp = new ACMP[]
+            {
+                new ACMP() { control = 496, hyst = 510, gain = 522, low_bandwidth = 524 },
+                new ACMP() { control = 501, hyst = 508, gain = 519, low_bandwidth = 518 },
+            };
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            //  SLG46620
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            PAKs.SLG46620 = new PAK();
+            PAKs.SLG46620.base_die = "SLG46620";
+            PAKs.SLG46620.package = "STQFN-20";
+            PAKs.SLG46620.package_size = "2mm x 3mm";
+            PAKs.SLG46620.PAK_family = 4;
+            PAKs.SLG46620.package_weight = "0.015 g";  //###
+            PAKs.SLG46620.pattern_id_address = 2031;
+            PAKs.SLG46620.dual_supply = false;
+            PAKs.SLG46620.pin = new PIN[] {
+                new PIN() { address = 0000, pin_type = "NA",                 vdd_src = 0  },        // 0
+                new PIN() { address = 0000, pin_type = "VDD",                vdd_src = 0  },        // 1
+                new PIN() { address = 0941, pin_type = "GPI",                vdd_src = 1  },        // 2
+                new PIN() { address = 0946, pin_type = "GPIO_OE", OE = 0342, vdd_src = 1  },        // 3
+                new PIN() { address = 0953, pin_type = "GPIO",               vdd_src = 1  },        // 4
+                new PIN() { address = 0960, pin_type = "GPIO_OE", OE = 0360, vdd_src = 1  },        // 5
+                new PIN() { address = 0967, pin_type = "GPIO",               vdd_src = 1  },        // 6
+                new PIN() { address = 0974, pin_type = "GPIO_OE", OE = 0378, vdd_src = 1  },        // 7
+                new PIN() { address = 0981, pin_type = "GPIO",               vdd_src = 1  },        // 8
+                new PIN() { address = 0988, pin_type = "GPIO_OE", OE = 0396, vdd_src = 1  },        // 9
+                new PIN() { address = 0995, pin_type = "SD_OE",   OE = 1408, vdd_src = 1  },        // 10
+                new PIN() { address = 0000, pin_type = "GND",                vdd_src = 0  },        // 11
+                new PIN() { address = 1911, pin_type = "SD",                 vdd_src = 1  },        // 12
+                new PIN() { address = 1919, pin_type = "GPIO_OE", OE = 1372, vdd_src = 1  },        // 13
+                new PIN() { address = 1926, pin_type = "GPIO_OE", OE = 1384, vdd_src = 1  },        // 14
+                new PIN() { address = 1933, pin_type = "GPIO",               vdd_src = 1  },        // 15
+                new PIN() { address = 1940, pin_type = "GPIO_OE", OE = 1402, vdd_src = 1  },        // 16
+                new PIN() { address = 1947, pin_type = "GPIO",               vdd_src = 1  },        // 17
+                new PIN() { address = 1954, pin_type = "GPIO_OE", OE = 1420, vdd_src = 1  },        // 18
+                new PIN() { address = 1961, pin_type = "GPIO_OE", OE = 1432, vdd_src = 1  },        // 19
+                new PIN() { address = 1968, pin_type = "GPIO",               vdd_src = 1  },        // 20
+            };
+            PAKs.SLG46620.cnt = new CNT[]
+            {
+                new CNT() { control = 1745, data = 1731, length = 14, selected = 1750 },    // 0
+                new CNT() { control = 1767, data = 1753, length = 14, selected = 1772 },    // 1
+                new CNT() { control = 1788, data = 1774, length = 14, selected = 1794 },    // 2
+                new CNT() { control = 1813, data = 1799, length = 14, selected = 1818 },    // 3
+                new CNT() { control = 1828, data = 1820, length = 08, selected = 1834 },    // 4
+                new CNT() { control = 1846, data = 1838, length = 08, selected = 1851 },    // 5
+                new CNT() { control = 1860, data = 1852, length = 08, selected = 1865 },    // 6
+                new CNT() { control = 1874, data = 1866, length = 08, selected = 1879 },    // 7
+                new CNT() { control = 1880, data = 1888, length = 08, selected = 1894 },    // 8
+                new CNT() { control = 1903, data = 1895, length = 08, selected = 1909 },    // 9
+            };
+            PAKs.SLG46620.acmp = new ACMP[]
+            {
+                new ACMP() { control = 862, hyst = 934, gain = 853, low_bandwidth = 852 },  // 0
+                new ACMP() { control = 897, hyst = 932, gain = 857, low_bandwidth = 861 },  // 1
+                new ACMP() { control = 902, hyst = 930, gain = 864, low_bandwidth = 862 },  // 2
+                new ACMP() { control = 907, hyst = 928, gain = 867, low_bandwidth = 866 },  // 3
+                new ACMP() { control = 912, hyst = 926, gain = 871, low_bandwidth = 875 },  // 4
+                new ACMP() { control = 917, hyst = 924, gain = 871, low_bandwidth = 880 },  // 5    //### ACMP5 has no gain option, fix this
+            };
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            //  SLG46621
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            // Finish filling out SLG46621 then do Base_Die_DB
+            PAKs.SLG46621 = new PAK();
+            PAKs.SLG46621.base_die = "SLG46621";
+            PAKs.SLG46621.package = "STQFN-20";
+            PAKs.SLG46621.package_size = "2mm x 3mm";
+            PAKs.SLG46621.PAK_family = 4;
+            PAKs.SLG46621.package_weight = "0.015 g";  //###
+            PAKs.SLG46621.pattern_id_address = 2031;
+            PAKs.SLG46621.dual_supply = false;
+            PAKs.SLG46621.pin = new PIN[] {
+                new PIN() { address = 0000, pin_type = "NA",                 vdd_src = 0  },        // 0
+                new PIN() { address = 0000, pin_type = "VDD",                vdd_src = 0  },        // 1
+                new PIN() { address = 0941, pin_type = "GPI",                vdd_src = 1  },        // 2
+                new PIN() { address = 0946, pin_type = "GPIO_OE", OE = 0342, vdd_src = 1  },        // 3
+                new PIN() { address = 0953, pin_type = "GPIO",               vdd_src = 1  },        // 4
+                new PIN() { address = 0960, pin_type = "GPIO_OE", OE = 0360, vdd_src = 1  },        // 5
+                new PIN() { address = 0967, pin_type = "GPIO",               vdd_src = 1  },        // 6
+                new PIN() { address = 0974, pin_type = "GPIO_OE", OE = 0378, vdd_src = 1  },        // 7
+                new PIN() { address = 0981, pin_type = "GPIO",               vdd_src = 1  },        // 8
+                new PIN() { address = 0988, pin_type = "GPIO_OE", OE = 0396, vdd_src = 1  },        // 9
+                new PIN() { address = 0995, pin_type = "SD_OE",   OE = 1408, vdd_src = 1  },        // 10
+                new PIN() { address = 0000, pin_type = "GND",                vdd_src = 0  },        // 11
+                new PIN() { address = 1911, pin_type = "SD",                 vdd_src = 1  },        // 12
+                new PIN() { address = 1919, pin_type = "GPIO_OE", OE = 1372, vdd_src = 1  },        // 13
+                new PIN() { address = 1926, pin_type = "GPIO_OE", OE = 1384, vdd_src = 1  },        // 14
+                new PIN() { address = 1933, pin_type = "GPIO",               vdd_src = 1  },        // 15
+                new PIN() { address = 1940, pin_type = "GPIO_OE", OE = 1402, vdd_src = 1  },        // 16
+                new PIN() { address = 1947, pin_type = "GPIO",               vdd_src = 1  },        // 17
+                new PIN() { address = 1954, pin_type = "GPIO_OE", OE = 1420, vdd_src = 1  },        // 18
+                new PIN() { address = 1961, pin_type = "GPIO_OE", OE = 1432, vdd_src = 1  },        // 19
+                new PIN() { address = 1968, pin_type = "GPIO",               vdd_src = 1  },        // 20
+            };
+            PAKs.SLG46621.cnt = new CNT[]
+            {
+                new CNT() { control = 1745, data = 1731, length = 14, selected = 1750 },    // 0
+                new CNT() { control = 1767, data = 1753, length = 14, selected = 1772 },    // 1
+                new CNT() { control = 1788, data = 1774, length = 14, selected = 1794 },    // 2
+                new CNT() { control = 1813, data = 1799, length = 14, selected = 1818 },    // 3
+                new CNT() { control = 1828, data = 1820, length = 08, selected = 1834 },    // 4
+                new CNT() { control = 1846, data = 1838, length = 08, selected = 1851 },    // 5
+                new CNT() { control = 1860, data = 1852, length = 08, selected = 1865 },    // 6
+                new CNT() { control = 1874, data = 1866, length = 08, selected = 1879 },    // 7
+                new CNT() { control = 1880, data = 1888, length = 08, selected = 1894 },    // 8
+                new CNT() { control = 1903, data = 1895, length = 08, selected = 1909 },    // 9
+            };
+            PAKs.SLG46621.acmp = new ACMP[]
+            {
+                new ACMP() { control = 862, hyst = 934, gain = 853, low_bandwidth = 852 },  // 0
+                new ACMP() { control = 897, hyst = 932, gain = 857, low_bandwidth = 861 },  // 1
+                new ACMP() { control = 902, hyst = 930, gain = 864, low_bandwidth = 862 },  // 2
+                new ACMP() { control = 907, hyst = 928, gain = 867, low_bandwidth = 866 },  // 3
+                new ACMP() { control = 912, hyst = 926, gain = 871, low_bandwidth = 875 },  // 4
+                new ACMP() { control = 917, hyst = 924, gain = 871, low_bandwidth = 880 },  // 5    //### ACMP5 has no gain option, fix this
+            };
         }
     }
 
     public static class PAKs
     {
         //GreenPAK5
+
         public static PAK SLG46531;
         public static PAK SLG46532;
         public static PAK SLG46533;
@@ -426,11 +586,13 @@
         public static PAK SLG46536;
 
         //GreenPAK4
+
         public static PAK SLG46140;
         public static PAK SLG46620;
         public static PAK SLG46621;
 
         //GreenPAK3
+
         public static PAK SLG46721;
         public static PAK SLG46722;
         public static PAK SLG46110;

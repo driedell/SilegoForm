@@ -423,7 +423,7 @@ namespace SilegoForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(384, 362);
-            this.Controls.Add(this.cancel_button);
+            this.Controls.Add(this.start_button);
             this.Controls.Add(this.help_textbox);
             this.Controls.Add(this.help_checkbox);
             this.Controls.Add(this.DS_rev_checkbox);
@@ -449,9 +449,9 @@ namespace SilegoForm
             this.Controls.Add(this.GP_button);
             this.Controls.Add(this.DS_file_textbox);
             this.Controls.Add(this.GP_file_textbox);
-            this.Controls.Add(this.start_button);
             this.Controls.Add(this.I_Q_textBox);
             this.Controls.Add(this.SilegoLogo);
+            this.Controls.Add(this.cancel_button);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(700, 400);
