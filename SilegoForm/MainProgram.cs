@@ -798,7 +798,7 @@ public static class MainProgram
             case "1": mode = "Counter"; mode_alt = "cnt"; break;
         }
 
-        if (mode.Equals("Delay") || mode.Equals("Counter"))
+        if (g.GreenPAK.base_die.Equals("SLG46140"))
         {
             switch (g.nvmData[control + 3].ToString() +
                     g.nvmData[control + 2].ToString() +
@@ -810,16 +810,33 @@ public static class MainProgram
                 case "0010": freq = g.GreenPAK.PAK4_RC_osc / 12; break;
                 case "0011": freq = g.GreenPAK.PAK4_RC_osc / 24; break;
                 case "0100": freq = g.GreenPAK.PAK4_RC_osc / 64; break;
-                case "0101": break;     // DLY_out3
-                case "0110": break;     // matrix_out67
-                case "0111": break;     // matrix_out67 / 8
+                case "0101": freq = -1; break;     // DLY_out
+                case "0110": freq = -1; break;     // matrix_out
+                case "0111": freq = -1; break;     // matrix_out / 8
                 case "1000": freq = g.GreenPAK.PAK4_RING_osc; break;
-                case "1001": break;     // matrix_out80 (SPI_SCLK)
+                case "1001": freq = -1; break;     // matrix_out
                 case "1010": freq = g.GreenPAK.PAK4_LF_osc; break;
-                case "1011": break;     // CKFSM_DIV256
-                case "1100": break;     // CKPWM
+                case "1011": freq = -1; break;     // ??
+                case "1100": freq = -1; break;     // ??
             }
         }
+        else
+        {
+            switch (g.nvmData[control + 2].ToString() +
+                    g.nvmData[control + 1].ToString() +
+                    g.nvmData[control + 0].ToString())
+            {
+                case "000": freq = g.GreenPAK.PAK4_RC_osc / 1; break;
+                case "001": freq = g.GreenPAK.PAK4_RC_osc / 4; break;
+                case "010": freq = g.GreenPAK.PAK4_RC_osc / 24; break;
+                case "011": freq = g.GreenPAK.PAK4_RC_osc / 64; break;
+                case "100": freq = g.GreenPAK.PAK4_LF_osc; break;
+                case "101": freq = -1; break;     // DLY_out
+                case "110": freq = g.GreenPAK.PAK4_RING_osc; break;
+                case "111": freq = -1; break;     // matrix_out
+            }
+        }
+
         bin = Reverse(g.nvmData.Substring(g.GreenPAK.cnt[i].data, g.GreenPAK.cnt[i].length));
 
         //Console.WriteLine("bin = " + bin.ToString());
@@ -846,7 +863,14 @@ public static class MainProgram
         g.GreenPAK.cnt[i].mode = mode;
         g.GreenPAK.cnt[i].mode_alt = mode_alt;
         g.GreenPAK.cnt[i].time.min = "--";        // ### Build in support for min/max values?
-        g.GreenPAK.cnt[i].time.typ = Math.Round(time, 3).ToString();
+        if (freq < 0)
+        {
+            g.GreenPAK.cnt[i].time.typ = "###";
+        }
+        else
+        {
+            g.GreenPAK.cnt[i].time.typ = Math.Round(time, 3).ToString();
+        }
         g.GreenPAK.cnt[i].time.max = "--";        // ### Build in support for min/max values?
 
         //Console.WriteLine("Counter" + i.ToString() + " mode: " + g.GreenPAK.cnt[i].mode);
@@ -1793,9 +1817,7 @@ public static class MainProgram
             //////////////////////////////////////////////////
             else if (g.GreenPAK.PAK_family.Equals(3))
             {
-
             }
-
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
