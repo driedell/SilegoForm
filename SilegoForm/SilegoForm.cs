@@ -352,5 +352,10 @@ namespace SilegoForm
         {
             backgroundWorker.CancelAsync();
         }
+
+        private void DS_rev_change_textbox_TextChanged(object sender, EventArgs e)
+        {
+            MainProgram.g.DS_rev_change = DS_rev_change_textbox.Text;
+        }
     }
 }

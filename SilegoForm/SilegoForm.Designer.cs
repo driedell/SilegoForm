@@ -64,15 +64,17 @@ namespace SilegoForm
             this.help_checkbox = new System.Windows.Forms.CheckBox();
             this.help_textbox = new System.Windows.Forms.TextBox();
             this.cancel_button = new System.Windows.Forms.Button();
+            this.DS_rev_change_textbox = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.SilegoLogo)).BeginInit();
             this.SuspendLayout();
             // 
             // SilegoLogo
             // 
             this.SilegoLogo.Image = ((System.Drawing.Image)(resources.GetObject("SilegoLogo.Image")));
-            this.SilegoLogo.Location = new System.Drawing.Point(100, 12);
+            this.SilegoLogo.Location = new System.Drawing.Point(12, 12);
             this.SilegoLogo.Name = "SilegoLogo";
-            this.SilegoLogo.Size = new System.Drawing.Size(200, 60);
+            this.SilegoLogo.Size = new System.Drawing.Size(100, 30);
             this.SilegoLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.SilegoLogo.TabIndex = 0;
             this.SilegoLogo.TabStop = false;
@@ -80,7 +82,7 @@ namespace SilegoForm
             // I_Q_textBox
             // 
             this.I_Q_textBox.Enabled = false;
-            this.I_Q_textBox.Location = new System.Drawing.Point(322, 130);
+            this.I_Q_textBox.Location = new System.Drawing.Point(322, 69);
             this.I_Q_textBox.Name = "I_Q_textBox";
             this.I_Q_textBox.Size = new System.Drawing.Size(50, 20);
             this.I_Q_textBox.TabIndex = 17;
@@ -172,7 +174,7 @@ namespace SilegoForm
             "028",
             "029",
             "030"});
-            this.DS_rev_combobox.Location = new System.Drawing.Point(297, 107);
+            this.DS_rev_combobox.Location = new System.Drawing.Point(297, 46);
             this.DS_rev_combobox.Name = "DS_rev_combobox";
             this.DS_rev_combobox.Size = new System.Drawing.Size(75, 21);
             this.DS_rev_combobox.TabIndex = 29;
@@ -183,7 +185,7 @@ namespace SilegoForm
             // I_Q_checkbox
             // 
             this.I_Q_checkbox.AutoSize = true;
-            this.I_Q_checkbox.Location = new System.Drawing.Point(228, 132);
+            this.I_Q_checkbox.Location = new System.Drawing.Point(228, 71);
             this.I_Q_checkbox.Name = "I_Q_checkbox";
             this.I_Q_checkbox.Size = new System.Drawing.Size(68, 17);
             this.I_Q_checkbox.TabIndex = 30;
@@ -234,7 +236,7 @@ namespace SilegoForm
             // pin_labels_checkbox
             // 
             this.pin_labels_checkbox.AutoSize = true;
-            this.pin_labels_checkbox.Location = new System.Drawing.Point(12, 155);
+            this.pin_labels_checkbox.Location = new System.Drawing.Point(12, 94);
             this.pin_labels_checkbox.Name = "pin_labels_checkbox";
             this.pin_labels_checkbox.Size = new System.Drawing.Size(75, 17);
             this.pin_labels_checkbox.TabIndex = 34;
@@ -245,7 +247,7 @@ namespace SilegoForm
             // pin_settings_checkbox
             // 
             this.pin_settings_checkbox.AutoSize = true;
-            this.pin_settings_checkbox.Location = new System.Drawing.Point(125, 177);
+            this.pin_settings_checkbox.Location = new System.Drawing.Point(125, 116);
             this.pin_settings_checkbox.Name = "pin_settings_checkbox";
             this.pin_settings_checkbox.Size = new System.Drawing.Size(82, 17);
             this.pin_settings_checkbox.TabIndex = 35;
@@ -256,7 +258,7 @@ namespace SilegoForm
             // metadata_checkbox
             // 
             this.metadata_checkbox.AutoSize = true;
-            this.metadata_checkbox.Location = new System.Drawing.Point(12, 132);
+            this.metadata_checkbox.Location = new System.Drawing.Point(12, 71);
             this.metadata_checkbox.Name = "metadata_checkbox";
             this.metadata_checkbox.Size = new System.Drawing.Size(71, 17);
             this.metadata_checkbox.TabIndex = 37;
@@ -267,7 +269,7 @@ namespace SilegoForm
             // temp_vdd_checkbox
             // 
             this.temp_vdd_checkbox.AutoSize = true;
-            this.temp_vdd_checkbox.Location = new System.Drawing.Point(125, 109);
+            this.temp_vdd_checkbox.Location = new System.Drawing.Point(125, 48);
             this.temp_vdd_checkbox.Name = "temp_vdd_checkbox";
             this.temp_vdd_checkbox.Size = new System.Drawing.Size(81, 17);
             this.temp_vdd_checkbox.TabIndex = 36;
@@ -278,7 +280,7 @@ namespace SilegoForm
             // CNTs_DLYs_checkbox
             // 
             this.CNTs_DLYs_checkbox.AutoSize = true;
-            this.CNTs_DLYs_checkbox.Location = new System.Drawing.Point(125, 132);
+            this.CNTs_DLYs_checkbox.Location = new System.Drawing.Point(125, 71);
             this.CNTs_DLYs_checkbox.Name = "CNTs_DLYs_checkbox";
             this.CNTs_DLYs_checkbox.Size = new System.Drawing.Size(84, 17);
             this.CNTs_DLYs_checkbox.TabIndex = 39;
@@ -289,7 +291,7 @@ namespace SilegoForm
             // ACMPs_checkbox
             // 
             this.ACMPs_checkbox.AutoSize = true;
-            this.ACMPs_checkbox.Location = new System.Drawing.Point(125, 155);
+            this.ACMPs_checkbox.Location = new System.Drawing.Point(125, 94);
             this.ACMPs_checkbox.Name = "ACMPs_checkbox";
             this.ACMPs_checkbox.Size = new System.Drawing.Size(61, 17);
             this.ACMPs_checkbox.TabIndex = 38;
@@ -304,16 +306,17 @@ namespace SilegoForm
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(112, 82);
+            this.label1.Location = new System.Drawing.Point(139, 12);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(177, 17);
+            this.label1.Size = new System.Drawing.Size(119, 34);
             this.label1.TabIndex = 41;
-            this.label1.Text = "Select applicable changes:";
+            this.label1.Text = "Select applicable \nchanges:";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // version_label
             // 
             this.version_label.AutoSize = true;
-            this.version_label.Location = new System.Drawing.Point(335, 9);
+            this.version_label.Location = new System.Drawing.Point(294, 17);
             this.version_label.Name = "version_label";
             this.version_label.Size = new System.Drawing.Size(37, 13);
             this.version_label.TabIndex = 43;
@@ -323,7 +326,7 @@ namespace SilegoForm
             // TM_Part_Code_textbox
             // 
             this.TM_Part_Code_textbox.Enabled = false;
-            this.TM_Part_Code_textbox.Location = new System.Drawing.Point(322, 152);
+            this.TM_Part_Code_textbox.Location = new System.Drawing.Point(322, 91);
             this.TM_Part_Code_textbox.Name = "TM_Part_Code_textbox";
             this.TM_Part_Code_textbox.Size = new System.Drawing.Size(50, 20);
             this.TM_Part_Code_textbox.TabIndex = 44;
@@ -332,7 +335,7 @@ namespace SilegoForm
             // TM_Part_Code_checkbox
             // 
             this.TM_Part_Code_checkbox.AutoSize = true;
-            this.TM_Part_Code_checkbox.Location = new System.Drawing.Point(228, 155);
+            this.TM_Part_Code_checkbox.Location = new System.Drawing.Point(228, 94);
             this.TM_Part_Code_checkbox.Name = "TM_Part_Code_checkbox";
             this.TM_Part_Code_checkbox.Size = new System.Drawing.Size(95, 17);
             this.TM_Part_Code_checkbox.TabIndex = 45;
@@ -343,7 +346,7 @@ namespace SilegoForm
             // TM_Revision_checkbox
             // 
             this.TM_Revision_checkbox.AutoSize = true;
-            this.TM_Revision_checkbox.Location = new System.Drawing.Point(228, 178);
+            this.TM_Revision_checkbox.Location = new System.Drawing.Point(228, 117);
             this.TM_Revision_checkbox.Name = "TM_Revision_checkbox";
             this.TM_Revision_checkbox.Size = new System.Drawing.Size(89, 17);
             this.TM_Revision_checkbox.TabIndex = 47;
@@ -354,7 +357,7 @@ namespace SilegoForm
             // TM_Revision_textbox
             // 
             this.TM_Revision_textbox.Enabled = false;
-            this.TM_Revision_textbox.Location = new System.Drawing.Point(322, 175);
+            this.TM_Revision_textbox.Location = new System.Drawing.Point(322, 114);
             this.TM_Revision_textbox.Name = "TM_Revision_textbox";
             this.TM_Revision_textbox.Size = new System.Drawing.Size(50, 20);
             this.TM_Revision_textbox.TabIndex = 46;
@@ -363,7 +366,7 @@ namespace SilegoForm
             // DS_rev_checkbox
             // 
             this.DS_rev_checkbox.AutoSize = true;
-            this.DS_rev_checkbox.Location = new System.Drawing.Point(228, 109);
+            this.DS_rev_checkbox.Location = new System.Drawing.Point(228, 48);
             this.DS_rev_checkbox.Name = "DS_rev_checkbox";
             this.DS_rev_checkbox.Size = new System.Drawing.Size(67, 17);
             this.DS_rev_checkbox.TabIndex = 48;
@@ -374,7 +377,7 @@ namespace SilegoForm
             // new_part_checkbox
             // 
             this.new_part_checkbox.AutoSize = true;
-            this.new_part_checkbox.Location = new System.Drawing.Point(12, 109);
+            this.new_part_checkbox.Location = new System.Drawing.Point(12, 48);
             this.new_part_checkbox.Name = "new_part_checkbox";
             this.new_part_checkbox.Size = new System.Drawing.Size(70, 17);
             this.new_part_checkbox.TabIndex = 42;
@@ -386,7 +389,7 @@ namespace SilegoForm
             // 
             this.help_checkbox.Appearance = System.Windows.Forms.Appearance.Button;
             this.help_checkbox.AutoSize = true;
-            this.help_checkbox.Location = new System.Drawing.Point(333, 25);
+            this.help_checkbox.Location = new System.Drawing.Point(333, 12);
             this.help_checkbox.Name = "help_checkbox";
             this.help_checkbox.Size = new System.Drawing.Size(39, 23);
             this.help_checkbox.TabIndex = 49;
@@ -417,12 +420,37 @@ namespace SilegoForm
             this.cancel_button.Visible = false;
             this.cancel_button.Click += new System.EventHandler(this.cancel_button_Click);
             // 
+            // DS_rev_change_textbox
+            // 
+            this.DS_rev_change_textbox.Location = new System.Drawing.Point(79, 140);
+            this.DS_rev_change_textbox.Multiline = true;
+            this.DS_rev_change_textbox.Name = "DS_rev_change_textbox";
+            this.DS_rev_change_textbox.Size = new System.Drawing.Size(293, 40);
+            this.DS_rev_change_textbox.TabIndex = 52;
+            this.DS_rev_change_textbox.TextChanged += new System.EventHandler(this.DS_rev_change_textbox_TextChanged);
+            // 
+            // label2
+            // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(12, 141);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(61, 34);
+            this.label2.TabIndex = 53;
+            this.label2.Text = "DS Rev \r\nChange:";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
             // SilegoForm
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(384, 362);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.DS_rev_change_textbox);
             this.Controls.Add(this.start_button);
             this.Controls.Add(this.help_textbox);
             this.Controls.Add(this.help_checkbox);
@@ -502,5 +530,7 @@ namespace SilegoForm
         private CheckBox help_checkbox;
         private TextBox help_textbox;
         public Button cancel_button;
+        private TextBox DS_rev_change_textbox;
+        private Label label2;
     }
 }
