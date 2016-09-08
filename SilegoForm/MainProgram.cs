@@ -160,167 +160,20 @@ public static class MainProgram
         }
     }
 
-    private static void pin_config_PAK5(int i, int address, string pin_type)
+    private static void pin_config(int i)
     {
-        int bit = address * 8;
-
-        switch (pin_type)
+        switch (g.GreenPAK.pin[i].PT)
         {
             case "GPI":
                 g.GreenPAK.pin[i].type = "Digital Input";
-                pin_config_resistor(i, bit + 5, bit + 4);
-                pin_config_OE_input(i, bit + 7, bit + 6);
-                break;
-
-            case "GPIO_OE":
-                int OE = g.GreenPAK.pin[i].OE * 8;
-
-                pin_config_resistor(i, bit + 3, bit + 2, bit + 1);
-
-                // ### check this section
-                if (g.nvmData.Substring(OE, 6).Equals("000000")) { g.GreenPAK.pin[i].type = "Digital Input"; }
-                else if (g.nvmData.Substring(OE, 6).Equals("111111")) { g.GreenPAK.pin[i].type = "Digital Output"; }
-                else { g.GreenPAK.pin[i].type = "Digital Input/Output"; }
-
-                switch (g.GreenPAK.pin[i].type)
-                {
-                    case "Digital Input": pin_config_OE_input(i, bit + 5, bit + 4); break;
-
-                    case "Digital Output": pin_config_OE_output(i, bit + 7, bit + 6); break;
-
-                    case "Digital Input/Output":
-                        pin_config_OE_input(i, bit + 5, bit + 4);
-                        g.GreenPAK.pin[i].description += " /\n";
-                        pin_config_OE_output(i, bit + 7, bit + 6);
-                        break;
-
-                    default: break;
-                }
-                break;
-
-            case "GPIO":
-                pin_config_resistor(i, bit + 4, bit + 3, bit + 2);
-                pin_config_GPIO(i, bit + 7, bit + 6, bit + 5, bit + 1);
-                break;
-
-            case "I2C":
-                switch (g.nvmData[bit + 2].ToString())  // Check if we're using I2C ### check if works
-                {
-                    case "0":                           // I2C is used
-                        g.GreenPAK.pin[i].type = "I2C";
-                        //g.GreenPAK.pin[i].description = "I2C";
-                        switch (g.nvmData[bit + 1].ToString())
-                        {
-                            //case "0": g.GreenPAK.pin[i].description += " 1x up to 400kHz"; break;
-                            //case "1": g.GreenPAK.pin[i].description += " 2x up to 1MHz"; break;
-                            case "0": g.GreenPAK.pin[i].description = "Digital Input without Schmitt Trigger"; break;
-                            case "1": g.GreenPAK.pin[i].description = "Digital Input without Schmitt Trigger"; break;
-                        }
-                        break;
-
-                    case "1":                            // I2C is not used
-                        pin_config_GPIO(i, bit + 7, bit + 6, bit + 5, bit + 1);
-                        break;
-                }
-
-                pin_config_resistor(i, bit + 4, bit + 3);
-
-                break;
-
-            case "SD_OE":
-                OE = g.GreenPAK.pin[i].OE * 8;
-
-                pin_config_resistor(i, bit + 3, bit + 2, bit + 1);
-
-                if (g.nvmData.Substring(OE, 6).Equals("000000")) { g.GreenPAK.pin[i].type = "Digital Input"; }
-                else if (g.nvmData.Substring(OE, 6).Equals("111111")) { g.GreenPAK.pin[i].type = "Digital Output"; }
-                else { g.GreenPAK.pin[i].type = "Digital Input/Output"; }
-
-                switch (g.GreenPAK.pin[i].type)
-                {
-                    case "Digital Input": pin_config_OE_input(i, bit + 5, bit + 4); break;
-
-                    case "Digital Output": pin_config_OE_output(i, bit + 7, bit + 6, bit + 0); break;
-
-                    case "Digital Input/Output":
-                        pin_config_OE_input(i, bit + 5, bit + 4);
-                        g.GreenPAK.pin[i].description += " /\n";
-                        pin_config_OE_output(i, bit + 7, bit + 6, bit + 0);
-                        break;
-
-                    default: break;
-                }
-                break;
-
-            case "SD":
-                pin_config_resistor(i, bit + 4, bit + 3, bit + 2);
-                pin_config_GPIO(i, bit + 7, bit + 6, bit + 5, bit + 1, bit + 0);
-                break;
-
-            default: break;
-        }
-        if (g.GreenPAK.pin[i].vdd_src.Equals(1))
-        {
-            switch (g.GreenPAK.pin[i].description)
-            {
-                case "Push Pull 1x": g.VDD.PP1x++; break;
-                case "Digital Input with Schmitt trigger": g.VHYS = true; g.VDD.wSchmitt = true; break;
-                case "Push Pull 2x": g.VDD.PP2x++; break;
-                case "Push Pull 4x": g.VDD.PP4x++; break;
-                case "Open Drain NMOS 1x": g.VDD.ODN1x++; break;
-                case "Open Drain NMOS 2x": g.VDD.ODN2x++; break;
-                case "Open Drain NMOS 4x": g.VDD.ODN4x++; break;
-                case "Open Drain PMOS 1x": g.VDD.ODP1x++; break;
-                case "Open Drain PMOS 2x": g.VDD.ODP2x++; break;
-                case "Digital Input without Schmitt trigger": g.VDD.woSchmitt = true; break;
-                case "Low Voltage Digital Input": g.VDD.LVDI = true; break;
-
-                //### TriState?
-
-                default: break;
-            }
-        }
-        else if (g.GreenPAK.pin[i].vdd_src.Equals(2))
-        {
-            switch (g.GreenPAK.pin[i].description)
-            {
-                case "Push Pull 1x": g.VDD2.PP1x++; break;
-                case "Digital Input with Schmitt trigger": g.VHYS = true; g.VDD2.wSchmitt = true; break;
-                case "Push Pull 2x": g.VDD2.PP2x++; break;
-                case "Push Pull 4x": g.VDD2.PP4x++; break;
-                case "Open Drain NMOS 1x": g.VDD2.ODN1x++; break;
-                case "Open Drain NMOS 2x": g.VDD2.ODN2x++; break;
-                case "Open Drain NMOS 4x": g.VDD2.ODN4x++; break;
-                case "Open Drain PMOS 1x": g.VDD2.ODP1x++; break;
-                case "Open Drain PMOS 2x": g.VDD2.ODP2x++; break;
-                case "Digital Input without Schmitt trigger": g.VDD2.woSchmitt = true; break;
-                case "Low Voltage Digital Input": g.VDD2.LVDI = true; break;
-
-                //### TriState?
-
-                default: break;
-            }
-        }
-
-        Console.WriteLine("Pin" + i.ToString() + ": " + g.GreenPAK.pin[i].type + ", " + g.GreenPAK.pin[i].description);
-    }
-
-    private static void pin_config_PAK4(int i, int address, string pin_type)
-    {
-        int bit = address;
-
-        switch (pin_type)
-        {
-            case "GPI":
-                g.GreenPAK.pin[i].type = "Digital Input";
-                pin_config_resistor(i, bit + 3, bit + 2, bit + 4);
-                pin_config_OE_input(i, bit + 1, bit + 0);
+                pin_config_resistor(i);
+                pin_config_OE_input(i);
                 break;
 
             case "GPIO_OE":
                 int OE = g.GreenPAK.pin[i].OE;
 
-                pin_config_resistor(i, bit + 5, bit + 4, bit + 6);
+                pin_config_resistor(i);
 
                 // ### check this section
                 if (g.nvmData.Substring(OE, 6).Equals("000000")) { g.GreenPAK.pin[i].type = "Digital Input"; }
@@ -329,27 +182,44 @@ public static class MainProgram
 
                 switch (g.GreenPAK.pin[i].type)
                 {
-                    case "Digital Input": pin_config_OE_input(i, bit + 1, bit + 0); break;
+                    case "Digital Input": pin_config_OE_input(i); break;
 
-                    case "Digital Output": pin_config_OE_output(i, bit + 3, bit + 2); break;
+                    case "Digital Output": pin_config_OE_output(i); break;
 
                     case "Digital Input/Output":
-                        pin_config_OE_input(i, bit + 1, bit + 0);
+                        pin_config_OE_input(i);
                         g.GreenPAK.pin[i].description += " /\n";
-                        pin_config_OE_output(i, bit + 3, bit + 2);
+                        pin_config_OE_output(i);
                         break;
+
+                    default: break;
                 }
                 break;
 
             case "GPIO":
-                pin_config_resistor(i, bit + 4, bit + 3, bit + 5);
-                pin_config_GPIO(i, bit + 2, bit + 1, bit + 0, bit + 6);
+                pin_config_resistor(i);
+                pin_config_GPIO(i);
+                break;
+
+            case "I2C":
+                pin_config_resistor(i);
+                switch (g.nvmData[g.GreenPAK.pin[i].UD].ToString())  // Check if we're using I2C ### check if works
+                {
+                    case "0":                           // I2C is used
+                        g.GreenPAK.pin[i].type = "I2C";
+                        g.GreenPAK.pin[i].description = "Digital Input without Schmitt Trigger";
+                        break;
+
+                    case "1":                            // I2C is not used
+                        pin_config_GPIO(i);
+                        break;
+                }
                 break;
 
             case "SD_OE":
                 OE = g.GreenPAK.pin[i].OE;
 
-                pin_config_resistor(i, bit + 5, bit + 4, bit + 6);
+                pin_config_resistor(i);
 
                 if (g.nvmData.Substring(OE, 6).Equals("000000")) { g.GreenPAK.pin[i].type = "Digital Input"; }
                 else if (g.nvmData.Substring(OE, 6).Equals("111111")) { g.GreenPAK.pin[i].type = "Digital Output"; }
@@ -357,26 +227,28 @@ public static class MainProgram
 
                 switch (g.GreenPAK.pin[i].type)
                 {
-                    case "Digital Input": pin_config_OE_input(i, bit + 1, bit + 0); break;
+                    case "Digital Input": pin_config_OE_input(i); break;
 
-                    case "Digital Output": pin_config_OE_output(i, bit + 3, bit + 2, bit + 7); break;
+                    case "Digital Output": pin_config_OE_output(i); break;
 
                     case "Digital Input/Output":
-                        pin_config_OE_input(i, bit + 1, bit + 0);
+                        pin_config_OE_input(i);
                         g.GreenPAK.pin[i].description += " /\n";
-                        pin_config_OE_output(i, bit + 3, bit + 2, bit + 7);
+                        pin_config_OE_output(i);
                         break;
+
+                    default: break;
                 }
                 break;
 
             case "SD":
-                pin_config_resistor(i, bit + 4, bit + 3, bit + 5);
-                pin_config_GPIO(i, bit + 2, bit + 1, bit + 0, bit + 6, bit + 7);
+                pin_config_resistor(i);
+                pin_config_GPIO(i);
                 break;
 
             default: break;
         }
-        if (g.GreenPAK.pin[i].vdd_src.Equals(1))
+        if (g.GreenPAK.pin[i].VS.Equals(1))
         {
             switch (g.GreenPAK.pin[i].description)
             {
@@ -397,7 +269,7 @@ public static class MainProgram
                 default: break;
             }
         }
-        else if (g.GreenPAK.pin[i].vdd_src.Equals(2))
+        else if (g.GreenPAK.pin[i].VS.Equals(2))
         {
             switch (g.GreenPAK.pin[i].description)
             {
@@ -422,104 +294,12 @@ public static class MainProgram
         Console.WriteLine("Pin" + i.ToString() + ": " + g.GreenPAK.pin[i].type + ", " + g.GreenPAK.pin[i].description);
     }
 
-    private static void pin_config_PAK3(int i, int address, string pin_type)
-    {
-        int bit = address;
-
-        switch (pin_type)
-        {
-            case "GPI":
-                g.GreenPAK.pin[i].type = "Digital Input";
-                pin_config_resistor(i, bit + 3, bit + 2, 0);
-                pin_config_OE_input(i, bit + 1, bit + 0);
-                break;
-
-            case "GPIO_OE":
-                int OE = g.GreenPAK.pin[i].OE;
-
-                pin_config_resistor(i, bit + 5, bit + 4, bit + 6);
-
-                // ### check this section
-                if (g.nvmData.Substring(OE, 6).Equals("000000")) { g.GreenPAK.pin[i].type = "Digital Input"; }
-                else if (g.nvmData.Substring(OE, 6).Equals("111111")) { g.GreenPAK.pin[i].type = "Digital Output"; }
-                else { g.GreenPAK.pin[i].type = "Digital Input/Output"; }
-
-                switch (g.GreenPAK.pin[i].type)
-                {
-                    case "Digital Input": pin_config_OE_input(i, bit + 1, bit + 0); break;
-
-                    case "Digital Output": pin_config_OE_output(i, bit + 3, bit + 2); break;
-
-                    case "Digital Input/Output":
-                        pin_config_OE_input(i, bit + 1, bit + 0);
-                        g.GreenPAK.pin[i].description += " /\n";
-                        pin_config_OE_output(i, bit + 3, bit + 2);
-                        break;
-                }
-                break;
-
-            case "GPIO":
-                pin_config_resistor(i, bit + 4, bit + 3, bit + 5);
-                pin_config_GPIO(i, bit + 2, bit + 1, bit + 0, bit + 6);
-                break;
-
-            case "SD":
-                pin_config_resistor(i, bit + 4, bit + 3, bit + 5);
-                pin_config_GPIO(i, bit + 2, bit + 1, bit + 0, bit + 6, bit + 7);
-                break;
-
-            default: break;
-        }
-        if (g.GreenPAK.pin[i].vdd_src.Equals(1))
-        {
-            switch (g.GreenPAK.pin[i].description)
-            {
-                case "Push Pull 1x": g.VDD.PP1x++; break;
-                case "Digital Input with Schmitt trigger": g.VHYS = true; g.VDD.wSchmitt = true; break;
-                case "Push Pull 2x": g.VDD.PP2x++; break;
-                case "Push Pull 4x": g.VDD.PP4x++; break;
-                case "Open Drain NMOS 1x": g.VDD.ODN1x++; break;
-                case "Open Drain NMOS 2x": g.VDD.ODN2x++; break;
-                case "Open Drain NMOS 4x": g.VDD.ODN4x++; break;
-                case "Open Drain PMOS 1x": g.VDD.ODP1x++; break;
-                case "Open Drain PMOS 2x": g.VDD.ODP2x++; break;
-                case "Digital Input without Schmitt trigger": g.VDD.woSchmitt = true; break;
-                case "Low Voltage Digital Input": g.VDD.LVDI = true; break;
-
-                //### TriState?
-
-                default: break;
-            }
-        }
-        else if (g.GreenPAK.pin[i].vdd_src.Equals(2))
-        {
-            switch (g.GreenPAK.pin[i].description)
-            {
-                case "Push Pull 1x": g.VDD2.PP1x++; break;
-                case "Digital Input with Schmitt trigger": g.VHYS = true; g.VDD2.wSchmitt = true; break;
-                case "Push Pull 2x": g.VDD2.PP2x++; break;
-                case "Push Pull 4x": g.VDD2.PP4x++; break;
-                case "Open Drain NMOS 1x": g.VDD2.ODN1x++; break;
-                case "Open Drain NMOS 2x": g.VDD2.ODN2x++; break;
-                case "Open Drain NMOS 4x": g.VDD2.ODN4x++; break;
-                case "Open Drain PMOS 1x": g.VDD2.ODP1x++; break;
-                case "Open Drain PMOS 2x": g.VDD2.ODP2x++; break;
-                case "Digital Input without Schmitt trigger": g.VDD2.woSchmitt = true; break;
-                case "Low Voltage Digital Input": g.VDD2.LVDI = true; break;
-
-                //### TriState?
-
-                default: break;
-            }
-        }
-
-        Console.WriteLine("Pin" + i.ToString() + ": " + g.GreenPAK.pin[i].type + ", " + g.GreenPAK.pin[i].description);
-    }
-
-    private static void pin_config_resistor(int i, int a, int b, int c = 0)
+    private static void pin_config_resistor(int i)
     {
         bool floating = false;
-        switch (g.nvmData[a].ToString() + g.nvmData[b].ToString())
+
+        switch (g.nvmData[g.GreenPAK.pin[i].RV + 1].ToString() +
+                g.nvmData[g.GreenPAK.pin[i].RV + 0].ToString())
         {
             case "00": g.GreenPAK.pin[i].resistor = "floating"; floating = true; break;
             case "01": g.GreenPAK.pin[i].resistor = "10kΩ"; break;
@@ -528,17 +308,22 @@ public static class MainProgram
         }
         if (floating.Equals(false))
         {
-            switch (g.nvmData[c].ToString())
+            switch (g.nvmData[g.GreenPAK.pin[i].UD].ToString())
             {
                 case "0": g.GreenPAK.pin[i].resistor += "\npulldown"; break;
                 case "1": g.GreenPAK.pin[i].resistor += "\npullup"; break;
             }
+            if (g.GreenPAK.pin[i].UD.Equals(0))
+            {
+                g.GreenPAK.pin[i].resistor += "\npulldown";
+            }
         }
     }
 
-    private static void pin_config_OE_input(int i, int a, int b)
+    private static void pin_config_OE_input(int i)
     {
-        switch (g.nvmData[a].ToString() + g.nvmData[b].ToString())
+        switch (g.nvmData[g.GreenPAK.pin[i].OM + 1].ToString() +
+                g.nvmData[g.GreenPAK.pin[i].OM + 1].ToString())
         {
             case "00": g.GreenPAK.pin[i].description += "Digital Input without Schmitt trigger"; break;
             case "01": g.GreenPAK.pin[i].description += "Digital Input with Schmitt trigger"; break;
@@ -547,15 +332,17 @@ public static class MainProgram
         }
     }
 
-    private static void pin_config_OE_output(int i, int a, int b, int c = -1)
+    private static void pin_config_OE_output(int i)
     {
-        if (c >= 0 && g.nvmData[c].ToString().Equals("1"))
+        if (g.GreenPAK.pin[i].SD >= 0 &&
+            g.nvmData[g.GreenPAK.pin[i].SD].ToString().Equals("1"))
         {
             g.GreenPAK.pin[i].description += "Open Drain NMOS 4x";
         }
         else
         {
-            switch (g.nvmData[a].ToString() + g.nvmData[b].ToString())
+            switch (g.nvmData[g.GreenPAK.pin[i].OM + 1].ToString() +
+                    g.nvmData[g.GreenPAK.pin[i].OM + 0].ToString())
             {
                 case "00": g.GreenPAK.pin[i].description += "Push Pull 1x"; break;
                 case "01": g.GreenPAK.pin[i].description += "Push Pull 2x"; break;
@@ -565,9 +352,11 @@ public static class MainProgram
         }
     }
 
-    private static void pin_config_GPIO(int i, int a, int b, int c, int d, int e = -1)
+    private static void pin_config_GPIO(int i)
     {
-        switch (g.nvmData[a].ToString() + g.nvmData[b].ToString() + g.nvmData[c].ToString())
+        switch (g.nvmData[g.GreenPAK.pin[i].IO + 2].ToString() +
+                g.nvmData[g.GreenPAK.pin[i].IO + 1].ToString() +
+                g.nvmData[g.GreenPAK.pin[i].IO + 0].ToString())
         {
             case "000": g.GreenPAK.pin[i].type = "Digital Input"; g.GreenPAK.pin[i].description = "Digital Input without Schmitt trigger"; break;
             case "001": g.GreenPAK.pin[i].type = "Digital Input"; g.GreenPAK.pin[i].description = "Digital Input with Schmitt trigger"; break;
@@ -578,13 +367,15 @@ public static class MainProgram
             case "110": g.GreenPAK.pin[i].type = "Digital Output"; g.GreenPAK.pin[i].description = ("Open Drain PMOS"); break;
             case "111": g.GreenPAK.pin[i].type = "Digital Output"; g.GreenPAK.pin[i].description = ("Open Drain NMOS"); break;
         }
-        if (g.GreenPAK.pin[i].type.Equals("Digital Output") && e >= 0 && g.nvmData[e].ToString().Equals("1"))
+        if (g.GreenPAK.pin[i].type.Equals("Digital Output") &&
+            g.GreenPAK.pin[i].SD >= 0 &&
+            g.nvmData[g.GreenPAK.pin[i].SD].ToString().Equals("1"))
         {
             g.GreenPAK.pin[i].description = "Open Drain NMOS 4x";
         }
         else if (g.GreenPAK.pin[i].type.Equals("Digital Output"))
         {
-            switch (g.nvmData[d].ToString())
+            switch (g.nvmData[g.GreenPAK.pin[i].DR].ToString())
             {
                 case "0": g.GreenPAK.pin[i].description += " 1x"; break;
                 case "1": g.GreenPAK.pin[i].description += " 2x"; break;
@@ -605,7 +396,7 @@ public static class MainProgram
 
     private static void acmp_config_PAK5(int i)
     {
-        int bit = g.GreenPAK.acmp[i].control * 8;
+        int bit = g.GreenPAK.acmp[i].TH * 8;
         int acmpVIH = 0;
         int acmpVIL = 0;
         byte multiplier = 1;
@@ -672,8 +463,8 @@ public static class MainProgram
                 //### include field for External VREF??
         }
 
-        switch (g.nvmData[g.GreenPAK.acmp[i].hyst + 1].ToString() +
-    g.nvmData[g.GreenPAK.acmp[i].hyst].ToString())
+        switch (g.nvmData[g.GreenPAK.acmp[i].HY + 1].ToString() +
+    g.nvmData[g.GreenPAK.acmp[i].HY].ToString())
         {
             case "00":
                 hysteresis = 0;
@@ -708,15 +499,15 @@ public static class MainProgram
 
     private static void acmp_config_PAK4(int i)
     {
-        int bit = g.GreenPAK.acmp[i].control;
+        int bit = g.GreenPAK.acmp[i].TH;
         int acmpVIH = 0;
         int acmpVIL = 0;
         byte multiplier = 1;
         string low_bw = null;
         byte hysteresis = 0;
 
-        switch (g.nvmData[g.GreenPAK.acmp[i].gain + 1].ToString() +
-                g.nvmData[g.GreenPAK.acmp[i].gain + 0].ToString())
+        switch (g.nvmData[g.GreenPAK.acmp[i].GN + 1].ToString() +
+                g.nvmData[g.GreenPAK.acmp[i].GN + 0].ToString())
         {
             case "00": multiplier = 1; break;
             case "01": multiplier = 2; break;
@@ -724,7 +515,7 @@ public static class MainProgram
             case "11": multiplier = 4; break;
         }
 
-        switch (g.nvmData[g.GreenPAK.acmp[i].low_bandwidth].ToString())  // ### still need this? unused
+        switch (g.nvmData[g.GreenPAK.acmp[i].LB].ToString())  // ### still need this? unused
         {
             case "0": low_bw = "OFF"; break;
             case "1": low_bw = "ON"; break;
@@ -776,8 +567,8 @@ public static class MainProgram
                 //### include field for External VREF??
         }
 
-        switch (g.nvmData[g.GreenPAK.acmp[i].hyst + 1].ToString() +
-                g.nvmData[g.GreenPAK.acmp[i].hyst + 0].ToString())
+        switch (g.nvmData[g.GreenPAK.acmp[i].HY + 1].ToString() +
+                g.nvmData[g.GreenPAK.acmp[i].HY + 0].ToString())
         {
             case "00":
                 hysteresis = 0;
@@ -810,42 +601,116 @@ public static class MainProgram
         g.GreenPAK.acmp[i].acmpVIL = acmpVIL.ToString();
     }
 
-    private static void counter_config_PAK5(int i)
+    private static void counter_config(int i)
     {
-        int bit = g.GreenPAK.cnt[i].control * 8;
-
         double freq = 0;
         double time = 0;
         string mode = null;
         string mode_alt = "dly";
 
-        Console.WriteLine("pakfamily = 5");
-        switch (g.nvmData[bit + 7].ToString() + g.nvmData[bit + 6].ToString())
+        switch (g.GreenPAK.PAK_family)
         {
-            case "00": mode = "Delay"; break;
-            case "01": mode = "One-Shot"; break;
-            case "10": mode = "Frequency Detector"; break;
-            case "11": mode = "Counter"; mode_alt = "cnt"; break;
+            case 5:
+                switch (g.nvmData[g.GreenPAK.cnt[i].MD + 1].ToString() +
+                        g.nvmData[g.GreenPAK.cnt[i].MD + 0].ToString())
+                {
+                    case "00": mode = "Delay"; break;
+                    case "01": mode = "One-Shot"; break;
+                    case "10": mode = "Frequency Detector"; break;
+                    case "11": mode = "Counter"; mode_alt = "cnt"; break;
+                }
+
+                switch (g.nvmData[g.GreenPAK.cnt[i].CK + 2].ToString() +
+                        g.nvmData[g.GreenPAK.cnt[i].CK + 1].ToString() +
+                        g.nvmData[g.GreenPAK.cnt[i].CK + 0].ToString())
+                {
+                    case "000": freq = g.GreenPAK.PAK5_osc0; break;
+                    case "001": freq = g.GreenPAK.PAK5_osc0 / 4; break;
+                    case "010": freq = g.GreenPAK.PAK5_osc0 / 12; break;
+                    case "011": freq = g.GreenPAK.PAK5_osc0 / 24; break;
+                    case "100": freq = g.GreenPAK.PAK5_osc0 / 64; break;
+                    case "101": freq = g.GreenPAK.PAK5_osc1; break;
+                        //case "110": break;                        //### include field for External Clock?
+                        //case "111": clk_src = "CNT1_Overflow"; break;
+                }
+                break;
+
+            case 4:
+                switch (g.nvmData[g.GreenPAK.cnt[i].SL].ToString())
+                {
+                    case "0": mode = "Delay"; break;
+                    case "1": mode = "Counter"; mode_alt = "cnt"; break;
+                }
+
+                if (g.GreenPAK.base_die.Equals("SLG46140"))
+                {
+                    switch (g.nvmData[g.GreenPAK.cnt[i].CK + 3].ToString() +
+                            g.nvmData[g.GreenPAK.cnt[i].CK + 2].ToString() +
+                            g.nvmData[g.GreenPAK.cnt[i].CK + 1].ToString() +
+                            g.nvmData[g.GreenPAK.cnt[i].CK + 0].ToString())
+                    {
+                        case "0000": freq = g.GreenPAK.PAK4_RC_osc / 1; break;
+                        case "0001": freq = g.GreenPAK.PAK4_RC_osc / 4; break;
+                        case "0010": freq = g.GreenPAK.PAK4_RC_osc / 12; break;
+                        case "0011": freq = g.GreenPAK.PAK4_RC_osc / 24; break;
+                        case "0100": freq = g.GreenPAK.PAK4_RC_osc / 64; break;
+                        case "0101": freq = -1; break;     // DLY_out
+                        case "0110": freq = -1; break;     // matrix_out
+                        case "0111": freq = -1; break;     // matrix_out / 8
+                        case "1000": freq = g.GreenPAK.PAK4_RING_osc; break;
+                        case "1001": freq = -1; break;     // matrix_out
+                        case "1010": freq = g.GreenPAK.PAK4_LF_osc; break;
+                        case "1011": freq = -1; break;     // ??
+                        case "1100": freq = -1; break;     // ??
+                    }
+                }
+                else
+                {
+                    switch (g.nvmData[g.GreenPAK.cnt[i].CK + 2].ToString() +
+                            g.nvmData[g.GreenPAK.cnt[i].CK + 1].ToString() +
+                            g.nvmData[g.GreenPAK.cnt[i].CK + 0].ToString())
+                    {
+                        case "000": freq = g.GreenPAK.PAK4_RC_osc / 1; break;
+                        case "001": freq = g.GreenPAK.PAK4_RC_osc / 4; break;
+                        case "010": freq = g.GreenPAK.PAK4_RC_osc / 24; break;
+                        case "011": freq = g.GreenPAK.PAK4_RC_osc / 64; break;
+                        case "100": freq = g.GreenPAK.PAK4_LF_osc; break;
+                        case "101": freq = -1; break;     // DLY_out
+                        case "110": freq = g.GreenPAK.PAK4_RING_osc; break;
+                        case "111": freq = -1; break;     // matrix_out
+                    }
+                }
+                break;
+
+            case 3:
+                switch (g.nvmData[g.GreenPAK.cnt[i].SL].ToString())
+                {
+                    case "0": mode = "Delay"; break;
+                    case "1": mode = "Counter"; mode_alt = "cnt"; break;
+                }
+
+                switch (g.nvmData[g.GreenPAK.cnt[i].CK + 2].ToString() +
+                        g.nvmData[g.GreenPAK.cnt[i].CK + 1].ToString() +
+                        g.nvmData[g.GreenPAK.cnt[i].CK + 0].ToString())
+                {
+                    case "000": freq = g.GreenPAK.PAK4_RC_osc / 1; break;
+                    case "001": freq = g.GreenPAK.PAK4_RC_osc / 4; break;
+                    case "010": freq = g.GreenPAK.PAK4_RC_osc / 12; break;
+                    case "011": freq = g.GreenPAK.PAK4_RC_osc / 24; break;
+                    case "100": freq = g.GreenPAK.PAK4_RC_osc / 64; break;
+                    case "101": freq = -1; break;       // External Clock
+                    case "110": freq = -1; break;       // External Clock / 8
+                    case "111": freq = -1; break;       // CounterX Overflow
+                }
+                break;
+
+            default:
+                break;
         }
 
-        switch (g.nvmData[bit + 4].ToString() + g.nvmData[bit + 3].ToString() + g.nvmData[bit + 2].ToString())
-        {
-            case "000": freq = g.GreenPAK.PAK5_osc0; break;
-            case "001": freq = g.GreenPAK.PAK5_osc0 / 4; break;
-            case "010": freq = g.GreenPAK.PAK5_osc0 / 12; break;
-            case "011": freq = g.GreenPAK.PAK5_osc0 / 24; break;
-            case "100": freq = g.GreenPAK.PAK5_osc0 / 64; break;
-            case "101": freq = g.GreenPAK.PAK5_osc1; break;
-                //case "110": break;                        //### include field for External Clock?
-                //case "111": clk_src = "CNT1_Overflow"; break;
-        }
-        //Console.WriteLine("freq = " + freq.ToString());
-
-        string bin = Reverse(g.nvmData.Substring(g.GreenPAK.cnt[i].data * 8, g.GreenPAK.cnt[i].length));
-        //Console.WriteLine("bin = " + bin.ToString());
+        string bin = Reverse(g.nvmData.Substring(g.GreenPAK.cnt[i].DA * 8, g.GreenPAK.cnt[i].LN));
 
         int counter_data = Convert.ToInt32(bin, 2);
-        //Console.WriteLine("counter_data = " + counter_data.ToString());
 
         if (mode.Equals("Counter"))        // ### Build in support for min/max values?
         {
@@ -855,193 +720,17 @@ public static class MainProgram
         {
             time = ((counter_data + 2) * (1 / freq));
         }
-        //Console.WriteLine("counter" + i.ToString() + " data + 1 = " + (counter_data + 1).ToString());
-        //Console.WriteLine("1/freq = " + (1 / freq).ToString());
-        //Console.WriteLine("time0: " + time.ToString());
 
         // SI Prefixes
         if (time < 0.001) { time = time * 1000000; g.GreenPAK.cnt[i].timeSI = "µs"; }
         else if (time < 1) { time = time * 1000; g.GreenPAK.cnt[i].timeSI = "ms"; }
         else { g.GreenPAK.cnt[i].timeSI = "s"; }
-
-        //Console.WriteLine("time1: " + time.ToString());
 
         g.GreenPAK.cnt[i].mode = mode;
         g.GreenPAK.cnt[i].mode_alt = mode_alt;
         g.GreenPAK.cnt[i].time.min = "--";        // ### Build in support for min/max values?
         g.GreenPAK.cnt[i].time.typ = Math.Round(time, 3).ToString();
         g.GreenPAK.cnt[i].time.max = "--";        // ### Build in support for min/max values?
-
-        //Console.WriteLine("Counter" + i.ToString() + " mode: " + g.GreenPAK.cnt[i].mode);
-        //Console.WriteLine("Counter" + i.ToString() + " mode_alt: " + g.GreenPAK.cnt[i].mode_alt);
-        //Console.WriteLine();
-    }
-
-    private static void counter_config_PAK4(int i)
-    {
-        int control = g.GreenPAK.cnt[i].control;
-
-        double freq = 0;
-        double time = 0;
-        string mode = null;
-        string mode_alt = "dly";
-        string bin = null;
-
-        switch (g.nvmData[g.GreenPAK.cnt[i].selected].ToString())
-        {
-            case "0": mode = "Delay"; break;
-            case "1": mode = "Counter"; mode_alt = "cnt"; break;
-        }
-
-        if (g.GreenPAK.base_die.Equals("SLG46140"))
-        {
-            switch (g.nvmData[control + 3].ToString() +
-                    g.nvmData[control + 2].ToString() +
-                    g.nvmData[control + 1].ToString() +
-                    g.nvmData[control + 0].ToString())
-            {
-                case "0000": freq = g.GreenPAK.PAK4_RC_osc / 1; break;
-                case "0001": freq = g.GreenPAK.PAK4_RC_osc / 4; break;
-                case "0010": freq = g.GreenPAK.PAK4_RC_osc / 12; break;
-                case "0011": freq = g.GreenPAK.PAK4_RC_osc / 24; break;
-                case "0100": freq = g.GreenPAK.PAK4_RC_osc / 64; break;
-                case "0101": freq = -1; break;     // DLY_out
-                case "0110": freq = -1; break;     // matrix_out
-                case "0111": freq = -1; break;     // matrix_out / 8
-                case "1000": freq = g.GreenPAK.PAK4_RING_osc; break;
-                case "1001": freq = -1; break;     // matrix_out
-                case "1010": freq = g.GreenPAK.PAK4_LF_osc; break;
-                case "1011": freq = -1; break;     // ??
-                case "1100": freq = -1; break;     // ??
-            }
-        }
-        else
-        {
-            switch (g.nvmData[control + 2].ToString() +
-                    g.nvmData[control + 1].ToString() +
-                    g.nvmData[control + 0].ToString())
-            {
-                case "000": freq = g.GreenPAK.PAK4_RC_osc / 1; break;
-                case "001": freq = g.GreenPAK.PAK4_RC_osc / 4; break;
-                case "010": freq = g.GreenPAK.PAK4_RC_osc / 24; break;
-                case "011": freq = g.GreenPAK.PAK4_RC_osc / 64; break;
-                case "100": freq = g.GreenPAK.PAK4_LF_osc; break;
-                case "101": freq = -1; break;     // DLY_out
-                case "110": freq = g.GreenPAK.PAK4_RING_osc; break;
-                case "111": freq = -1; break;     // matrix_out
-            }
-        }
-
-        bin = Reverse(g.nvmData.Substring(g.GreenPAK.cnt[i].data, g.GreenPAK.cnt[i].length));
-
-        //Console.WriteLine("bin = " + bin.ToString());
-
-        int counter_data = Convert.ToInt32(bin, 2);
-        //Console.WriteLine("counter_data = " + counter_data.ToString());
-
-        if (mode.Equals("Counter"))        // ### Build in support for min/max values?
-        {
-            time = ((counter_data + 1) * (1 / freq));
-        }
-        else
-        {
-            time = ((counter_data + 2) * (1 / freq));
-        }
-
-        // SI Prefixes
-        if (time < 0.001) { time = time * 1000000; g.GreenPAK.cnt[i].timeSI = "µs"; }
-        else if (time < 1) { time = time * 1000; g.GreenPAK.cnt[i].timeSI = "ms"; }
-        else { g.GreenPAK.cnt[i].timeSI = "s"; }
-
-        //Console.WriteLine("time1: " + time.ToString());
-
-        g.GreenPAK.cnt[i].mode = mode;
-        g.GreenPAK.cnt[i].mode_alt = mode_alt;
-        g.GreenPAK.cnt[i].time.min = "--";        // ### Build in support for min/max values?
-        if (freq < 0)
-        {
-            g.GreenPAK.cnt[i].time.typ = "###";
-        }
-        else
-        {
-            g.GreenPAK.cnt[i].time.typ = Math.Round(time, 3).ToString();
-        }
-        g.GreenPAK.cnt[i].time.max = "--";        // ### Build in support for min/max values?
-
-        //Console.WriteLine("Counter" + i.ToString() + " mode: " + g.GreenPAK.cnt[i].mode);
-        //Console.WriteLine("Counter" + i.ToString() + " mode_alt: " + g.GreenPAK.cnt[i].mode_alt);
-        //Console.WriteLine();
-    }
-
-    private static void counter_config_PAK3(int i)
-    {
-        int control = g.GreenPAK.cnt[i].control;
-
-        double freq = 0;
-        double time = 0;
-        string mode = null;
-        string mode_alt = "dly";
-        string bin = null;
-
-        switch (g.nvmData[g.GreenPAK.cnt[i].selected].ToString())
-        {
-            case "0": mode = "Delay"; break;
-            case "1": mode = "Counter"; mode_alt = "cnt"; break;
-        }
-
-        switch (g.nvmData[control + 2].ToString() +
-                g.nvmData[control + 1].ToString() +
-                g.nvmData[control + 0].ToString())
-        {
-            case "000": freq = g.GreenPAK.PAK4_RC_osc / 1; break;
-            case "001": freq = g.GreenPAK.PAK4_RC_osc / 4; break;
-            case "010": freq = g.GreenPAK.PAK4_RC_osc / 12; break;
-            case "011": freq = g.GreenPAK.PAK4_RC_osc / 24; break;
-            case "100": freq = g.GreenPAK.PAK4_RC_osc / 64; break;
-            case "101": freq = -1; break;       // External Clock
-            case "110": freq = -1; break;       // External Clock / 8
-            case "111": freq = -1; break;       // CounterX Overflow
-        }
-
-        bin = Reverse(g.nvmData.Substring(g.GreenPAK.cnt[i].data, g.GreenPAK.cnt[i].length));
-
-        //Console.WriteLine("bin = " + bin.ToString());
-
-        int counter_data = Convert.ToInt32(bin, 2);
-        //Console.WriteLine("counter_data = " + counter_data.ToString());
-
-        if (mode.Equals("Counter"))        // ### Build in support for min/max values?
-        {
-            time = ((counter_data + 1) * (1 / freq));
-        }
-        else
-        {
-            time = ((counter_data + 2) * (1 / freq));
-        }
-
-        // SI Prefixes
-        if (time < 0.001) { time = time * 1000000; g.GreenPAK.cnt[i].timeSI = "µs"; }
-        else if (time < 1) { time = time * 1000; g.GreenPAK.cnt[i].timeSI = "ms"; }
-        else { g.GreenPAK.cnt[i].timeSI = "s"; }
-
-        //Console.WriteLine("time1: " + time.ToString());
-
-        g.GreenPAK.cnt[i].mode = mode;
-        g.GreenPAK.cnt[i].mode_alt = mode_alt;
-        g.GreenPAK.cnt[i].time.min = "--";        // ### Build in support for min/max values?
-        if (freq < 0)
-        {
-            g.GreenPAK.cnt[i].time.typ = "###";
-        }
-        else
-        {
-            g.GreenPAK.cnt[i].time.typ = Math.Round(time, 3).ToString();
-        }
-        g.GreenPAK.cnt[i].time.max = "--";        // ### Build in support for min/max values?
-
-        //Console.WriteLine("Counter" + i.ToString() + " mode: " + g.GreenPAK.cnt[i].mode);
-        //Console.WriteLine("Counter" + i.ToString() + " mode_alt: " + g.GreenPAK.cnt[i].mode_alt);
-        //Console.WriteLine();
     }
 
     private static string HexStringToBinary(string hex)
@@ -1434,10 +1123,10 @@ public static class MainProgram
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(3, "Creating PAKs");
 
-        PAK.createPAKs();
+        //PAK.createPAKs();
 
-        if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Selecting PAK");
+        //if (worker.CancellationPending) { e.Cancel = true; return; }
+        //form.backgroundWorker.ReportProgress(3, "Selecting PAK");
 
         // GreenPAK5
         foreach (XElement chip in g.ELEMENT.Descendants("chip")
@@ -1445,12 +1134,12 @@ public static class MainProgram
         {
             switch (chip.Attribute("revision").Value)
             {
-                case "1": g.GreenPAK = PAKs.SLG46531; break;
-                case "2": g.GreenPAK = PAKs.SLG46532; break;
-                case "3": g.GreenPAK = PAKs.SLG46533; break;
-                case "4": g.GreenPAK = PAKs.SLG46534; break;
-                case "5": g.GreenPAK = PAKs.SLG46535; break;
-                case "6": g.GreenPAK = PAKs.SLG46536; break;
+                case "1": PAK.createPAKs("SLG46531"); g.GreenPAK = PAKs.SLG46531; break;
+                case "2": PAK.createPAKs("SLG46532"); g.GreenPAK = PAKs.SLG46532; break;
+                case "3": PAK.createPAKs("SLG46533"); g.GreenPAK = PAKs.SLG46533; break;
+                case "4": PAK.createPAKs("SLG46534"); g.GreenPAK = PAKs.SLG46534; break;
+                case "5": PAK.createPAKs("SLG46535"); g.GreenPAK = PAKs.SLG46535; break;
+                case "6": PAK.createPAKs("SLG46536"); g.GreenPAK = PAKs.SLG46536; break;
                 default: break;
             }
         }
@@ -1460,9 +1149,9 @@ public static class MainProgram
         {
             switch (chip.Attribute("revision").Value)
             {
-                case "1": g.GreenPAK = PAKs.SLG46140; break;
-                case "2": g.GreenPAK = PAKs.SLG46620; break;
-                case "6": g.GreenPAK = PAKs.SLG46621; break;
+                case "1": PAK.createPAKs("SLG46140"); g.GreenPAK = PAKs.SLG46140; break;
+                case "2": PAK.createPAKs("SLG46620"); g.GreenPAK = PAKs.SLG46620; break;
+                case "6": PAK.createPAKs("SLG46621"); g.GreenPAK = PAKs.SLG46621; break;
                 default: break;
             }
         }
@@ -1472,14 +1161,14 @@ public static class MainProgram
         {
             switch (chip.Attribute("revision").Value)
             {
-                case "2": g.GreenPAK = PAKs.SLG46721; break;
-                case "3": g.GreenPAK = PAKs.SLG46722; break;
-                case "4": g.GreenPAK = PAKs.SLG46110; break;
-                case "5": g.GreenPAK = PAKs.SLG46120; break;
-                case "6": g.GreenPAK = PAKs.SLG46116; break;
-                case "7": g.GreenPAK = PAKs.SLG46117; break;
-                case "11": g.GreenPAK = PAKs.SLG46121; break;
-                case "12": g.GreenPAK = PAKs.SLG46108; break;
+                case "2": PAK.createPAKs("SLG46721"); g.GreenPAK = PAKs.SLG46721; break;
+                case "3": PAK.createPAKs("SLG46722"); g.GreenPAK = PAKs.SLG46722; break;
+                case "4": PAK.createPAKs("SLG46110"); g.GreenPAK = PAKs.SLG46110; break;
+                case "5": PAK.createPAKs("SLG46120"); g.GreenPAK = PAKs.SLG46120; break;
+                case "6": PAK.createPAKs("SLG46116"); g.GreenPAK = PAKs.SLG46116; break;
+                case "7": PAK.createPAKs("SLG46117"); g.GreenPAK = PAKs.SLG46117; break;
+                case "11": PAK.createPAKs("SLG46121"); g.GreenPAK = PAKs.SLG46121; break;
+                case "12": PAK.createPAKs("SLG46108"); g.GreenPAK = PAKs.SLG46108; break;
                 default: break;
             }
         }
@@ -1625,7 +1314,7 @@ public static class MainProgram
         {
             for (int i = 1; i < g.GreenPAK.pin.Length; i++)
             {
-                if (g.GreenPAK.pin[i].pin_type.Equals("VDD"))
+                if (g.GreenPAK.pin[i].PT.Equals("VDD"))
                 {
                     g.doc.Variables["pin" + i.ToString() + "_label"].Value = "VDD";
                     g.GreenPAK.pin[i].name = "VDD";
@@ -1633,7 +1322,7 @@ public static class MainProgram
                     g.GreenPAK.pin[i].type = "PWR";
                     g.GreenPAK.pin[i].description = "Supply Voltage";
                 }
-                else if (g.GreenPAK.pin[i].pin_type.Equals("GND"))
+                else if (g.GreenPAK.pin[i].PT.Equals("GND"))
                 {
                     g.doc.Variables["pin" + i.ToString() + "_label"].Value = "GND";
                     g.GreenPAK.pin[i].name = "GND";
@@ -1641,7 +1330,7 @@ public static class MainProgram
                     g.GreenPAK.pin[i].type = "GND";
                     g.GreenPAK.pin[i].description = "Ground";
                 }
-                else if (g.GreenPAK.dual_supply.Equals(true) && g.GreenPAK.pin[i].pin_type.Equals("VDD2"))
+                else if (g.GreenPAK.dual_supply.Equals(true) && g.GreenPAK.pin[i].PT.Equals("VDD2"))
                 {
                     g.doc.Variables["pin" + i.ToString() + "_label"].Value = "VDD2";
                     g.GreenPAK.pin[i].name = "VDD2";
@@ -1672,12 +1361,7 @@ public static class MainProgram
 
                         if (pin.Element("textLabel") != null)
                         {
-                            switch (g.GreenPAK.PAK_family)
-                            {
-                                case 5: pin_config_PAK5(i, g.GreenPAK.pin[i].address, g.GreenPAK.pin[i].pin_type); break;
-                                case 4: pin_config_PAK4(i, g.GreenPAK.pin[i].address, g.GreenPAK.pin[i].pin_type); break;
-                                case 3: pin_config_PAK3(i, g.GreenPAK.pin[i].address, g.GreenPAK.pin[i].pin_type); break;  //###
-                            }
+                            pin_config(i);
                             g.GreenPAK.pin[i].name = pin.Element("textLabel").Value;
                             g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
                         }
@@ -2001,29 +1685,38 @@ public static class MainProgram
                     if (counter.Element("graphics").Attribute("hidden").Value.Equals("0"))
                     {
                         if (g.GreenPAK.PAK_family.Equals(5) &&
-                            g.nvmData[g.GreenPAK.cnt[i].selected].ToString().Equals("1"))
+                            g.nvmData[g.GreenPAK.cnt[i].SL].ToString().Equals("1"))
                         {
                             g.GreenPAK.cnt[i].used = true;
-                            counter_config_PAK5(i);
+                            counter_config(i);
                             break;
                         }
                         else if (g.GreenPAK.PAK_family.Equals(4))
                         {
-                            switch (g.nvmData[g.GreenPAK.cnt[i].selected + 1].ToString() +
-                                    g.nvmData[g.GreenPAK.cnt[i].selected + 0].ToString())
+                            switch (g.nvmData[g.GreenPAK.cnt[i].SL + 1].ToString())
                             {
-                                case "00":
-                                case "01":
+                                case "0":
                                     g.GreenPAK.cnt[i].used = true;
-                                    counter_config_PAK4(i);
+                                    counter_config(i);
                                     break;
                             }
                             break;
                         }
                         else if (g.GreenPAK.PAK_family.Equals(3))
                         {
-                            g.GreenPAK.cnt[i].used = true;
-                            counter_config_PAK3(i);
+                            if (g.GreenPAK.cnt[i].SL != 0)
+                            {
+                                if (g.nvmData[g.GreenPAK.cnt[i].SL].ToString().Equals("1"))
+                                {
+                                    g.GreenPAK.cnt[i].used = true;
+                                    counter_config(i);
+                                }
+                            }
+                            else
+                            {
+                                g.GreenPAK.cnt[i].used = true;
+                                counter_config(i);
+                            }
                         }
                     }
                 }
