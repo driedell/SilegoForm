@@ -357,5 +357,11 @@ namespace SilegoForm
         {
             MainProgram.g.DS_rev_change = DS_rev_change_textbox.Text;
         }
+
+        private void lock_checkbox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (lock_status_checkbox.Checked) MainProgram.g.lock_status_update = true;
+            else MainProgram.g.lock_status_update = false;
+        }
     }
 }

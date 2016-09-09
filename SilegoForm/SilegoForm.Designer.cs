@@ -65,6 +65,7 @@ namespace SilegoForm
             this.cancel_button = new System.Windows.Forms.Button();
             this.DS_rev_change_textbox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.lock_status_checkbox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.SilegoLogo)).BeginInit();
             this.SuspendLayout();
             // 
@@ -428,12 +429,24 @@ namespace SilegoForm
             this.label2.Text = "DS Rev \r\nChange:";
             this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // lock_checkbox
+            // 
+            this.lock_status_checkbox.AutoSize = true;
+            this.lock_status_checkbox.Location = new System.Drawing.Point(12, 130);
+            this.lock_status_checkbox.Name = "lock_checkbox";
+            this.lock_status_checkbox.Size = new System.Drawing.Size(83, 17);
+            this.lock_status_checkbox.TabIndex = 54;
+            this.lock_status_checkbox.Text = "Lock Status";
+            this.lock_status_checkbox.UseVisualStyleBackColor = true;
+            this.lock_status_checkbox.CheckedChanged += new System.EventHandler(this.lock_checkbox_CheckedChanged);
+            // 
             // SilegoForm
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(384, 362);
+            this.Controls.Add(this.lock_status_checkbox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.DS_rev_change_textbox);
             this.Controls.Add(this.start_button);
@@ -515,5 +528,6 @@ namespace SilegoForm
         public Button cancel_button;
         private TextBox DS_rev_change_textbox;
         private Label label2;
+        private CheckBox lock_status_checkbox;
     }
 }
