@@ -19,9 +19,7 @@ public static class MainProgram
         public static Microsoft.Office.Interop.Word.Document doc;
         public static OleDbConnection connection = new OleDbConnection();
 
-        // ### update the paths below
         public static string GreenPAK_File = null;
-
         public static string DataSheet_File = null;
         public static string templatePath = @"P:\Apps_Tools\New_DS_Template\";
 
@@ -178,7 +176,9 @@ public static class MainProgram
 
                 // ### check this section
 
-                if (g.GreenPAK.base_die.Equals("SLG46108"))
+                if (g.GreenPAK.base_die.Equals("SLG46108") ||
+                    g.GreenPAK.base_die.Equals("SLG46116") ||
+                    g.GreenPAK.base_die.Equals("SLG46117"))
                 {
                     if (g.nvmData.Substring(OE, 5).Equals("00000")) { g.GreenPAK.pin[i].type = "Digital Input"; }
                     else if (g.nvmData.Substring(OE, 5).Equals("11111")) { g.GreenPAK.pin[i].type = "Digital Output"; }
@@ -213,7 +213,7 @@ public static class MainProgram
 
             case "I2C":
                 pin_config_resistor(i);
-                switch (g.nvmData[g.GreenPAK.pin[i].UD].ToString())  // Check if we're using I2C ### check if works
+                switch (g.nvmData[g.GreenPAK.pin[i].UD].ToString())  // Check if we're using I2C
                 {
                     case "0":                           // I2C is used
                         g.GreenPAK.pin[i].type = "I2C";
@@ -407,112 +407,8 @@ public static class MainProgram
         return null;
     }
 
-    private static void acmp_config_PAK5(int i)
+    private static void acmp_config(int i)
     {
-        int bit = g.GreenPAK.acmp[i].TH * 8;
-        int acmpVIH = 0;
-        int acmpVIL = 0;
-        byte multiplier = 1;
-        string low_bw = null;
-        byte hysteresis = 0;
-
-        switch (g.nvmData[bit + 6].ToString() + g.nvmData[bit + 5].ToString())
-        {
-            case "00": multiplier = 1; break;
-            case "01": multiplier = 2; break;
-            case "10": multiplier = 3; break;
-            case "11": multiplier = 4; break;
-        }
-
-        switch (g.nvmData[bit + 7].ToString())  // ### still need this? unused
-        {
-            case "0": low_bw = "OFF"; break;
-            case "1": low_bw = "ON"; break;
-        }
-
-        switch (g.nvmData[bit + 4].ToString() +
-                g.nvmData[bit + 3].ToString() +
-                g.nvmData[bit + 2].ToString() +
-                g.nvmData[bit + 1].ToString() +
-                g.nvmData[bit + 0].ToString())
-        {
-            case "00000": acmpVIH = 0050 * multiplier; acmpVIL = 0050 * multiplier; break;
-            case "00001": acmpVIH = 0100 * multiplier; acmpVIL = 0100 * multiplier; break;
-            case "00010": acmpVIH = 0150 * multiplier; acmpVIL = 0150 * multiplier; break;
-            case "00011": acmpVIH = 0200 * multiplier; acmpVIL = 0200 * multiplier; break;
-            case "00100": acmpVIH = 0250 * multiplier; acmpVIL = 0250 * multiplier; break;
-            case "00101": acmpVIH = 0300 * multiplier; acmpVIL = 0300 * multiplier; break;
-            case "00110": acmpVIH = 0350 * multiplier; acmpVIL = 0350 * multiplier; break;
-            case "00111": acmpVIH = 0400 * multiplier; acmpVIL = 0400 * multiplier; break;
-            case "01000": acmpVIH = 0450 * multiplier; acmpVIL = 0450 * multiplier; break;
-            case "01001": acmpVIH = 0500 * multiplier; acmpVIL = 0500 * multiplier; break;
-            case "01010": acmpVIH = 0550 * multiplier; acmpVIL = 0550 * multiplier; break;
-            case "01011": acmpVIH = 0600 * multiplier; acmpVIL = 0600 * multiplier; break;
-            case "01100": acmpVIH = 0650 * multiplier; acmpVIL = 0650 * multiplier; break;
-            case "01101": acmpVIH = 0700 * multiplier; acmpVIL = 0700 * multiplier; break;
-            case "01110": acmpVIH = 0750 * multiplier; acmpVIL = 0750 * multiplier; break;
-            case "01111": acmpVIH = 0800 * multiplier; acmpVIL = 0800 * multiplier; break;
-            case "10000": acmpVIH = 0850 * multiplier; acmpVIL = 0850 * multiplier; break;
-            case "10001": acmpVIH = 0900 * multiplier; acmpVIL = 0900 * multiplier; break;
-            case "10010": acmpVIH = 0950 * multiplier; acmpVIL = 0950 * multiplier; break;
-            case "10011": acmpVIH = 1000 * multiplier; acmpVIL = 1000 * multiplier; break;
-            case "10100": acmpVIH = 1050 * multiplier; acmpVIL = 1050 * multiplier; break;
-            case "10101": acmpVIH = 1100 * multiplier; acmpVIL = 1100 * multiplier; break;
-            case "10110": acmpVIH = 1150 * multiplier; acmpVIL = 1150 * multiplier; break;
-            case "10111": acmpVIH = 1200 * multiplier; acmpVIL = 1200 * multiplier; break;
-            case "11000":
-                acmpVIH = (int)Convert.ToDouble(g.GreenPAK.vdd.typ) * 1000 / 3;
-                acmpVIL = (int)Convert.ToDouble(g.GreenPAK.vdd.typ) * 1000 / 3;
-                break;
-
-            case "11001":
-                acmpVIH = (int)Convert.ToDouble(g.GreenPAK.vdd.typ) * 1000 / 4;
-                acmpVIL = (int)Convert.ToDouble(g.GreenPAK.vdd.typ) * 1000 / 4;
-                break;
-                //case "11010": acmpVIH = EXT_VREF; break;
-                //case "11011": acmpVIH = EXT_VREF; break;
-                //case "11100": acmpVIH = EXT_VREF / 2; break;
-                //case "11101": acmpVIH = EXT_VREF / 2; break;
-                //### include field for External VREF??
-        }
-
-        switch (g.nvmData[g.GreenPAK.acmp[i].HY + 1].ToString() +
-    g.nvmData[g.GreenPAK.acmp[i].HY].ToString())
-        {
-            case "00":
-                hysteresis = 0;
-                break;
-
-            case "01":
-                hysteresis = 25;
-                acmpVIH = (int)(acmpVIH + (12.5 * multiplier));
-                acmpVIL = (int)(acmpVIL - (12.5 * multiplier));
-                break;
-
-            case "10":
-                hysteresis = 50;
-                acmpVIL = acmpVIL - (50 * multiplier);
-                break;
-
-            case "11":
-                hysteresis = 200;
-                acmpVIL = acmpVIL - (200 * multiplier);
-                break;
-        }
-        if (acmpVIL < 0)
-        {
-            acmpVIL = 0;
-        }
-
-        g.GreenPAK.acmp[i].low_bw = low_bw;
-        g.GreenPAK.acmp[i].hysteresis = hysteresis.ToString();
-        g.GreenPAK.acmp[i].acmpVIH = acmpVIH.ToString();
-        g.GreenPAK.acmp[i].acmpVIL = acmpVIL.ToString();
-    }
-
-    private static void acmp_config_PAK4(int i)
-    {
-        int bit = g.GreenPAK.acmp[i].TH;
         int acmpVIH = 0;
         int acmpVIL = 0;
         byte multiplier = 1;
@@ -534,11 +430,11 @@ public static class MainProgram
             case "1": low_bw = "ON"; break;
         }
 
-        switch (g.nvmData[bit + 4].ToString() +
-                g.nvmData[bit + 3].ToString() +
-                g.nvmData[bit + 2].ToString() +
-                g.nvmData[bit + 1].ToString() +
-                g.nvmData[bit + 0].ToString())
+        switch (g.nvmData[g.GreenPAK.acmp[i].TH + 4].ToString() +
+                g.nvmData[g.GreenPAK.acmp[i].TH + 3].ToString() +
+                g.nvmData[g.GreenPAK.acmp[i].TH + 2].ToString() +
+                g.nvmData[g.GreenPAK.acmp[i].TH + 1].ToString() +
+                g.nvmData[g.GreenPAK.acmp[i].TH + 0].ToString())
         {
             case "00000": acmpVIH = 0050 * multiplier; acmpVIL = 0050 * multiplier; break;
             case "00001": acmpVIH = 0100 * multiplier; acmpVIL = 0100 * multiplier; break;
@@ -1311,67 +1207,73 @@ public static class MainProgram
         g.doc.Variables["Pattern_ID"].Value = Convert.ToInt32(pattern, 2).ToString().PadLeft(3, '0');
 
         // Locked/Unlocked
-        if (g.GreenPAK.PAK_family.Equals(5))
+        if (g.new_part_update)
         {
             foreach (Table table in g.doc.Tables)
             {
                 if (table.Title == "lock_table")
                 {
-                    while (table.Rows.Count < 4)
+                    if (g.GreenPAK.PAK_family.Equals(5))
                     {
-                        table.Rows.Add();
+                        while (table.Rows.Count < 4)
+                        {
+                            table.Rows.Add();
+                        }
+
+                        table.Cell(1, 2).Range.Text = "Unlocked";
+                        table.Cell(2, 2).Range.Text = "Locked for read, bits <1535:0> ";
+                        table.Cell(3, 2).Range.Text = "Locked for write, bits <1535:0>";
+                        table.Cell(4, 2).Range.Text = "Locked for read and write, bits <1535:0>";
+
+                        break;
                     }
-
-                    table.Cell(1, 2).Range.Text = "Unlocked";
-                    table.Cell(2, 2).Range.Text = "Locked for read, bits <1535:0> ";
-                    table.Cell(3, 2).Range.Text = "Locked for write, bits <1535:0>";
-                    table.Cell(4, 2).Range.Text = "Locked for read and write, bits <1535:0>";
-
-                    for (int i = 0; i < table.Rows.Count; i++)
+                    else if (g.GreenPAK.PAK_family.Equals(4) ||
+                             g.GreenPAK.PAK_family.Equals(3))
                     {
-                        table.Cell(i, 1).Range.Text = "";
+                        table.Delete();
+                        break;
                     }
-
-                    string nvm_lock = null;
-                    switch (g.nvmData[g.GreenPAK.PAK5_nvm_read_lock].ToString() +
-                            g.nvmData[g.GreenPAK.PAK5_nvm_write_lock].ToString())
-                    {
-                        case "00": nvm_lock = "U"; table.Cell(1, 1).Range.Text = "X"; break;
-                        case "01": nvm_lock = "L"; table.Cell(3, 1).Range.Text = "X"; break;
-                        case "10": nvm_lock = "L"; table.Cell(2, 1).Range.Text = "X"; break;
-                        case "11": nvm_lock = "L"; table.Cell(4, 1).Range.Text = "X"; break;
-                    }
-                    g.doc.Variables["NVM_lock"].Value = nvm_lock;
-
-                    break;
                 }
             }
         }
-        else if (g.GreenPAK.PAK_family.Equals(4) ||
-                 g.GreenPAK.PAK_family.Equals(3))
+
+        if (g.lock_status_update)
         {
+            string nvm_lock = null;
+
             foreach (Table table in g.doc.Tables)
             {
                 if (table.Title == "lock_table")
                 {
-                    table.Cell(1, 2).Range.Text = "Unlocked";
-                    table.Cell(2, 2).Range.Text = "Locked";
-
-                    string nvm_lock = null;
-                    switch (g.nvmData[g.GreenPAK.lock_status].ToString())
+                    if (g.GreenPAK.PAK_family.Equals(5))
                     {
-                        case "0": nvm_lock = "U"; table.Cell(1, 1).Range.Text = "X"; break;
-                        case "1": nvm_lock = "L"; table.Cell(2, 1).Range.Text = "X"; break;
-                    }
-                    g.doc.Variables["NVM_lock"].Value = nvm_lock;
+                        for (int i = 0; i < table.Rows.Count; i++)
+                        {
+                            table.Cell(i, 1).Range.Text = "";
+                        }
 
-                    break;
+                        switch (g.nvmData[g.GreenPAK.PAK5_nvm_read_lock].ToString() +
+                                g.nvmData[g.GreenPAK.PAK5_nvm_write_lock].ToString())
+                        {
+                            case "00": nvm_lock = "U"; table.Cell(1, 1).Range.Text = "X"; break;
+                            case "01": nvm_lock = "L"; table.Cell(3, 1).Range.Text = "X"; break;
+                            case "10": nvm_lock = "L"; table.Cell(2, 1).Range.Text = "X"; break;
+                            case "11": nvm_lock = "L"; table.Cell(4, 1).Range.Text = "X"; break;
+                        }
+                    }
+                    else if (g.GreenPAK.PAK_family.Equals(4) ||
+                             g.GreenPAK.PAK_family.Equals(3))
+                    {
+                        switch (g.nvmData[g.GreenPAK.lock_status].ToString())
+                        {
+                            case "0": nvm_lock = "U"; break;
+                            case "1": nvm_lock = "L"; break;
+                        }
+                    }
                 }
             }
+            g.doc.Variables["NVM_lock"].Value = nvm_lock;
         }
-
-        //### GreenPAK4 Lock
-        //### GreenPAK3 Lock
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  Pin Labels and Settings
@@ -1850,12 +1752,7 @@ public static class MainProgram
                     if (acmp.Element("graphics").Attribute("hidden").Value.Equals("0"))
                     {
                         g.GreenPAK.acmp[i].used = true;
-                        switch (g.GreenPAK.PAK_family)
-                        {
-                            case 5: acmp_config_PAK5(i); break;
-                            case 4: acmp_config_PAK4(i); break;
-                            case 3: break; //###
-                        }
+                        acmp_config(i);
                     }
                 }
             }

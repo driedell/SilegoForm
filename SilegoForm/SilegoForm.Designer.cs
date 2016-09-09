@@ -247,7 +247,7 @@ namespace SilegoForm
             // pin_settings_checkbox
             // 
             this.pin_settings_checkbox.AutoSize = true;
-            this.pin_settings_checkbox.Location = new System.Drawing.Point(125, 130);
+            this.pin_settings_checkbox.Location = new System.Drawing.Point(12, 130);
             this.pin_settings_checkbox.Name = "pin_settings_checkbox";
             this.pin_settings_checkbox.Size = new System.Drawing.Size(82, 17);
             this.pin_settings_checkbox.TabIndex = 35;
@@ -429,11 +429,11 @@ namespace SilegoForm
             this.label2.Text = "DS Rev \r\nChange:";
             this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // lock_checkbox
+            // lock_status_checkbox
             // 
             this.lock_status_checkbox.AutoSize = true;
-            this.lock_status_checkbox.Location = new System.Drawing.Point(12, 130);
-            this.lock_status_checkbox.Name = "lock_checkbox";
+            this.lock_status_checkbox.Location = new System.Drawing.Point(125, 131);
+            this.lock_status_checkbox.Name = "lock_status_checkbox";
             this.lock_status_checkbox.Size = new System.Drawing.Size(83, 17);
             this.lock_status_checkbox.TabIndex = 54;
             this.lock_status_checkbox.Text = "Lock Status";
