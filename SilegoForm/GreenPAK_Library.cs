@@ -532,6 +532,7 @@
             PAKs.SLG46140.RC_osc_pre_div = 568;
             PAKs.SLG46140.RING_osc_freq = 27250000;
             PAKs.SLG46140.RING_osc_pre_div = 576;
+            PAKs.SLG46140.lock_status = 1015;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -601,6 +602,7 @@
             PAKs.SLG46620.RC_osc_pre_div = 1643;
             PAKs.SLG46620.RING_osc_freq = 27250000;
             PAKs.SLG46620.RING_osc_pre_div = 1635;
+            PAKs.SLG46620.lock_status = 2039;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -672,6 +674,7 @@
             PAKs.SLG46621.RC_osc_pre_div = 1643;
             PAKs.SLG46621.RING_osc_freq = 27250000;
             PAKs.SLG46621.RING_osc_pre_div = 1635;
+            PAKs.SLG46621.lock_status = 2039;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -732,6 +735,7 @@
             PAKs.SLG46721.RC_osc_freq_alt = 2000000;
             PAKs.SLG46721.RC_osc_src = 0708;
             PAKs.SLG46721.RC_osc_pre_div = 0565;
+            PAKs.SLG46721.lock_status = 979;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -793,6 +797,7 @@
             PAKs.SLG46722.RC_osc_freq_alt = 2000000;
             PAKs.SLG46722.RC_osc_src = 0970;
             PAKs.SLG46722.RC_osc_pre_div = 975;
+            PAKs.SLG46722.lock_status = 979;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -840,6 +845,7 @@
             PAKs.SLG46110.RC_osc_freq_alt = 2000000;
             PAKs.SLG46110.RC_osc_src = 0303;
             PAKs.SLG46110.RC_osc_pre_div = 0304;
+            PAKs.SLG46110.lock_status = 450;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -887,6 +893,7 @@
             PAKs.SLG46120.RC_osc_freq_alt = 2000000;
             PAKs.SLG46120.RC_osc_src = 0536;
             PAKs.SLG46120.RC_osc_pre_div = 0537;
+            PAKs.SLG46120.lock_status = 712;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -931,6 +938,7 @@
             PAKs.SLG46116.RC_osc_freq_alt = 2000000;
             PAKs.SLG46116.RC_osc_src = 0303;
             PAKs.SLG46116.RC_osc_pre_div = 0304;
+            PAKs.SLG46116.lock_status = 450;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -975,6 +983,7 @@
             PAKs.SLG46117.RC_osc_freq_alt = 2000000;
             PAKs.SLG46117.RC_osc_src = 0303;
             PAKs.SLG46117.RC_osc_pre_div = 0304;
+            PAKs.SLG46117.lock_status = 450;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1024,6 +1033,7 @@
             PAKs.SLG46121.RC_osc_freq_alt = 2000000;
             PAKs.SLG46121.RC_osc_src = 0536;
             PAKs.SLG46121.RC_osc_pre_div = 0537;
+            PAKs.SLG46121.lock_status = 712;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1066,6 +1076,7 @@
                 "and encodes information including part number, programming code number, date code and lot code." + 
                 "This same information is provided in plain text form on a label placed on the reel. If you " +
                 "need assistance in decoding the SN Code, please contact Silego.";
+            PAKs.SLG46108.lock_status = 402;
         }
     }
 
