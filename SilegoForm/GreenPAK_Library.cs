@@ -78,6 +78,7 @@
             public byte LN;         // Length (number of bits)
             public int MD;          // Counter mode (count/delay/etc)
             public int SL;          // Selected (counter vs LUT)
+            public byte CS;         // Clock Source length (4 bits vs 3 bits)
 
             public bool used;
             public string mode;
@@ -514,10 +515,10 @@
             };
             PAKs.SLG46140.cnt = new CNT[]
             {
-                new CNT() { CK = 0737, DA = 0722, LN = 16, MD = 0743, SL = 0743 },    // 0
-                new CNT() { CK = 0714, DA = 0705, LN = 08, MD = 0720, SL = 0720 },    // 1
-                new CNT() { CK = 0695, DA = 0680, LN = 08, MD = 0701, SL = 0701 },    // 2
-                new CNT() { CK = 0670, DA = 0661, LN = 08, MD = 0676, SL = 0676 },    // 3
+                new CNT() { CK = 0737, DA = 0722, LN = 16, MD = 0743, SL = 0743, CS = 4 },    // 0
+                new CNT() { CK = 0714, DA = 0705, LN = 08, MD = 0720, SL = 0720, CS = 4 },    // 1
+                new CNT() { CK = 0695, DA = 0680, LN = 08, MD = 0701, SL = 0701, CS = 4 },    // 2
+                new CNT() { CK = 0670, DA = 0661, LN = 08, MD = 0676, SL = 0676, CS = 4 },    // 3
             };
             PAKs.SLG46140.acmp = new ACMP[]
             {
@@ -574,16 +575,16 @@
             };
             PAKs.SLG46620.cnt = new CNT[]
             {
-                new CNT() { CK = 1745, DA = 1731, LN = 14, MD = 1750, SL = 1750 },    // 0
-                new CNT() { CK = 1767, DA = 1753, LN = 14, MD = 1772, SL = 1772 },    // 1
-                new CNT() { CK = 1788, DA = 1774, LN = 14, MD = 1794, SL = 1794 },    // 2
-                new CNT() { CK = 1813, DA = 1799, LN = 14, MD = 1818, SL = 1818 },    // 3
-                new CNT() { CK = 1828, DA = 1820, LN = 08, MD = 1834, SL = 0000 },    // 4
-                new CNT() { CK = 1846, DA = 1838, LN = 08, MD = 1851, SL = 0000 },    // 5
-                new CNT() { CK = 1860, DA = 1852, LN = 08, MD = 1865, SL = 0000 },    // 6
-                new CNT() { CK = 1874, DA = 1866, LN = 08, MD = 1879, SL = 0000 },    // 7
-                new CNT() { CK = 1888, DA = 1880, LN = 08, MD = 1894, SL = 0000 },    // 8
-                new CNT() { CK = 1903, DA = 1895, LN = 08, MD = 1909, SL = 0000 },    // 9
+                new CNT() { CK = 1745, DA = 1731, LN = 14, MD = 1750, SL = 1750, CS = 3 },    // 0
+                new CNT() { CK = 1767, DA = 1753, LN = 14, MD = 1772, SL = 1772, CS = 3 },    // 1
+                new CNT() { CK = 1788, DA = 1774, LN = 14, MD = 1794, SL = 1794, CS = 4 },    // 2
+                new CNT() { CK = 1813, DA = 1799, LN = 14, MD = 1818, SL = 1818, CS = 3 },    // 3
+                new CNT() { CK = 1828, DA = 1820, LN = 08, MD = 1834, SL = 0000, CS = 4 },    // 4
+                new CNT() { CK = 1846, DA = 1838, LN = 08, MD = 1851, SL = 0000, CS = 3 },    // 5
+                new CNT() { CK = 1860, DA = 1852, LN = 08, MD = 1865, SL = 0000, CS = 3 },    // 6
+                new CNT() { CK = 1874, DA = 1866, LN = 08, MD = 1879, SL = 0000, CS = 3 },    // 7
+                new CNT() { CK = 1888, DA = 1880, LN = 08, MD = 1894, SL = 0000, CS = 4 },    // 8
+                new CNT() { CK = 1903, DA = 1895, LN = 08, MD = 1909, SL = 0000, CS = 4 },    // 9
             };
             PAKs.SLG46620.acmp = new ACMP[]
             {
@@ -620,7 +621,7 @@
             PAKs.SLG46621.dual_supply = true;
             PAKs.SLG46621.dual_supply_vdd_pins = "PIN2-PIN10";
             PAKs.SLG46621.dual_supply_vdd2_pins = "PIN12-PIN20";
-            PAKs.SLG46620.pin = new PIN[]
+            PAKs.SLG46621.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
                 new PIN() { PT = "VDD",                                                                               },    // 01
@@ -646,16 +647,16 @@
             };
             PAKs.SLG46621.cnt = new CNT[]
             {
-                new CNT() { CK = 1745, DA = 1731, LN = 14, MD = 1750, SL = 1750 },    // 0
-                new CNT() { CK = 1767, DA = 1753, LN = 14, MD = 1772, SL = 1772 },    // 1
-                new CNT() { CK = 1788, DA = 1774, LN = 14, MD = 1794, SL = 1794 },    // 2
-                new CNT() { CK = 1813, DA = 1799, LN = 14, MD = 1818, SL = 1818 },    // 3
-                new CNT() { CK = 1828, DA = 1820, LN = 08, MD = 1834, SL = 0000 },    // 4
-                new CNT() { CK = 1846, DA = 1838, LN = 08, MD = 1851, SL = 0000 },    // 5
-                new CNT() { CK = 1860, DA = 1852, LN = 08, MD = 1865, SL = 0000 },    // 6
-                new CNT() { CK = 1874, DA = 1866, LN = 08, MD = 1879, SL = 0000 },    // 7
-                new CNT() { CK = 1888, DA = 1880, LN = 08, MD = 1894, SL = 0000 },    // 8
-                new CNT() { CK = 1903, DA = 1895, LN = 08, MD = 1909, SL = 0000 },    // 9
+                new CNT() { CK = 1745, DA = 1731, LN = 14, MD = 1750, SL = 1750, CS = 3 },    // 0
+                new CNT() { CK = 1767, DA = 1753, LN = 14, MD = 1772, SL = 1772, CS = 3 },    // 1
+                new CNT() { CK = 1788, DA = 1774, LN = 14, MD = 1794, SL = 1794, CS = 4 },    // 2
+                new CNT() { CK = 1813, DA = 1799, LN = 14, MD = 1818, SL = 1818, CS = 3 },    // 3
+                new CNT() { CK = 1828, DA = 1820, LN = 08, MD = 1834, SL = 0000, CS = 4 },    // 4
+                new CNT() { CK = 1846, DA = 1838, LN = 08, MD = 1851, SL = 0000, CS = 3 },    // 5
+                new CNT() { CK = 1860, DA = 1852, LN = 08, MD = 1865, SL = 0000, CS = 3 },    // 6
+                new CNT() { CK = 1874, DA = 1866, LN = 08, MD = 1879, SL = 0000, CS = 3 },    // 7
+                new CNT() { CK = 1888, DA = 1880, LN = 08, MD = 1894, SL = 0000, CS = 4 },    // 8
+                new CNT() { CK = 1903, DA = 1895, LN = 08, MD = 1909, SL = 0000, CS = 4 },    // 9
             };
             PAKs.SLG46621.acmp = new ACMP[]
             {
@@ -1067,6 +1068,9 @@
                 new CNT() { CK = 0320, DA = 0323, LN = 08, MD = 0318, SL = 0001 },    // 1
                 new CNT() { CK = 0270, DA = 0273, LN = 08, MD = 0269, SL = 0285 },    // 2
                 new CNT() { CK = 0336, DA = 0339, LN = 08, MD = 0335, SL = 0001 },    // 3
+            };
+            PAKs.SLG46108.acmp = new ACMP[]
+            {
             };
             PAKs.SLG46108.RC_osc_freq = 25000;
             PAKs.SLG46108.RC_osc_freq_alt = 2000000;

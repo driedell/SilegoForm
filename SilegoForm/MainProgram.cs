@@ -34,6 +34,7 @@ public static class MainProgram
         public static bool lock_status_update = false;
         public static bool TM_part_code_update = false;
         public static bool TM_revision_update = false;
+        public static bool ext_clk_update = false;
 
         public static string I_Q = "1.0";
         public static string TM_part_code = "~~";
@@ -42,6 +43,7 @@ public static class MainProgram
         public static string DS_rev_change = null;
         public static string Date = null;
         public static string part_number = "SLG~~~~~";
+        public static int ext_clk_freq = 0;
 
         //public static PAK GreenPAK;
         public static PAK GreenPAK;
@@ -182,13 +184,13 @@ public static class MainProgram
                 {
                     if (g.nvmData.Substring(OE, 5).Equals("00000")) { g.GreenPAK.pin[i].type = "Digital Input"; }
                     else if (g.nvmData.Substring(OE, 5).Equals("11111")) { g.GreenPAK.pin[i].type = "Digital Output"; }
-                    else { g.GreenPAK.pin[i].type = "Digital Input/Output"; }
+                    else { g.GreenPAK.pin[i].type = "Digital I/O"; }
                 }
                 else
                 {
                     if (g.nvmData.Substring(OE, 6).Equals("000000")) { g.GreenPAK.pin[i].type = "Digital Input"; }
                     else if (g.nvmData.Substring(OE, 6).Equals("111111")) { g.GreenPAK.pin[i].type = "Digital Output"; }
-                    else { g.GreenPAK.pin[i].type = "Digital Input/Output"; }
+                    else { g.GreenPAK.pin[i].type = "Digital I/O"; }
                 }
                 switch (g.GreenPAK.pin[i].type)
                 {
@@ -196,7 +198,7 @@ public static class MainProgram
 
                     case "Digital Output": pin_config_OE_output(i); break;
 
-                    case "Digital Input/Output":
+                    case "Digital I/O":
                         pin_config_OE_input(i);
                         g.GreenPAK.pin[i].description += " /\n";
                         pin_config_OE_output(i);
@@ -233,7 +235,7 @@ public static class MainProgram
 
                 if (g.nvmData.Substring(OE, 6).Equals("000000")) { g.GreenPAK.pin[i].type = "Digital Input"; }
                 else if (g.nvmData.Substring(OE, 6).Equals("111111")) { g.GreenPAK.pin[i].type = "Digital Output"; }
-                else { g.GreenPAK.pin[i].type = "Digital Input/Output"; }
+                else { g.GreenPAK.pin[i].type = "Digital I/O"; }
 
                 switch (g.GreenPAK.pin[i].type)
                 {
@@ -241,7 +243,7 @@ public static class MainProgram
 
                     case "Digital Output": pin_config_OE_output(i); break;
 
-                    case "Digital Input/Output":
+                    case "Digital I/O":
                         pin_config_OE_input(i);
                         g.GreenPAK.pin[i].description += " /\n";
                         pin_config_OE_output(i);
@@ -539,8 +541,8 @@ public static class MainProgram
                     case "011": freq = g.GreenPAK.RC_osc_freq / 24; break;
                     case "100": freq = g.GreenPAK.RC_osc_freq / 64; break;
                     case "101": freq = g.GreenPAK.RING_osc_freq; break;
-                        //case "110": break;                        //### include field for External Clock?
-                        //case "111": clk_src = "CNT1_Overflow"; break;
+                    case "110": freq = g.ext_clk_freq; break;
+                    case "111": freq = -1; g.GreenPAK.cnt[i].used = false; return;
                 }
                 break;
 
@@ -551,7 +553,7 @@ public static class MainProgram
                     case "1": mode = "Counter"; mode_alt = "cnt"; break;
                 }
 
-                if (g.GreenPAK.base_die.Equals("SLG46140"))
+                if (g.GreenPAK.cnt[i].CS.Equals(4))
                 {
                     switch (g.nvmData[g.GreenPAK.cnt[i].CK + 3].ToString() +
                             g.nvmData[g.GreenPAK.cnt[i].CK + 2].ToString() +
@@ -563,17 +565,17 @@ public static class MainProgram
                         case "0010": freq = g.GreenPAK.RC_osc_freq / 12; break;
                         case "0011": freq = g.GreenPAK.RC_osc_freq / 24; break;
                         case "0100": freq = g.GreenPAK.RC_osc_freq / 64; break;
-                        case "0101": freq = -1; break;     // DLY_out
-                        case "0110": freq = -1; break;     // matrix_out
-                        case "0111": freq = -1; break;     // matrix_out / 8
+                        case "0101": freq = -1; g.GreenPAK.cnt[i].used = false; return;     // DLY_out
+                        case "0110": freq = -1; g.GreenPAK.cnt[i].used = false; return;     // matrix_out
+                        case "0111": freq = -1; g.GreenPAK.cnt[i].used = false; return;     // matrix_out / 8
                         case "1000": freq = g.GreenPAK.RING_osc_freq; break;
-                        case "1001": freq = -1; break;     // matrix_out
+                        case "1001": freq = -1; g.GreenPAK.cnt[i].used = false; return;     // matrix_out
                         case "1010": freq = g.GreenPAK.LF_osc_freq; break;
-                        case "1011": freq = -1; break;     // ??
-                        case "1100": freq = -1; break;     // ??
+                        case "1011": freq = -1; g.GreenPAK.cnt[i].used = false; return;     // ??
+                        case "1100": freq = -1; g.GreenPAK.cnt[i].used = false; return;     // ??
                     }
                 }
-                else
+                else if (g.GreenPAK.cnt[i].CS.Equals(3))
                 {
                     switch (g.nvmData[g.GreenPAK.cnt[i].CK + 2].ToString() +
                             g.nvmData[g.GreenPAK.cnt[i].CK + 1].ToString() +
@@ -584,9 +586,9 @@ public static class MainProgram
                         case "010": freq = g.GreenPAK.RC_osc_freq / 24; break;
                         case "011": freq = g.GreenPAK.RC_osc_freq / 64; break;
                         case "100": freq = g.GreenPAK.LF_osc_freq; break;
-                        case "101": freq = -1; break;     // DLY_out
+                        case "101": freq = -1; g.GreenPAK.cnt[i].used = false; return;     // DLY_out
                         case "110": freq = g.GreenPAK.RING_osc_freq; break;
-                        case "111": freq = -1; break;     // matrix_out
+                        case "111": freq = -1; g.GreenPAK.cnt[i].used = false; return;     // matrix_out
                     }
                 }
                 break;
@@ -607,9 +609,9 @@ public static class MainProgram
                     case "010": freq = g.GreenPAK.RC_osc_freq / 12; break;
                     case "011": freq = g.GreenPAK.RC_osc_freq / 24; break;
                     case "100": freq = g.GreenPAK.RC_osc_freq / 64; break;
-                    case "101": freq = -1; break;       // External Clock
-                    case "110": freq = -1; break;       // External Clock / 8
-                    case "111": freq = -1; break;       // CounterX Overflow
+                    case "101": freq = -1; g.GreenPAK.cnt[i].used = false; return;       // External Clock
+                    case "110": freq = -1; g.GreenPAK.cnt[i].used = false; return;       // External Clock / 8
+                    case "111": freq = -1; g.GreenPAK.cnt[i].used = false; return;       // CounterX Overflow
                 }
                 break;
 
@@ -1368,7 +1370,8 @@ public static class MainProgram
             if (g.VDD.ODP1x > 0) { output_summary += "\n\r" + (g.VDD.ODP1x + g.VDD2.ODP1x).ToString() + " Output \u2014 Open Drain PMOS 1x"; }
             if (g.VDD.ODP2x > 0) { output_summary += "\n\r" + (g.VDD.ODP2x + g.VDD2.ODP2x).ToString() + " Output \u2014 Open Drain PMOS 2x"; }
 
-            g.doc.Variables["output_summary"].Value = output_summary.Substring(3);
+            try { g.doc.Variables["output_summary"].Value = output_summary.Substring(3);  }
+            catch { }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1536,7 +1539,37 @@ public static class MainProgram
                     pin_cell_config(12, 380, 120, 'U');
                     break;
 
-                case 8:                             //###
+                case 8:
+                    foreach (Shape shape in g.doc.Shapes)
+                    {
+                        if (shape.Title == "pinout_diagram")
+                        {
+                            int left = (int)shape.Left;
+                            int top = (int)shape.Top;
+                            int width = (int)shape.Width;
+                            int height = (int)shape.Height;
+
+                            shape.Delete();
+
+                            Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"Resources\STQFN_8.png");
+                            newShape.Title = "pinout_diagram";
+                            newShape.RelativeHorizontalPosition = WdRelativeHorizontalPosition.wdRelativeHorizontalPositionPage;
+                            newShape.RelativeVerticalPosition = WdRelativeVerticalPosition.wdRelativeVerticalPositionPage;
+                            newShape.Left = left;
+                            newShape.Top = top;
+                            newShape.Width = width;
+                            newShape.Height = height;
+                            break;
+                        }
+                    }
+                    pin_cell_config(01, 264, 222, 'L');
+                    pin_cell_config(02, 264, 242, 'L');
+                    pin_cell_config(03, 264, 262, 'L');
+                    pin_cell_config(04, 380, 300, 'D');
+                    pin_cell_config(05, 430, 262, 'R');
+                    pin_cell_config(06, 430, 242, 'R');
+                    pin_cell_config(07, 430, 222, 'R');
+                    pin_cell_config(08, 380, 120, 'U');
                     break;
 
                 default: break;
@@ -1742,7 +1775,7 @@ public static class MainProgram
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(3, "Loading ACMP settings");
 
-        if (g.ACMPs_update)
+        if (g.ACMPs_update && (g.GreenPAK.acmp.Length > 0))
         {
             for (int i = 0; i < g.GreenPAK.acmp.Length; i++)
             {
@@ -1780,7 +1813,10 @@ public static class MainProgram
         int symbolRow = 0;
 
         string VDD_DB = null;
-        double VDD_typ = Convert.ToDouble(g.GreenPAK.vdd.typ);
+        double VDD_min = Convert.ToDouble(g.GreenPAK.vdd.min);
+        double VDD_max = Convert.ToDouble(g.GreenPAK.vdd.max);
+
+        double VDD_typ = (VDD_max + VDD_min) / 2;
 
         if ((Math.Abs(VDD_typ - 1.8) < Math.Abs(VDD_typ - 3.3)) &&
             (Math.Abs(VDD_typ - 1.8) < Math.Abs(VDD_typ - 5.0)))
@@ -1802,8 +1838,11 @@ public static class MainProgram
         }
 
         string VDD2_DB = null;
-        double VDD2_typ = Convert.ToDouble(g.GreenPAK.vdd2.typ);
-        if (g.GreenPAK.dual_supply)
+        double VDD2_min = Convert.ToDouble(g.GreenPAK.vdd2.min);
+        double VDD2_max = Convert.ToDouble(g.GreenPAK.vdd2.max);
+
+        double VDD2_typ = (VDD2_max + VDD2_min) / 2; if (g.GreenPAK.dual_supply)
+
         {
             if ((Math.Abs(VDD2_typ - 1.8) < Math.Abs(VDD2_typ - 3.3)) &&
                 (Math.Abs(VDD2_typ - 1.8) < Math.Abs(VDD2_typ - 5.0)))
@@ -1851,10 +1890,11 @@ public static class MainProgram
         {
             if (table.Title == "ec_table")
             {
-                //table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitContent);
-
                 if (g.pin_settings_update || g.temp_vdd_update)
                 {
+                    ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    //  VDD2
+                    ////////////////////////////////////////////////////////////////////////////////////////////////////
                     if (g.GreenPAK.dual_supply)
                     {
                         symbolRow = EC_row_symbol(table, "VDD2");
@@ -2256,11 +2296,11 @@ public static class MainProgram
             if (table.Title == "DRH")
             {
                 table.Rows.Add();
-                int a = table.Rows.Count;
+                int DRH_row = table.Rows.Count - 1;
 
-                table.Cell(a - 1, 1).Range.Text = DateTime.Now.ToString("MM/dd/yyyy");
-                table.Cell(a - 1, 2).Range.Text = g.DS_rev.Insert(1, ".");
-                table.Cell(a - 1, 3).Range.Text = g.DS_rev_change;
+                table.Cell(DRH_row, 1).Range.Text = DateTime.Now.ToString("MM/dd/yyyy");
+                table.Cell(DRH_row, 2).Range.Text = g.DS_rev.Insert(1, ".");
+                table.Cell(DRH_row, 3).Range.Text = g.DS_rev_change;
 
                 break;
             }

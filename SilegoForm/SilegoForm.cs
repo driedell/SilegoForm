@@ -9,7 +9,7 @@ namespace SilegoForm
         public SilegoForm()
         {
             InitializeComponent();
-            MaximumSize = new System.Drawing.Size(400, 400);
+            MaximumSize = new System.Drawing.Size(400, 500);
         }
 
         private void DS_rev_combobox_SelectedIndexChanged(object sender, EventArgs e)
@@ -100,7 +100,7 @@ namespace SilegoForm
             // Start the BackgroundWorker.
         }
 
-        private void Start_Button_Click(object sender, EventArgs e)
+        private void start_button_Click(object sender, EventArgs e)
         {
             //Console.WriteLine(MainProgram.g.GreenPAK_File);
             //Console.WriteLine(MainProgram.g.DataSheet_File);
@@ -127,6 +127,8 @@ namespace SilegoForm
             I_Q_checkbox.Enabled = false;
             TM_Part_Code_checkbox.Enabled = false;
             TM_Revision_checkbox.Enabled = false;
+            lock_status_checkbox.Enabled = false;
+
 
             progressBar.Visible = true;
             status_label.Visible = true;
@@ -190,9 +192,9 @@ namespace SilegoForm
                 I_Q_checkbox.Enabled = true;
                 TM_Part_Code_checkbox.Enabled = true;
                 TM_Revision_checkbox.Enabled = true;
+                lock_status_checkbox.Enabled = true;
 
                 progressBar.Visible = false;
-                status_label.Visible = false;
             }
             else
             {
@@ -289,7 +291,7 @@ namespace SilegoForm
             {
                 MainProgram.g.TM_part_code_update = false;
                 TM_Part_Code_textbox.Enabled = false;
-                TM_Part_Code_textbox.Text = "--";
+                TM_Part_Code_textbox.Text = "";
             }
         }
 
@@ -309,7 +311,7 @@ namespace SilegoForm
             {
                 MainProgram.g.TM_revision_update = false;
                 TM_Revision_textbox.Enabled = false;
-                TM_Revision_textbox.Text = "--";
+                TM_Revision_textbox.Text = "";
             }
         }
 
@@ -334,16 +336,16 @@ namespace SilegoForm
         {
             if (help_checkbox.Checked)
             {
-                Size = new System.Drawing.Size(700, 400);
-                MaximumSize = new System.Drawing.Size(700, 400);
-                MinimumSize = new System.Drawing.Size(700, 400);
+                Size = new System.Drawing.Size(700, 500);
+                MaximumSize = new System.Drawing.Size(700, 500);
+                MinimumSize = new System.Drawing.Size(700, 500);
                 help_textbox.Visible = true;
             }
             else if (!help_checkbox.Checked)
             {
-                Size = new System.Drawing.Size(400, 400);
-                MaximumSize = new System.Drawing.Size(400, 400);
-                MinimumSize = new System.Drawing.Size(400, 400);
+                Size = new System.Drawing.Size(400, 500);
+                MaximumSize = new System.Drawing.Size(400, 500);
+                MinimumSize = new System.Drawing.Size(400, 500);
                 help_textbox.Visible = false;
             }
         }
@@ -363,5 +365,6 @@ namespace SilegoForm
             if (lock_status_checkbox.Checked) MainProgram.g.lock_status_update = true;
             else MainProgram.g.lock_status_update = false;
         }
+
     }
 }
