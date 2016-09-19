@@ -1104,6 +1104,8 @@ public static class MainProgram
                 case "7": PAK.createSLG46117(); g.GreenPAK = PAKs.SLG46117; break;
                 case "11": PAK.createSLG46121(); g.GreenPAK = PAKs.SLG46121; break;
                 case "12": PAK.createSLG46108(); g.GreenPAK = PAKs.SLG46108; break;
+                case "13": PAK.createSLG46169(); g.GreenPAK = PAKs.SLG46169; break;
+                case "14": PAK.createSLG46170(); g.GreenPAK = PAKs.SLG46170; break;
                 default: break;
             }
         }

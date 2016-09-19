@@ -487,7 +487,6 @@
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         internal static void createSLG50003()
         {
-
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -495,7 +494,63 @@
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         internal static void createSLG46533M()
         {
-
+            PAKs.SLG46533M = new PAK();
+            PAKs.SLG46533M.base_die = "SLG46533M";
+            PAKs.SLG46533M.package = "MSTQFN-22L";
+            PAKs.SLG46533M.package_size = "2mm x 3mm";
+            PAKs.SLG46533M.PAK_family = 5;
+            PAKs.SLG46533M.package_weight = "0.0058 g";
+            PAKs.SLG46533M.pattern_id_address = 1840;
+            PAKs.SLG46533M.dual_supply = false;
+            PAKs.SLG46533M.pin = new PIN[]
+            {
+                new PIN() { PT = "NA",                                                                                },    // 00
+                new PIN() { PT = "GPI",     RV = 1028, IM = 1030,                                             VS = 1  },    // 01
+                new PIN() { PT = "GPIO_OE", RV = 1034, UD = 1033, IM = 1036, OM = 1038, OE = 0208,            VS = 1  },    // 02
+                new PIN() { PT = "GPIO",    RV = 1043, UD = 1042, IO = 1045, DR = 1041,                       VS = 1  },    // 03
+                new PIN() { PT = "GPIO_OE", RV = 1050, UD = 1049, IM = 1052, OM = 1054, OE = 0232,            VS = 1  },    // 04
+                new PIN() { PT = "GPIO",    RV = 1059, UD = 1058, IO = 1061, DR = 1057,                       VS = 1  },    // 05
+                new PIN() { PT = "GPIO_OE", RV = 1066, UD = 1065, IM = 1068, OM = 1070, OE = 0256,            VS = 1  },    // 06
+                new PIN() { PT = "I2C",     RV = 1083, UD = 1082, IO = 1085, DR = 1081,                       VS = 1  },    // 07
+                new PIN() { PT = "SD_OE",   RV = 1090, UD = 1089, IM = 1092, OM = 1094, OE = 0288, SD = 1088, VS = 1  },    // 08
+                new PIN() { PT = "NA",                                                                                },    // 09
+                new PIN() { PT = "NA",                                                                                },    // 10
+                new PIN() { PT = "GPIO_OE", RV = 1106, UD = 1105, IM = 1108, OM = 1110, OE = 0312,            VS = 1  },    // 11
+                new PIN() { PT = "GPIO_OE", RV = 1114, UD = 1113, IM = 1116, OM = 1118, OE = 0328,            VS = 1  },    // 12
+                new PIN() { PT = "GPIO_OE", RV = 1130, UD = 1129, IM = 1132, OM = 1134, OE = 0352,            VS = 1  },    // 13
+                new PIN() { PT = "GPIO",    RV = 1139, UD = 1138, IO = 1141, DR = 1137,                       VS = 1  },    // 14
+                new PIN() { PT = "GPIO_OE", RV = 1154, UD = 1153, IM = 1156, OM = 1158, OE = 0392,            VS = 1  },    // 15
+                new PIN() { PT = "VDD",                                                                               },    // 16
+                new PIN() { PT = "GPIO",    RV = 1163, UD = 1162, IO = 1165, DR = 1161,                       VS = 1  },    // 17
+                new PIN() { PT = "GPIO_OE", RV = 1146, UD = 1145, IM = 1148, OM = 1150, OE = 0376,            VS = 1  },    // 18
+                new PIN() { PT = "I2C",     RV = 1075, UD = 1074, IO = 1077, DR = 1073,                       VS = 1  },    // 19
+                new PIN() { PT = "GND",                                                                               },    // 20
+                new PIN() { PT = "SD",      RV = 1099, UD = 1098, IO = 1101, DR = 1097,            SD = 1096, VS = 1  },    // 21
+                new PIN() { PT = "GPIO",    RV = 1123, UD = 1122, IO = 1125, DR = 1121,                       VS = 1  },    // 22
+          };
+            PAKs.SLG46533M.cnt = new CNT[]
+            {
+                    new CNT() { CK = 1314, DA = 1576, LN = 16, MD = 1318, SL = 1193 },    // 0
+                    new CNT() { CK = 1322, DA = 1592, LN = 16, MD = 1326, SL = 1192 },    // 1
+                    new CNT() { CK = 1274, DA = 1536, LN = 8,  MD = 1278, SL = 1198 },    // 2
+                    new CNT() { CK = 1282, DA = 1544, LN = 8,  MD = 1286, SL = 1197 },    // 3
+                    new CNT() { CK = 1290, DA = 1552, LN = 8,  MD = 1294, SL = 1196 },    // 4
+                    new CNT() { CK = 1298, DA = 1560, LN = 8,  MD = 1302, SL = 1195 },    // 5
+                    new CNT() { CK = 1306, DA = 1568, LN = 8,  MD = 1310, SL = 1194 },    // 6
+            };
+            PAKs.SLG46533M.acmp = new ACMP[]
+            {
+                    new ACMP() { TH = 1624, GN = 1629, LB = 1629, HY = 1174 },    // 0
+                    new ACMP() { TH = 1632, GN = 1637, LB = 1639, HY = 1170 },    // 1
+                    new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
+                    new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
+            };
+            PAKs.SLG46533M.RC_osc_freq = 25000;
+            PAKs.SLG46533M.RC_osc_freq_alt = 2000000;
+            PAKs.SLG46533M.RC_osc_src = 1342;
+            PAKs.SLG46533M.RC_osc_pre_div = 1339;
+            PAKs.SLG46533M.RING_osc_freq = 25000000;
+            PAKs.SLG46533M.RING_osc_pre_div = 1336;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -503,7 +558,61 @@
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         internal static void createSLG46537()
         {
-
+            PAKs.SLG46537 = new PAK();
+            PAKs.SLG46537.base_die = "SLG46537";
+            PAKs.SLG46537.package = "STQFN-20L";
+            PAKs.SLG46537.package_size = "2mm x 3mm";
+            PAKs.SLG46537.PAK_family = 5;
+            PAKs.SLG46537.package_weight = "0.0090 g";
+            PAKs.SLG46537.pattern_id_address = 1840;
+            PAKs.SLG46537.dual_supply = false;
+            PAKs.SLG46537.pin = new PIN[]
+            {
+                new PIN() { PT = "NA",                                                                                },    // 00
+                new PIN() { PT = "VDD",                                                                               },    // 01
+                new PIN() { PT = "GPI",     RV = 1028, IM = 1030,                                             VS = 1  },    // 02
+                new PIN() { PT = "GPIO_OE", RV = 1034, UD = 1033, IM = 1036, OM = 1038, OE = 0208,            VS = 1  },    // 03
+                new PIN() { PT = "GPIO",    RV = 1043, UD = 1042, IO = 1045, DR = 1041,                       VS = 1  },    // 04
+                new PIN() { PT = "GPIO_OE", RV = 1050, UD = 1049, IM = 1052, OM = 1054, OE = 0232,            VS = 1  },    // 05
+                new PIN() { PT = "GPIO",    RV = 1059, UD = 1058, IO = 1061, DR = 1057,                       VS = 1  },    // 06
+                new PIN() { PT = "GPIO_OE", RV = 1066, UD = 1065, IM = 1068, OM = 1070, OE = 0256,            VS = 1  },    // 07
+                new PIN() { PT = "I2C",     RV = 1075, UD = 1074, IO = 1077, DR = 1073,                       VS = 1  },    // 08
+                new PIN() { PT = "I2C",     RV = 1083, UD = 1082, IO = 1085, DR = 1081,                       VS = 1  },    // 09
+                new PIN() { PT = "SD_OE",   RV = 1090, UD = 1089, IM = 1092, OM = 1094, OE = 0288, SD = 1088, VS = 1  },    // 10
+                new PIN() { PT = "GND",                                                                               },    // 11
+                new PIN() { PT = "SD",      RV = 1099, UD = 1098, IO = 1101, DR = 1097,            SD = 1096, VS = 1  },    // 12
+                new PIN() { PT = "GPIO_OE", RV = 1106, UD = 1105, IM = 1108, OM = 1110, OE = 0312,            VS = 1  },    // 13
+                new PIN() { PT = "GPIO_OE", RV = 1114, UD = 1113, IM = 1116, OM = 1118, OE = 0328,            VS = 1  },    // 14
+                new PIN() { PT = "GPIO",    RV = 1123, UD = 1122, IO = 1125, DR = 1121,                       VS = 1  },    // 15
+                new PIN() { PT = "GPIO_OE", RV = 1130, UD = 1129, IM = 1132, OM = 1134, OE = 0352,            VS = 1  },    // 16
+                new PIN() { PT = "GPIO",    RV = 1139, UD = 1138, IO = 1141, DR = 1137,                       VS = 1  },    // 17
+                new PIN() { PT = "GPIO_OE", RV = 1146, UD = 1145, IM = 1148, OM = 1150, OE = 0376,            VS = 1  },    // 18
+                new PIN() { PT = "GPIO_OE", RV = 1154, UD = 1153, IM = 1156, OM = 1158, OE = 0392,            VS = 1  },    // 19
+                new PIN() { PT = "GPIO",    RV = 1163, UD = 1162, IO = 1165, DR = 1161,                       VS = 1  },    // 20
+            };
+            PAKs.SLG46537.cnt = new CNT[]
+            {
+                new CNT() { CK = 1314, DA = 1576, LN = 16, MD = 1318, SL = 1193 },    // 0
+                new CNT() { CK = 1322, DA = 1592, LN = 16, MD = 1326, SL = 1192 },    // 1
+                new CNT() { CK = 1274, DA = 1536, LN = 8,  MD = 1278, SL = 1198 },    // 2
+                new CNT() { CK = 1282, DA = 1544, LN = 8,  MD = 1286, SL = 1197 },    // 3
+                new CNT() { CK = 1290, DA = 1552, LN = 8,  MD = 1294, SL = 1196 },    // 4
+                new CNT() { CK = 1298, DA = 1560, LN = 8,  MD = 1302, SL = 1195 },    // 5
+                new CNT() { CK = 1306, DA = 1568, LN = 8,  MD = 1310, SL = 1194 },    // 6
+            };
+            PAKs.SLG46537.acmp = new ACMP[]
+            {
+                new ACMP() { TH = 1624, GN = 1629, LB = 1629, HY = 1174 },    // 0
+                new ACMP() { TH = 1632, GN = 1637, LB = 1639, HY = 1170 },    // 1
+                new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
+                new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
+            };
+            PAKs.SLG46537.RC_osc_freq = 25000;
+            PAKs.SLG46537.RC_osc_freq_alt = 2000000;
+            PAKs.SLG46537.RC_osc_src = 1342;
+            PAKs.SLG46537.RC_osc_pre_div = 1339;
+            PAKs.SLG46537.RING_osc_freq = 25000000;
+            PAKs.SLG46537.RING_osc_pre_div = 1336;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -511,7 +620,63 @@
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         internal static void createSLG46538()
         {
-
+            PAKs.SLG46538 = new PAK();
+            PAKs.SLG46538.base_die = "SLG46538";
+            PAKs.SLG46538.package = "STQFN-20L";
+            PAKs.SLG46538.package_size = "2mm x 3mm";
+            PAKs.SLG46538.PAK_family = 5;
+            PAKs.SLG46538.package_weight = "0.0090 g";
+            PAKs.SLG46538.pattern_id_address = 1840;
+            PAKs.SLG46538.dual_supply = true;
+            PAKs.SLG46538.dual_supply_vdd_pins = "PIN2-PIN10";
+            PAKs.SLG46538.dual_supply_vdd2_pins = "PIN12-PIN20";
+            PAKs.SLG46538.pin = new PIN[]
+            {
+                new PIN() { PT = "NA",                                                                                },    // 00
+                new PIN() { PT = "VDD",                                                                               },    // 01
+                new PIN() { PT = "GPI",     RV = 1028, IM = 1030,                                             VS = 1  },    // 02
+                new PIN() { PT = "GPIO_OE", RV = 1034, UD = 1033, IM = 1036, OM = 1038, OE = 0208,            VS = 1  },    // 03
+                new PIN() { PT = "GPIO",    RV = 1043, UD = 1042, IO = 1045, DR = 1041,                       VS = 1  },    // 04
+                new PIN() { PT = "GPIO_OE", RV = 1050, UD = 1049, IM = 1052, OM = 1054, OE = 0232,            VS = 1  },    // 05
+                new PIN() { PT = "GPIO",    RV = 1059, UD = 1058, IO = 1061, DR = 1057,                       VS = 1  },    // 06
+                new PIN() { PT = "GPIO_OE", RV = 1066, UD = 1065, IM = 1068, OM = 1070, OE = 0256,            VS = 1  },    // 07
+                new PIN() { PT = "I2C",     RV = 1075, UD = 1074, IO = 1077, DR = 1073,                       VS = 1  },    // 08
+                new PIN() { PT = "I2C",     RV = 1083, UD = 1082, IO = 1085, DR = 1081,                       VS = 1  },    // 09
+                new PIN() { PT = "SD_OE",   RV = 1090, UD = 1089, IM = 1092, OM = 1094, OE = 0288, SD = 1088, VS = 1  },    // 10
+                new PIN() { PT = "GND",                                                                               },    // 11
+                new PIN() { PT = "SD",      RV = 1099, UD = 1098, IO = 1101, DR = 1097,            SD = 1096, VS = 2  },    // 12
+                new PIN() { PT = "GPIO_OE", RV = 1106, UD = 1105, IM = 1108, OM = 1110, OE = 0312,            VS = 2  },    // 13
+                new PIN() { PT = "VDD2",                                                                              },    // 14
+                new PIN() { PT = "GPIO",    RV = 1123, UD = 1122, IO = 1125, DR = 1121,                       VS = 2  },    // 15
+                new PIN() { PT = "GPIO_OE", RV = 1130, UD = 1129, IM = 1132, OM = 1134, OE = 0352,            VS = 2  },    // 16
+                new PIN() { PT = "GPIO",    RV = 1139, UD = 1138, IO = 1141, DR = 1137,                       VS = 2  },    // 17
+                new PIN() { PT = "GPIO_OE", RV = 1146, UD = 1145, IM = 1148, OM = 1150, OE = 0376,            VS = 2  },    // 18
+                new PIN() { PT = "GPIO_OE", RV = 1154, UD = 1153, IM = 1156, OM = 1158, OE = 0392,            VS = 2  },    // 19
+                new PIN() { PT = "GPIO",    RV = 1163, UD = 1162, IO = 1165, DR = 1161,                       VS = 2  },    // 20
+            };
+            PAKs.SLG46538.cnt = new CNT[]
+            {
+                new CNT() { CK = 1314, DA = 1576, LN = 16, MD = 1318, SL = 1193 },    // 0
+                new CNT() { CK = 1322, DA = 1592, LN = 16, MD = 1326, SL = 1192 },    // 1
+                new CNT() { CK = 1274, DA = 1536, LN = 8,  MD = 1278, SL = 1198 },    // 2
+                new CNT() { CK = 1282, DA = 1544, LN = 8,  MD = 1286, SL = 1197 },    // 3
+                new CNT() { CK = 1290, DA = 1552, LN = 8,  MD = 1294, SL = 1196 },    // 4
+                new CNT() { CK = 1298, DA = 1560, LN = 8,  MD = 1302, SL = 1195 },    // 5
+                new CNT() { CK = 1306, DA = 1568, LN = 8,  MD = 1310, SL = 1194 },    // 6
+            };
+            PAKs.SLG46538.acmp = new ACMP[]
+            {
+                new ACMP() { TH = 1624, GN = 1629, LB = 1629, HY = 1174 },    // 0
+                new ACMP() { TH = 1632, GN = 1637, LB = 1639, HY = 1170 },    // 1
+                new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
+                new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
+            };
+            PAKs.SLG46538.RC_osc_freq = 25000;
+            PAKs.SLG46538.RC_osc_freq_alt = 2000000;
+            PAKs.SLG46538.RC_osc_src = 1342;
+            PAKs.SLG46538.RC_osc_pre_div = 1339;
+            PAKs.SLG46538.RING_osc_freq = 25000000;
+            PAKs.SLG46538.RING_osc_pre_div = 1336;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -519,7 +684,63 @@
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         internal static void createSLG46537M()
         {
-
+            PAKs.SLG46537M = new PAK();
+            PAKs.SLG46537M.base_die = "SLG46537M";
+            PAKs.SLG46537M.package = "MSTQFN-22L";
+            PAKs.SLG46537M.package_size = "2mm x 2.2mm";
+            PAKs.SLG46537M.PAK_family = 5;
+            PAKs.SLG46537M.package_weight = "0.0058 g";
+            PAKs.SLG46537M.pattern_id_address = 1840;
+            PAKs.SLG46537M.dual_supply = false;
+            PAKs.SLG46537M.pin = new PIN[]
+            {
+                new PIN() { PT = "NA",                                                                                },    // 00
+                new PIN() { PT = "GPI",     RV = 1028, IM = 1030,                                             VS = 1  },    // 01
+                new PIN() { PT = "GPIO_OE", RV = 1034, UD = 1033, IM = 1036, OM = 1038, OE = 0208,            VS = 1  },    // 02
+                new PIN() { PT = "GPIO",    RV = 1043, UD = 1042, IO = 1045, DR = 1041,                       VS = 1  },    // 03
+                new PIN() { PT = "GPIO_OE", RV = 1050, UD = 1049, IM = 1052, OM = 1054, OE = 0232,            VS = 1  },    // 04
+                new PIN() { PT = "GPIO",    RV = 1059, UD = 1058, IO = 1061, DR = 1057,                       VS = 1  },    // 05
+                new PIN() { PT = "GPIO_OE", RV = 1066, UD = 1065, IM = 1068, OM = 1070, OE = 0256,            VS = 1  },    // 06
+                new PIN() { PT = "I2C",     RV = 1083, UD = 1082, IO = 1085, DR = 1081,                       VS = 1  },    // 07
+                new PIN() { PT = "SD_OE",   RV = 1090, UD = 1089, IM = 1092, OM = 1094, OE = 0288, SD = 1088, VS = 1  },    // 08
+                new PIN() { PT = "NA",                                                                                },    // 09
+                new PIN() { PT = "NA",                                                                                },    // 10
+                new PIN() { PT = "GPIO_OE", RV = 1106, UD = 1105, IM = 1108, OM = 1110, OE = 0312,            VS = 1  },    // 11
+                new PIN() { PT = "GPIO_OE", RV = 1114, UD = 1113, IM = 1116, OM = 1118, OE = 0328,            VS = 1  },    // 12
+                new PIN() { PT = "GPIO_OE", RV = 1130, UD = 1129, IM = 1132, OM = 1134, OE = 0352,            VS = 1  },    // 13
+                new PIN() { PT = "GPIO",    RV = 1139, UD = 1138, IO = 1141, DR = 1137,                       VS = 1  },    // 14
+                new PIN() { PT = "GPIO_OE", RV = 1154, UD = 1153, IM = 1156, OM = 1158, OE = 0392,            VS = 1  },    // 15
+                new PIN() { PT = "VDD",                                                                               },    // 16
+                new PIN() { PT = "GPIO",    RV = 1163, UD = 1162, IO = 1165, DR = 1161,                       VS = 1  },    // 17
+                new PIN() { PT = "GPIO_OE", RV = 1146, UD = 1145, IM = 1148, OM = 1150, OE = 0376,            VS = 1  },    // 18
+                new PIN() { PT = "I2C",     RV = 1075, UD = 1074, IO = 1077, DR = 1073,                       VS = 1  },    // 19
+                new PIN() { PT = "GND",                                                                               },    // 20
+                new PIN() { PT = "SD",      RV = 1099, UD = 1098, IO = 1101, DR = 1097,            SD = 1096, VS = 1  },    // 21
+                new PIN() { PT = "GPIO",    RV = 1123, UD = 1122, IO = 1125, DR = 1121,                       VS = 1  },    // 22
+            };
+            PAKs.SLG46537M.cnt = new CNT[]
+            {
+                new CNT() { CK = 1314, DA = 1576, LN = 16, MD = 1318, SL = 1193 },    // 0
+                new CNT() { CK = 1322, DA = 1592, LN = 16, MD = 1326, SL = 1192 },    // 1
+                new CNT() { CK = 1274, DA = 1536, LN = 8,  MD = 1278, SL = 1198 },    // 2
+                new CNT() { CK = 1282, DA = 1544, LN = 8,  MD = 1286, SL = 1197 },    // 3
+                new CNT() { CK = 1290, DA = 1552, LN = 8,  MD = 1294, SL = 1196 },    // 4
+                new CNT() { CK = 1298, DA = 1560, LN = 8,  MD = 1302, SL = 1195 },    // 5
+                new CNT() { CK = 1306, DA = 1568, LN = 8,  MD = 1310, SL = 1194 },    // 6
+            };
+            PAKs.SLG46537M.acmp = new ACMP[]
+            {
+                new ACMP() { TH = 1624, GN = 1629, LB = 1629, HY = 1174 },    // 0
+                new ACMP() { TH = 1632, GN = 1637, LB = 1639, HY = 1170 },    // 1
+                new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
+                new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
+            };
+            PAKs.SLG46537M.RC_osc_freq = 25000;
+            PAKs.SLG46537M.RC_osc_freq_alt = 2000000;
+            PAKs.SLG46537M.RC_osc_src = 1342;
+            PAKs.SLG46537M.RC_osc_pre_div = 1339;
+            PAKs.SLG46537M.RING_osc_freq = 25000000;
+            PAKs.SLG46537M.RING_osc_pre_div = 1336;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -527,7 +748,65 @@
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         internal static void createSLG46538M()
         {
-
+            PAKs.SLG46538M = new PAK();
+            PAKs.SLG46538M.base_die = "SLG46538M";
+            PAKs.SLG46538M.package = "MSTQFN-22L";
+            PAKs.SLG46538M.package_size = "2mm x 2.2mm";
+            PAKs.SLG46538M.PAK_family = 5;
+            PAKs.SLG46538M.package_weight = "0.0058 g";
+            PAKs.SLG46538M.pattern_id_address = 1840;
+            PAKs.SLG46538M.dual_supply = true;
+            PAKs.SLG46538M.dual_supply_vdd_pins = "IOs 0, 1, 2, 3, 4, 5, 6, 7, 8";
+            PAKs.SLG46538M.dual_supply_vdd2_pins = "IOs 9, 10, 12, 13, 14, 15, 16, 17";
+            PAKs.SLG46538M.pin = new PIN[]
+            {
+                new PIN() { PT = "NA",                                                                                },    // 00
+                new PIN() { PT = "GPI",     RV = 1028, IM = 1030,                                             VS = 1  },    // 01
+                new PIN() { PT = "GPIO_OE", RV = 1034, UD = 1033, IM = 1036, OM = 1038, OE = 0208,            VS = 1  },    // 02
+                new PIN() { PT = "GPIO",    RV = 1043, UD = 1042, IO = 1045, DR = 1041,                       VS = 1  },    // 03
+                new PIN() { PT = "GPIO_OE", RV = 1050, UD = 1049, IM = 1052, OM = 1054, OE = 0232,            VS = 1  },    // 04
+                new PIN() { PT = "GPIO",    RV = 1059, UD = 1058, IO = 1061, DR = 1057,                       VS = 1  },    // 05
+                new PIN() { PT = "GPIO_OE", RV = 1066, UD = 1065, IM = 1068, OM = 1070, OE = 0256,            VS = 1  },    // 06
+                new PIN() { PT = "I2C",     RV = 1083, UD = 1082, IO = 1085, DR = 1081,                       VS = 1  },    // 07
+                new PIN() { PT = "SD_OE",   RV = 1090, UD = 1089, IM = 1092, OM = 1094, OE = 0288, SD = 1088, VS = 1  },    // 08
+                new PIN() { PT = "NA",                                                                                },    // 09
+                new PIN() { PT = "NA",                                                                                },    // 10
+                new PIN() { PT = "GPIO_OE", RV = 1106, UD = 1105, IM = 1108, OM = 1110, OE = 0312,            VS = 2  },    // 11
+                new PIN() { PT = "VDD2",                                                                              },    // 12
+                new PIN() { PT = "GPIO_OE", RV = 1130, UD = 1129, IM = 1132, OM = 1134, OE = 0352,            VS = 2  },    // 13
+                new PIN() { PT = "GPIO",    RV = 1139, UD = 1138, IO = 1141, DR = 1137,                       VS = 2  },    // 14
+                new PIN() { PT = "GPIO_OE", RV = 1154, UD = 1153, IM = 1156, OM = 1158, OE = 0392,            VS = 2  },    // 15
+                new PIN() { PT = "VDD",                                                                               },    // 16
+                new PIN() { PT = "GPIO",    RV = 1163, UD = 1162, IO = 1165, DR = 1161,                       VS = 2  },    // 17
+                new PIN() { PT = "GPIO_OE", RV = 1146, UD = 1145, IM = 1148, OM = 1150, OE = 0376,            VS = 2  },    // 18
+                new PIN() { PT = "I2C",     RV = 1075, UD = 1074, IO = 1077, DR = 1073,                       VS = 1  },    // 19
+                new PIN() { PT = "GND",                                                                               },    // 20
+                new PIN() { PT = "SD",      RV = 1099, UD = 1098, IO = 1101, DR = 1097,            SD = 1096, VS = 2  },    // 21
+                new PIN() { PT = "GPIO",    RV = 1123, UD = 1122, IO = 1125, DR = 1121,                       VS = 2  },    // 22
+            };
+            PAKs.SLG46538M.cnt = new CNT[]
+            {
+                new CNT() { CK = 1314, DA = 1576, LN = 16, MD = 1318, SL = 1193 },    // 0
+                new CNT() { CK = 1322, DA = 1592, LN = 16, MD = 1326, SL = 1192 },    // 1
+                new CNT() { CK = 1274, DA = 1536, LN = 8,  MD = 1278, SL = 1198 },    // 2
+                new CNT() { CK = 1282, DA = 1544, LN = 8,  MD = 1286, SL = 1197 },    // 3
+                new CNT() { CK = 1290, DA = 1552, LN = 8,  MD = 1294, SL = 1196 },    // 4
+                new CNT() { CK = 1298, DA = 1560, LN = 8,  MD = 1302, SL = 1195 },    // 5
+                new CNT() { CK = 1306, DA = 1568, LN = 8,  MD = 1310, SL = 1194 },    // 6
+            };
+            PAKs.SLG46538M.acmp = new ACMP[]
+            {
+                new ACMP() { TH = 1624, GN = 1629, LB = 1629, HY = 1174 },    // 0
+                new ACMP() { TH = 1632, GN = 1637, LB = 1639, HY = 1170 },    // 1
+                new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
+                new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
+            };
+            PAKs.SLG46538M.RC_osc_freq = 25000;
+            PAKs.SLG46538M.RC_osc_freq_alt = 2000000;
+            PAKs.SLG46538M.RC_osc_src = 1342;
+            PAKs.SLG46538M.RC_osc_pre_div = 1339;
+            PAKs.SLG46538M.RING_osc_freq = 25000000;
+            PAKs.SLG46538M.RING_osc_pre_div = 1336;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1130,6 +1409,20 @@
                 "need assistance in decoding the SN Code, please contact Silego.";
             PAKs.SLG46108.lock_status = 402;
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  SLG46169
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        internal static void createSLG46169()
+        {
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  SLG46170
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        internal static void createSLG46170()
+        {
+        }
     }
 
     public static class PAKs
@@ -1139,15 +1432,15 @@
         public static PAK SLG46531;
         public static PAK SLG46532;
         public static PAK SLG46533;
-        public static PAK SLG46533M;
         public static PAK SLG46534;
         public static PAK SLG46535;
         public static PAK SLG46536;
-        public static PAK SLG46537;
-        public static PAK SLG46537M;
-        public static PAK SLG46538;
-        public static PAK SLG46538M;
         public static PAK SLG50003;
+        public static PAK SLG46533M;
+        public static PAK SLG46537;
+        public static PAK SLG46538;
+        public static PAK SLG46537M;
+        public static PAK SLG46538M;
 
         // GreenPAK4
 
@@ -1165,5 +1458,7 @@
         public static PAK SLG46117;
         public static PAK SLG46121;
         public static PAK SLG46108;
+        public static PAK SLG46169;
+        public static PAK SLG46170;
     }
 }
