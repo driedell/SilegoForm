@@ -37,8 +37,8 @@ public static class MainProgram
         public static bool ext_clk_update = false;
 
         public static string I_Q = "1.0";
-        public static string TM_part_code = "~~";
-        public static string TM_revision = "~~";
+        public static string TM_part_code = "  ";
+        public static string TM_revision = "  ";
         public static string DS_rev = "010";
         public static string DS_rev_change = null;
         public static string Date = null;
@@ -940,7 +940,7 @@ public static class MainProgram
         }
     }
 
-    private static void shapeReplace(InlineShape shape, string title)
+    private static void InlineShapeReplace(InlineShape shape, string title)
     {
         Range range = shape.Range;
         shape.Delete();
@@ -955,12 +955,19 @@ public static class MainProgram
             (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_a.png");
         }
         else if ((title == "size" || title == "TR_specs") &&
+            (g.GreenPAK.base_die.Equals("SLG46116") ||
+             g.GreenPAK.base_die.Equals("SLG46117")))
+        {
+            newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
+            (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_b.png");
+        }
+        else if ((title == "size" || title == "TR_specs") &&
             (g.GreenPAK.base_die.Equals("SLG46534") ||
              g.GreenPAK.base_die.Equals("SLG46535") ||
              g.GreenPAK.base_die.Equals("SLG46536")))
         {
             newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
-            (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_b.png");
+            (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_c.png");
         }
         else
         {
@@ -1062,6 +1069,12 @@ public static class MainProgram
                 case "4": PAK.createSLG46534(); g.GreenPAK = PAKs.SLG46534; break;
                 case "5": PAK.createSLG46535(); g.GreenPAK = PAKs.SLG46535; break;
                 case "6": PAK.createSLG46536(); g.GreenPAK = PAKs.SLG46536; break;
+                case "7": PAK.createSLG50003(); g.GreenPAK = PAKs.SLG50003; break;
+                case "10": PAK.createSLG46533M(); g.GreenPAK = PAKs.SLG46533M; break;
+                case "11": PAK.createSLG46537(); g.GreenPAK = PAKs.SLG46537; break;
+                case "12": PAK.createSLG46538(); g.GreenPAK = PAKs.SLG46538; break;
+                case "13": PAK.createSLG46537M(); g.GreenPAK = PAKs.SLG46537M; break;
+                case "14": PAK.createSLG46538M(); g.GreenPAK = PAKs.SLG46538M; break;
                 default: break;
             }
         }
@@ -1097,6 +1110,7 @@ public static class MainProgram
 
         g.doc.Variables["GreenPAK_Base_Die"].Value = g.GreenPAK.base_die;
         g.doc.Variables["GreenPAK_Package"].Value = g.GreenPAK.package;
+        g.doc.Variables["GreenPAK_Package_alt"].Value = g.GreenPAK.package.Substring(0, g.GreenPAK.package.IndexOf("-"));
         g.doc.Variables["GreenPAK_Package_size"].Value = g.GreenPAK.package_size;
         g.doc.Variables["GreenPAK_Family"].Value = g.GreenPAK.PAK_family.ToString();
         g.doc.Variables["GreenPAK_Pin_Count"].Value = (g.GreenPAK.pin.Length - 1).ToString();
@@ -1303,7 +1317,7 @@ public static class MainProgram
                     g.GreenPAK.pin[i].type = "GND";
                     g.GreenPAK.pin[i].description = "Ground";
                 }
-                else if (g.GreenPAK.dual_supply.Equals(true) && g.GreenPAK.pin[i].PT.Equals("VDD2"))
+                else if (g.GreenPAK.pin[i].PT.Equals("VDD2"))
                 {
                     g.doc.Variables["pin" + i.ToString() + "_label"].Value = "VDD2";
                     g.GreenPAK.pin[i].name = "VDD2";
@@ -1370,7 +1384,7 @@ public static class MainProgram
             if (g.VDD.ODP1x > 0) { output_summary += "\n\r" + (g.VDD.ODP1x + g.VDD2.ODP1x).ToString() + " Output \u2014 Open Drain PMOS 1x"; }
             if (g.VDD.ODP2x > 0) { output_summary += "\n\r" + (g.VDD.ODP2x + g.VDD2.ODP2x).ToString() + " Output \u2014 Open Drain PMOS 2x"; }
 
-            try { g.doc.Variables["output_summary"].Value = output_summary.Substring(3);  }
+            try { g.doc.Variables["output_summary"].Value = output_summary.Substring(3); }
             catch { }
         }
 
@@ -1415,9 +1429,9 @@ public static class MainProgram
 
         if (g.new_part_update)
         {
-            switch (g.GreenPAK.pin.Length - 1)
+            switch (g.GreenPAK.package)
             {
-                case 20:
+                case "STQFN-20L":
                     foreach (Shape shape in g.doc.Shapes)
                     {
                         if (shape.Title == "pinout_diagram")
@@ -1463,7 +1477,55 @@ public static class MainProgram
 
                     break;
 
-                case 14:
+                case "MSTQFN-22L":
+                    foreach (Shape shape in g.doc.Shapes)
+                    {
+                        if (shape.Title == "pinout_diagram")
+                        {
+                            int left = (int)shape.Left;
+                            int top = (int)shape.Top;
+                            int width = (int)shape.Width;
+                            int height = (int)shape.Height;
+
+                            shape.Delete();
+
+                            Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"Resources\MSTQFN_22.png");
+                            newShape.Title = "pinout_diagram";
+                            newShape.RelativeHorizontalPosition = WdRelativeHorizontalPosition.wdRelativeHorizontalPositionPage;
+                            newShape.RelativeVerticalPosition = WdRelativeVerticalPosition.wdRelativeVerticalPositionPage;
+                            newShape.Left = left;
+                            newShape.Top = top;
+                            newShape.Width = width;
+                            newShape.Height = height;
+                            break;
+                        }
+                    }
+                    pin_cell_config(01, 264, 222, 'L');
+                    pin_cell_config(02, 264, 242, 'L');
+                    pin_cell_config(03, 264, 262, 'L');
+                    pin_cell_config(04, 264, 282, 'L');
+                    pin_cell_config(05, 264, 302, 'L');
+                    pin_cell_config(06, 380, 335, 'D');
+                    pin_cell_config(07, 400, 335, 'D');
+                    pin_cell_config(08, 420, 335, 'D');
+                    pin_cell_config(09, 472, 302, 'R');
+                    pin_cell_config(10, 472, 282, 'R');
+                    pin_cell_config(11, 472, 262, 'R');
+                    pin_cell_config(12, 472, 242, 'R');
+                    pin_cell_config(13, 472, 222, 'R');
+                    pin_cell_config(14, 420, 120, 'U');
+                    pin_cell_config(15, 400, 120, 'U');
+                    pin_cell_config(16, 380, 120, 'U');
+                    pin_cell_config(17, 264, 252, 'L');
+                    pin_cell_config(18, 264, 272, 'L');
+                    pin_cell_config(19, 264, 292, 'L');
+                    pin_cell_config(20, 472, 292, 'R');
+                    pin_cell_config(21, 472, 272, 'R');
+                    pin_cell_config(22, 472, 252, 'R');
+
+                    break;
+
+                case "STQFN-14L":
                     foreach (Shape shape in g.doc.Shapes)
                     {
                         if (shape.Title == "pinout_diagram")
@@ -1502,7 +1564,7 @@ public static class MainProgram
                     pin_cell_config(14, 380, 120, 'U');
                     break;
 
-                case 12:
+                case "STQFN-12L":
                     foreach (Shape shape in g.doc.Shapes)
                     {
                         if (shape.Title == "pinout_diagram")
@@ -1539,7 +1601,7 @@ public static class MainProgram
                     pin_cell_config(12, 380, 120, 'U');
                     break;
 
-                case 8:
+                case "STQFN-8L":
                     foreach (Shape shape in g.doc.Shapes)
                     {
                         if (shape.Title == "pinout_diagram")
@@ -2260,19 +2322,19 @@ public static class MainProgram
 
             foreach (InlineShape shape in g.doc.InlineShapes)
             {
-                if (shape.Title == "TM") { shapeReplace(shape, "TM"); break; }
+                if (shape.Title == "TM") { InlineShapeReplace(shape, "TM"); break; }
             }
             foreach (InlineShape shape in g.doc.InlineShapes)
             {
-                if (shape.Title == "size") { shapeReplace(shape, "size"); break; }
+                if (shape.Title == "size") { InlineShapeReplace(shape, "size"); break; }
             }
             foreach (InlineShape shape in g.doc.InlineShapes)
             {
-                if (shape.Title == "TR_specs") { shapeReplace(shape, "TR_specs"); break; }
+                if (shape.Title == "TR_specs") { InlineShapeReplace(shape, "TR_specs"); break; }
             }
             foreach (InlineShape shape in g.doc.InlineShapes)
             {
-                if (shape.Title == "TR") { shapeReplace(shape, "TR"); break; }
+                if (shape.Title == "TR") { InlineShapeReplace(shape, "TR"); break; }
             }
         }
 

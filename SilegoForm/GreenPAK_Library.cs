@@ -3,7 +3,7 @@
     public class PAK
     {
         public string base_die;
-        public string package;          //### STQFN-14 vs STQFN-14L?
+        public string package;          //### STQFN-14L vs STQFN-14LL?
         public byte PAK_family;
         public string package_size;
         public string package_weight;
@@ -122,7 +122,7 @@
         public int PAK5_I2C_Slave_Address = 1864;
 
         // PAK4 stuff
-        public int lock_status;     //### find this for pak4 and pak3
+        public int lock_status;
 
         // PAK3 stuff
         public string TM_note;
@@ -134,7 +134,7 @@
         {
             PAKs.SLG46531 = new PAK();
             PAKs.SLG46531.base_die = "SLG46531";
-            PAKs.SLG46531.package = "STQFN-20";
+            PAKs.SLG46531.package = "STQFN-20L";
             PAKs.SLG46531.package_size = "2mm x 3mm";
             PAKs.SLG46531.PAK_family = 5;
             PAKs.SLG46531.package_weight = "0.0090 g";
@@ -196,7 +196,7 @@
         {
             PAKs.SLG46532 = new PAK();
             PAKs.SLG46532.base_die = "SLG46532";
-            PAKs.SLG46532.package = "STQFN-20";
+            PAKs.SLG46532.package = "STQFN-20L";
             PAKs.SLG46532.package_size = "2mm x 3mm";
             PAKs.SLG46532.PAK_family = 5;
             PAKs.SLG46532.package_weight = "0.0090 g";
@@ -260,7 +260,7 @@
         {
             PAKs.SLG46533 = new PAK();
             PAKs.SLG46533.base_die = "SLG46533";
-            PAKs.SLG46533.package = "STQFN-20";
+            PAKs.SLG46533.package = "STQFN-20L";
             PAKs.SLG46533.package_size = "2mm x 3mm";
             PAKs.SLG46533.PAK_family = 5;
             PAKs.SLG46533.package_weight = "0.0090 g";
@@ -322,7 +322,7 @@
         {
             PAKs.SLG46534 = new PAK();
             PAKs.SLG46534.base_die = "SLG46534";
-            PAKs.SLG46534.package = "STQFN-14";
+            PAKs.SLG46534.package = "STQFN-14L_c";
             PAKs.SLG46534.package_size = "2mm x 2.2mm";
             PAKs.SLG46534.PAK_family = 5;
             PAKs.SLG46534.package_weight = "0.0067 g";
@@ -377,7 +377,7 @@
         {
             PAKs.SLG46535 = new PAK();
             PAKs.SLG46535.base_die = "SLG46535";
-            PAKs.SLG46535.package = "STQFN-14";
+            PAKs.SLG46535.package = "STQFN-14L_c";
             PAKs.SLG46535.package_size = "2mm x 2.2mm";
             PAKs.SLG46535.PAK_family = 5;
             PAKs.SLG46535.package_weight = "0.0068 g";
@@ -434,7 +434,7 @@
         {
             PAKs.SLG46536 = new PAK();
             PAKs.SLG46536.base_die = "SLG46536";
-            PAKs.SLG46536.package = "STQFN-14";
+            PAKs.SLG46536.package = "STQFN-14L_c";
             PAKs.SLG46536.package_size = "2mm x 2.2mm";
             PAKs.SLG46536.PAK_family = 5;
             PAKs.SLG46536.package_weight = "0.0066 g";
@@ -483,13 +483,61 @@
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  SLG50003
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        internal static void createSLG50003()
+        {
+
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  SLG46533M
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        internal static void createSLG46533M()
+        {
+
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  SLG46537
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        internal static void createSLG46537()
+        {
+
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  SLG46538
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        internal static void createSLG46538()
+        {
+
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  SLG46537M
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        internal static void createSLG46537M()
+        {
+
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  SLG46538M
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        internal static void createSLG46538M()
+        {
+
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  SLG46140
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         internal static void createSLG46140()
         {
             PAKs.SLG46140 = new PAK();
             PAKs.SLG46140.base_die = "SLG46140";
-            PAKs.SLG46140.package = "STQFN-14";
+            PAKs.SLG46140.package = "STQFN-14L_a";
             PAKs.SLG46140.package_size = "1.6mm x 2mm";
             PAKs.SLG46140.PAK_family = 4;
             PAKs.SLG46140.package_weight = "0.00xx g";  //###
@@ -543,7 +591,7 @@
         {
             PAKs.SLG46620 = new PAK();
             PAKs.SLG46620.base_die = "SLG46620";
-            PAKs.SLG46620.package = "STQFN-20";
+            PAKs.SLG46620.package = "STQFN-20L";
             PAKs.SLG46620.package_size = "2mm x 3mm";
             PAKs.SLG46620.PAK_family = 4;
             PAKs.SLG46620.package_weight = "0.015 g";
@@ -613,7 +661,7 @@
         {
             PAKs.SLG46621 = new PAK();
             PAKs.SLG46621.base_die = "SLG46621";
-            PAKs.SLG46621.package = "STQFN-20";
+            PAKs.SLG46621.package = "STQFN-20L";
             PAKs.SLG46621.package_size = "2mm x 3mm";
             PAKs.SLG46621.PAK_family = 4;
             PAKs.SLG46621.package_weight = "0.015 g";
@@ -685,7 +733,7 @@
         {
             PAKs.SLG46721 = new PAK();
             PAKs.SLG46721.base_die = "SLG46721";
-            PAKs.SLG46721.package = "STQFN-20";
+            PAKs.SLG46721.package = "STQFN-20L";
             PAKs.SLG46721.package_size = "2mm x 3mm";
             PAKs.SLG46721.PAK_family = 3;
             PAKs.SLG46721.package_weight = "0.015 g";
@@ -746,7 +794,7 @@
         {
             PAKs.SLG46722 = new PAK();
             PAKs.SLG46722.base_die = "SLG46722";
-            PAKs.SLG46722.package = "STQFN-20";
+            PAKs.SLG46722.package = "STQFN-20L";
             PAKs.SLG46722.package_size = "2mm x 3mm";
             PAKs.SLG46722.PAK_family = 3;
             PAKs.SLG46722.package_weight = "0.015 g";
@@ -808,7 +856,7 @@
         {
             PAKs.SLG46110 = new PAK();
             PAKs.SLG46110.base_die = "SLG46110";
-            PAKs.SLG46110.package = "STQFN-12";
+            PAKs.SLG46110.package = "STQFN-12L";
             PAKs.SLG46110.package_size = "1.6mm x 1.6mm";
             PAKs.SLG46110.PAK_family = 3;
             PAKs.SLG46110.package_weight = "0.0036 g";
@@ -856,7 +904,7 @@
         {
             PAKs.SLG46120 = new PAK();
             PAKs.SLG46120.base_die = "SLG46120";
-            PAKs.SLG46120.package = "STQFN-12";
+            PAKs.SLG46120.package = "STQFN-12L";
             PAKs.SLG46120.package_size = "1.6mm x 1.6mm";
             PAKs.SLG46120.PAK_family = 3;
             PAKs.SLG46120.package_weight = "0.0038 g";
@@ -904,7 +952,7 @@
         {
             PAKs.SLG46116 = new PAK();
             PAKs.SLG46116.base_die = "SLG46116";
-            PAKs.SLG46116.package = "STQFN-14";         //### this may change
+            PAKs.SLG46116.package = "STQFN-14L_b";         //### this may change
             PAKs.SLG46116.package_size = "1.6mm x 2.5mm";
             PAKs.SLG46116.PAK_family = 3;
             PAKs.SLG46116.package_weight = "0.0059 g";
@@ -949,7 +997,7 @@
         {
             PAKs.SLG46117 = new PAK();
             PAKs.SLG46117.base_die = "SLG46117";
-            PAKs.SLG46117.package = "STQFN-14";         //### this may change
+            PAKs.SLG46117.package = "STQFN-14L_b";         //### this may change
             PAKs.SLG46117.package_size = "1.6mm x 2.5mm";
             PAKs.SLG46117.PAK_family = 3;
             PAKs.SLG46117.package_weight = "0.0059 g";
@@ -994,7 +1042,7 @@
         {
             PAKs.SLG46121 = new PAK();
             PAKs.SLG46121.base_die = "SLG46121";
-            PAKs.SLG46121.package = "STQFN-12";
+            PAKs.SLG46121.package = "STQFN-12L";
             PAKs.SLG46121.package_size = "1.6mm x 1.6mm";
             PAKs.SLG46121.PAK_family = 3;
             PAKs.SLG46121.package_weight = "0.0038 g";
@@ -1044,7 +1092,7 @@
         {
             PAKs.SLG46108 = new PAK();
             PAKs.SLG46108.base_die = "SLG46108";
-            PAKs.SLG46108.package = "STQFN-8";
+            PAKs.SLG46108.package = "STQFN-8L";
             PAKs.SLG46108.package_size = "1mm x 1.2mm";
             PAKs.SLG46108.PAK_family = 3;
             PAKs.SLG46108.package_weight = "0.0017 g";
@@ -1077,7 +1125,7 @@
             PAKs.SLG46108.RC_osc_src = 0287;
             PAKs.SLG46108.RC_osc_pre_div = 0288;
             PAKs.SLG46108.TM_note = "Note: The SN Code (Line 1 and Line 2) is generated during production, " +
-                "and encodes information including part number, programming code number, date code and lot code." + 
+                "and encodes information including part number, programming code number, date code and lot code." +
                 "This same information is provided in plain text form on a label placed on the reel. If you " +
                 "need assistance in decoding the SN Code, please contact Silego.";
             PAKs.SLG46108.lock_status = 402;
@@ -1091,9 +1139,15 @@
         public static PAK SLG46531;
         public static PAK SLG46532;
         public static PAK SLG46533;
+        public static PAK SLG46533M;
         public static PAK SLG46534;
         public static PAK SLG46535;
         public static PAK SLG46536;
+        public static PAK SLG46537;
+        public static PAK SLG46537M;
+        public static PAK SLG46538;
+        public static PAK SLG46538M;
+        public static PAK SLG50003;
 
         // GreenPAK4
 
