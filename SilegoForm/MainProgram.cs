@@ -417,13 +417,16 @@ public static class MainProgram
         string low_bw = null;
         byte hysteresis = 0;
 
-        switch (g.nvmData[g.GreenPAK.acmp[i].GN + 1].ToString() +
-                g.nvmData[g.GreenPAK.acmp[i].GN + 0].ToString())
+        if (g.GreenPAK.acmp[i].GN > 0)
         {
-            case "00": multiplier = 1; break;
-            case "01": multiplier = 2; break;
-            case "10": multiplier = 3; break;
-            case "11": multiplier = 4; break;
+            switch (g.nvmData[g.GreenPAK.acmp[i].GN + 1].ToString() +
+                    g.nvmData[g.GreenPAK.acmp[i].GN + 0].ToString())
+            {
+                case "00": multiplier = 1; break;
+                case "01": multiplier = 2; break;
+                case "10": multiplier = 3; break;
+                case "11": multiplier = 4; break;
+            }
         }
 
         switch (g.nvmData[g.GreenPAK.acmp[i].LB].ToString())  // ### still need this? unused
@@ -477,29 +480,67 @@ public static class MainProgram
                 //case "11101": acmpVIH = EXT_VREF / 2; break;
                 //### include field for External VREF??
         }
-
-        switch (g.nvmData[g.GreenPAK.acmp[i].HY + 1].ToString() +
-                g.nvmData[g.GreenPAK.acmp[i].HY + 0].ToString())
+        
+        if (g.GreenPAK.base_die.Equals("SLG50003"))
         {
-            case "00":
-                hysteresis = 0;
-                break;
+            switch (g.nvmData[g.GreenPAK.acmp[i].HY + 2].ToString() + 
+                    g.nvmData[g.GreenPAK.acmp[i].HY + 1].ToString() +
+                    g.nvmData[g.GreenPAK.acmp[i].HY + 0].ToString())
+            {
+                case "000":
+                    hysteresis = 0;
+                    break;
 
-            case "01":
-                hysteresis = 25;
-                acmpVIH = (int)(acmpVIH + (12.5 * multiplier));
-                acmpVIL = (int)(acmpVIL - (12.5 * multiplier));
-                break;
+                case "001":
+                    hysteresis = 25;
+                    acmpVIH = (int)(acmpVIH + (12.5 * multiplier));
+                    acmpVIL = (int)(acmpVIL - (12.5 * multiplier));
+                    break;
 
-            case "10":
-                hysteresis = 50;
-                acmpVIL = acmpVIL - (50 * multiplier);
-                break;
+                case "010":
+                    hysteresis = 50;
+                    acmpVIL = acmpVIL - (50 * multiplier);
+                    break;
 
-            case "11":
-                hysteresis = 200;
-                acmpVIL = acmpVIL - (200 * multiplier);
-                break;
+                case "011":
+                    hysteresis = 200;
+                    acmpVIL = acmpVIL - (200 * multiplier);
+                    break;
+                case "110":
+                    hysteresis = 100;
+                    acmpVIL = acmpVIL - (100 * multiplier);
+                    break;
+                case "111":
+                    hysteresis = 150;
+                    acmpVIL = acmpVIL - (150 * multiplier);
+                    break;
+            }
+        }
+        else
+        {
+            switch (g.nvmData[g.GreenPAK.acmp[i].HY + 1].ToString() +
+                    g.nvmData[g.GreenPAK.acmp[i].HY + 0].ToString())
+            {
+                case "00":
+                    hysteresis = 0;
+                    break;
+
+                case "01":
+                    hysteresis = 25;
+                    acmpVIH = (int)(acmpVIH + (12.5 * multiplier));
+                    acmpVIL = (int)(acmpVIL - (12.5 * multiplier));
+                    break;
+
+                case "10":
+                    hysteresis = 50;
+                    acmpVIL = acmpVIL - (50 * multiplier);
+                    break;
+
+                case "11":
+                    hysteresis = 200;
+                    acmpVIL = acmpVIL - (200 * multiplier);
+                    break;
+            }
         }
         if (acmpVIL < 0)
         {
@@ -540,7 +581,16 @@ public static class MainProgram
                     case "010": freq = g.GreenPAK.RC_osc_freq / 12; break;
                     case "011": freq = g.GreenPAK.RC_osc_freq / 24; break;
                     case "100": freq = g.GreenPAK.RC_osc_freq / 64; break;
-                    case "101": freq = g.GreenPAK.RING_osc_freq; break;
+                    case "101":
+                        if (g.GreenPAK.RING_osc_freq > 0)
+                        {
+                            freq = g.GreenPAK.RING_osc_freq; break;
+                        }
+                        else if (g.GreenPAK.LF_osc_freq > 0)
+                        {
+                            freq = g.GreenPAK.LF_osc_freq; break;
+                        }
+                        else break;
                     case "110": freq = g.ext_clk_freq; break;
                     case "111": freq = -1; g.GreenPAK.cnt[i].used = false; return;
                 }
@@ -781,11 +831,11 @@ public static class MainProgram
 
         EC_clearSection(table, row);
         table.Cell(row, 2).Range.Text = level + "-Level Input Voltage";
-        if (g.GreenPAK.dual_supply && !symbol.Contains("2"))
+        if (g.GreenPAK.dual_supply_PAK && !symbol.Contains("2"))
         {
             table.Cell(row, 2).Range.Text += g.GreenPAK.dual_supply_vdd_pins;
         }
-        else if (g.GreenPAK.dual_supply && symbol.Contains("2"))
+        else if (g.GreenPAK.dual_supply_PAK && symbol.Contains("2"))
         {
             table.Cell(row, 2).Range.Text += g.GreenPAK.dual_supply_vdd2_pins;
         }
@@ -836,11 +886,11 @@ public static class MainProgram
         EC_clearSection(table, row);
 
         table.Cell(row, 2).Range.Text = level + "-Level Output " + VC;
-        if (g.GreenPAK.dual_supply && !symbol.Contains("2"))
+        if (g.GreenPAK.dual_supply_PAK && !symbol.Contains("2"))
         {
             table.Cell(row, 2).Range.Text += g.GreenPAK.dual_supply_vdd_pins;
         }
-        else if (g.GreenPAK.dual_supply && symbol.Contains("2"))
+        else if (g.GreenPAK.dual_supply_PAK && symbol.Contains("2"))
         {
             table.Cell(row, 2).Range.Text += g.GreenPAK.dual_supply_vdd2_pins;
         }
@@ -1111,7 +1161,7 @@ public static class MainProgram
         }
 
         g.doc.Variables["GreenPAK_Base_Die"].Value = g.GreenPAK.base_die;
-        g.doc.Variables["GreenPAK_Package"].Value = g.GreenPAK.package;
+        g.doc.Variables["GreenPAK_Package"].Value = g.GreenPAK.package.Substring(0, g.GreenPAK.package.IndexOf("_"));
         g.doc.Variables["GreenPAK_Package_alt"].Value = g.GreenPAK.package.Substring(0, g.GreenPAK.package.IndexOf("-"));
         g.doc.Variables["GreenPAK_Package_size"].Value = g.GreenPAK.package_size;
         g.doc.Variables["GreenPAK_Family"].Value = g.GreenPAK.PAK_family.ToString();
@@ -1160,7 +1210,7 @@ public static class MainProgram
         }
 
         // VDD2 specs
-        if (g.GreenPAK.dual_supply)
+        if (g.GreenPAK.dual_supply_PAK)
         {
             foreach (XElement xEle in g.ELEMENT.Descendants("vdd2Specs"))
             {
@@ -1233,15 +1283,17 @@ public static class MainProgram
                 {
                     if (g.GreenPAK.PAK_family.Equals(5))
                     {
-                        while (table.Rows.Count < 4)
+                        while (table.Rows.Count < 6)
                         {
                             table.Rows.Add();
                         }
 
                         table.Cell(1, 2).Range.Text = "Unlocked";
-                        table.Cell(2, 2).Range.Text = "Locked for read, bits <1535:0> ";
-                        table.Cell(3, 2).Range.Text = "Locked for write, bits <1535:0>";
-                        table.Cell(4, 2).Range.Text = "Locked for read and write, bits <1535:0>";
+                        table.Cell(2, 2).Range.Text = "Locked for read, bits <0:1535> ";
+                        table.Cell(3, 2).Range.Text = "Locked for write, bits <0:1535>";
+                        table.Cell(4, 2).Range.Text = "Locked for write, bits <0:2047>";
+                        table.Cell(5, 2).Range.Text = "Locked for read and write, bits <0:1535>";
+                        table.Cell(6, 2).Range.Text = "Locked for read, bits <0:1535>, locked for write, bits <0:2047>";
 
                         break;
                     }
@@ -1270,13 +1322,18 @@ public static class MainProgram
                             table.Cell(i, 1).Range.Text = "";
                         }
 
-                        switch (g.nvmData[g.GreenPAK.PAK5_nvm_read_lock].ToString() +
-                                g.nvmData[g.GreenPAK.PAK5_nvm_write_lock].ToString())
+                        switch (g.nvmData[g.GreenPAK.lock_read].ToString() +
+                                g.nvmData[g.GreenPAK.lock_write_0].ToString() +
+                                g.nvmData[g.GreenPAK.lock_write_1].ToString())
                         {
-                            case "00": nvm_lock = "U"; table.Cell(1, 1).Range.Text = "X"; break;
-                            case "01": nvm_lock = "L"; table.Cell(3, 1).Range.Text = "X"; break;
-                            case "10": nvm_lock = "L"; table.Cell(2, 1).Range.Text = "X"; break;
-                            case "11": nvm_lock = "L"; table.Cell(4, 1).Range.Text = "X"; break;
+                            case "000": nvm_lock = "U"; table.Cell(1, 1).Range.Text = "X"; break;
+                            case "001": nvm_lock = "L"; table.Cell(4, 1).Range.Text = "X"; break;
+                            case "010": nvm_lock = "L"; table.Cell(3, 1).Range.Text = "X"; break;
+                            case "011": nvm_lock = "L"; table.Cell(4, 1).Range.Text = "X"; break;   // Superfluous
+                            case "100": nvm_lock = "L"; table.Cell(2, 1).Range.Text = "X"; break;
+                            case "101": nvm_lock = "L"; table.Cell(6, 1).Range.Text = "X"; break;
+                            case "110": nvm_lock = "L"; table.Cell(5, 1).Range.Text = "X"; break;
+                            case "111": nvm_lock = "L"; table.Cell(6, 1).Range.Text = "X"; break;   // Superfluous
                         }
                     }
                     else if (g.GreenPAK.PAK_family.Equals(4) ||
@@ -1326,6 +1383,20 @@ public static class MainProgram
                     g.GreenPAK.pin[i].resistor = "--";
                     g.GreenPAK.pin[i].type = "PWR";
                     g.GreenPAK.pin[i].description = "Supply Voltage";
+                }
+                else if (g.GreenPAK.pin[i].PT.Equals("LDO_IN"))
+                {
+                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "LDO Input";
+                    g.GreenPAK.pin[i].description = "Low Drop Out Regulator Input";
+                }
+                else if (g.GreenPAK.pin[i].PT.Equals("LDO_OUT"))
+                {
+                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "LDO Output";
+                    g.GreenPAK.pin[i].description = "Low Drop Out Regulator Output";
                 }
                 else
                 {
@@ -1905,7 +1976,7 @@ public static class MainProgram
         double VDD2_min = Convert.ToDouble(g.GreenPAK.vdd2.min);
         double VDD2_max = Convert.ToDouble(g.GreenPAK.vdd2.max);
 
-        double VDD2_typ = (VDD2_max + VDD2_min) / 2; if (g.GreenPAK.dual_supply)
+        double VDD2_typ = (VDD2_max + VDD2_min) / 2; if (g.GreenPAK.dual_supply_PAK)
 
         {
             if ((Math.Abs(VDD2_typ - 1.8) < Math.Abs(VDD2_typ - 3.3)) &&
@@ -1959,7 +2030,7 @@ public static class MainProgram
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     //  VDD2
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if (g.GreenPAK.dual_supply)
+                    if (g.GreenPAK.dual_supply_PAK)
                     {
                         symbolRow = EC_row_symbol(table, "VDD2");
                         row = symbolRow;
