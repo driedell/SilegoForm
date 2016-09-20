@@ -485,11 +485,11 @@
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  SLG50003
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        internal static void createSLG50003()       // ###
+        internal static void createSLG50003()
         {
             PAKs.SLG50003 = new PAK();
             PAKs.SLG50003.base_die = "SLG50003";
-            PAKs.SLG50003.package = "STQFN-20L_b";
+            PAKs.SLG50003.package = "STQFN-22L";
             PAKs.SLG50003.package_size = "2mm x 3mm";
             PAKs.SLG50003.PAK_family = 5;
             PAKs.SLG50003.LDO_PAK = true;
