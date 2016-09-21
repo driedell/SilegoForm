@@ -480,10 +480,10 @@ public static class MainProgram
                 //case "11101": acmpVIH = EXT_VREF / 2; break;
                 //### include field for External VREF??
         }
-        
+
         if (g.GreenPAK.base_die.Equals("SLG50003"))
         {
-            switch (g.nvmData[g.GreenPAK.acmp[i].HY + 2].ToString() + 
+            switch (g.nvmData[g.GreenPAK.acmp[i].HY + 2].ToString() +
                     g.nvmData[g.GreenPAK.acmp[i].HY + 1].ToString() +
                     g.nvmData[g.GreenPAK.acmp[i].HY + 0].ToString())
             {
@@ -506,10 +506,12 @@ public static class MainProgram
                     hysteresis = 200;
                     acmpVIL = acmpVIL - (200 * multiplier);
                     break;
+
                 case "110":
                     hysteresis = 100;
                     acmpVIL = acmpVIL - (100 * multiplier);
                     break;
+
                 case "111":
                     hysteresis = 150;
                     acmpVIL = acmpVIL - (150 * multiplier);
@@ -990,41 +992,62 @@ public static class MainProgram
         }
     }
 
-    private static void InlineShapeReplace(InlineShape shape, string title)
+    private static void InlineShapeReplace(string title)
     {
-        Range range = shape.Range;
-        shape.Delete();
-        InlineShape newShape;
+        foreach (InlineShape shape in g.doc.InlineShapes)
+        {
+            if (shape.Title.Equals(title))
+            {
+                Range range = shape.Range;
+                shape.Delete();
+                InlineShape newShape;
 
-        Console.WriteLine(g.templatePath + @"Resources\STQFN_" + (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + ".png");
+                Console.WriteLine(g.templatePath + @"Resources\" + (g.templatePath + @"Resources\" + g.GreenPAK.package + "_" + title + ".png"));
 
-        if ((title == "size" || title == "TR_specs") &&
-            g.GreenPAK.base_die.Equals("SLG46140"))
-        {
-            newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
-            (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_a.png");
+                try
+                {
+                    newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\" + g.GreenPAK.package + "_" + title + ".png");
+                    newShape.Title = title;
+                }
+                catch
+                {
+                    MessageBox.Show("Could not find " + g.templatePath + @"Resources\" + g.GreenPAK.package + "_" + title + ".png");
+                }
+                return;
+            }
         }
-        else if ((title == "size" || title == "TR_specs") &&
-            (g.GreenPAK.base_die.Equals("SLG46116") ||
-             g.GreenPAK.base_die.Equals("SLG46117")))
-        {
-            newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
-            (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_b.png");
-        }
-        else if ((title == "size" || title == "TR_specs") &&
-            (g.GreenPAK.base_die.Equals("SLG46534") ||
-             g.GreenPAK.base_die.Equals("SLG46535") ||
-             g.GreenPAK.base_die.Equals("SLG46536")))
-        {
-            newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
-            (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_c.png");
-        }
-        else
-        {
-            newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
-                (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + ".png");
-        }
-        newShape.Title = title;
+
+        //try
+        //{
+        //    if ((title == "size" || title == "TR_specs") &&
+        //        g.GreenPAK.base_die.Equals("SLG46140"))
+        //    {
+        //        newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
+        //        (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_a.png");
+        //    }
+        //    else if ((title == "size" || title == "TR_specs") &&
+        //        (g.GreenPAK.base_die.Equals("SLG46116") ||
+        //         g.GreenPAK.base_die.Equals("SLG46117")))
+        //    {
+        //        newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
+        //        (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_b.png");
+        //    }
+        //    else if ((title == "size" || title == "TR_specs") &&
+        //        (g.GreenPAK.base_die.Equals("SLG46534") ||
+        //         g.GreenPAK.base_die.Equals("SLG46535") ||
+        //         g.GreenPAK.base_die.Equals("SLG46536")))
+        //    {
+        //        newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
+        //        (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_c.png");
+        //    }
+        //    else
+        //    {
+        //        newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
+        //            (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + ".png");
+        //    }
+        //    newShape.Title = title;
+        //}
+        //catch { }
     }
 
     private static string accessQuery(string returnField, string param1, string param2 = "-1", string param3 = "-1")
@@ -1161,7 +1184,14 @@ public static class MainProgram
         }
 
         g.doc.Variables["GreenPAK_Base_Die"].Value = g.GreenPAK.base_die;
-        g.doc.Variables["GreenPAK_Package"].Value = g.GreenPAK.package.Substring(0, g.GreenPAK.package.IndexOf("_"));
+        if (g.GreenPAK.package.Contains("_"))
+        {
+            g.doc.Variables["GreenPAK_Package"].Value = g.GreenPAK.package.Substring(0, g.GreenPAK.package.IndexOf("_"));
+        }
+        else
+        {
+            g.doc.Variables["GreenPAK_Package"].Value = g.GreenPAK.package;
+        }
         g.doc.Variables["GreenPAK_Package_alt"].Value = g.GreenPAK.package.Substring(0, g.GreenPAK.package.IndexOf("-"));
         g.doc.Variables["GreenPAK_Package_size"].Value = g.GreenPAK.package_size;
         g.doc.Variables["GreenPAK_Family"].Value = g.GreenPAK.PAK_family.ToString();
@@ -1199,10 +1229,18 @@ public static class MainProgram
         // VDD specs
         foreach (XElement xEle in g.ELEMENT.Descendants("vddSpecs"))
         {
-            g.doc.Variables["vddMin"].Value = xEle.Attribute("vddMin").Value;
-            g.doc.Variables["vddTyp"].Value = xEle.Attribute("vddTyp").Value;
-            g.doc.Variables["vddMax"].Value = xEle.Attribute("vddMax").Value;
-
+            try
+            {
+                g.doc.Variables["vddMin"].Value = xEle.Attribute("vddMin").Value;
+                g.doc.Variables["vddTyp"].Value = xEle.Attribute("vddTyp").Value;
+                g.doc.Variables["vddMax"].Value = xEle.Attribute("vddMax").Value;
+            }
+            catch
+            {
+                e.Cancel = true;
+                form.backgroundWorker.ReportProgress(3, "Error: Missing VDD Specs");
+                return;
+            }
             g.GreenPAK.vdd = new PAK.mTM();
             g.GreenPAK.vdd.min = xEle.Attribute("vddMin").Value;
             g.GreenPAK.vdd.typ = xEle.Attribute("vddTyp").Value;
@@ -1214,9 +1252,18 @@ public static class MainProgram
         {
             foreach (XElement xEle in g.ELEMENT.Descendants("vdd2Specs"))
             {
-                g.doc.Variables["vdd2Min"].Value = xEle.Attribute("vdd2Min").Value;
-                g.doc.Variables["vdd2Typ"].Value = xEle.Attribute("vdd2Typ").Value;
-                g.doc.Variables["vdd2Max"].Value = xEle.Attribute("vdd2Max").Value;
+                try
+                {
+                    g.doc.Variables["vdd2Min"].Value = xEle.Attribute("vdd2Min").Value;
+                    g.doc.Variables["vdd2Typ"].Value = xEle.Attribute("vdd2Typ").Value;
+                    g.doc.Variables["vdd2Max"].Value = xEle.Attribute("vdd2Max").Value;
+                }
+                catch
+                {
+                    e.Cancel = true;
+                    form.backgroundWorker.ReportProgress(3, "Error: Missing VDD2 Specs");
+                    return;
+                }
 
                 g.GreenPAK.vdd2 = new PAK.mTM();
                 g.GreenPAK.vdd2.min = xEle.Attribute("vdd2Min").Value;
@@ -1228,11 +1275,20 @@ public static class MainProgram
         // Temp specs
         foreach (XElement xEle in g.ELEMENT.Descendants("tempSpecs"))
         {
-            g.doc.Variables["tempMin"].Value = xEle.Attribute("tempMin").Value;
-            g.doc.Variables["tempTyp"].Value = xEle.Attribute("tempTyp").Value;
-            g.doc.Variables["tempMax"].Value = xEle.Attribute("tempMax").Value;
+            try
+            {
+                g.doc.Variables["tempMin"].Value = xEle.Attribute("tempMin").Value;
+                g.doc.Variables["tempTyp"].Value = xEle.Attribute("tempTyp").Value;
+                g.doc.Variables["tempMax"].Value = xEle.Attribute("tempMax").Value;
+            }
+            catch
+            {
+                e.Cancel = true;
+                form.backgroundWorker.ReportProgress(3, "Error: Missing TEMP Specs");
+                return;
+            }
 
-            g.GreenPAK.temp = new PAK.mTM();
+        g.GreenPAK.temp = new PAK.mTM();
             g.GreenPAK.temp.min = xEle.Attribute("tempMin").Value;
             g.GreenPAK.temp.typ = xEle.Attribute("tempTyp").Value;
             g.GreenPAK.temp.max = xEle.Attribute("tempMax").Value;
@@ -1326,14 +1382,14 @@ public static class MainProgram
                                 g.nvmData[g.GreenPAK.lock_write_0].ToString() +
                                 g.nvmData[g.GreenPAK.lock_write_1].ToString())
                         {
-                            case "000": nvm_lock = "U"; table.Cell(1, 1).Range.Text = "X"; break;
-                            case "001": nvm_lock = "L"; table.Cell(4, 1).Range.Text = "X"; break;
-                            case "010": nvm_lock = "L"; table.Cell(3, 1).Range.Text = "X"; break;
-                            case "011": nvm_lock = "L"; table.Cell(4, 1).Range.Text = "X"; break;   // Superfluous
-                            case "100": nvm_lock = "L"; table.Cell(2, 1).Range.Text = "X"; break;
-                            case "101": nvm_lock = "L"; table.Cell(6, 1).Range.Text = "X"; break;
-                            case "110": nvm_lock = "L"; table.Cell(5, 1).Range.Text = "X"; break;
-                            case "111": nvm_lock = "L"; table.Cell(6, 1).Range.Text = "X"; break;   // Superfluous
+                            case "000": nvm_lock = "U"; table.Cell(1, 1).Range.Text = "√"; break;
+                            case "001": nvm_lock = "L"; table.Cell(4, 1).Range.Text = "√"; break;
+                            case "010": nvm_lock = "L"; table.Cell(3, 1).Range.Text = "√"; break;
+                            case "011": nvm_lock = "L"; table.Cell(4, 1).Range.Text = "√"; break;   // Superfluous
+                            case "100": nvm_lock = "L"; table.Cell(2, 1).Range.Text = "√"; break;
+                            case "101": nvm_lock = "L"; table.Cell(6, 1).Range.Text = "√"; break;
+                            case "110": nvm_lock = "L"; table.Cell(5, 1).Range.Text = "√"; break;
+                            case "111": nvm_lock = "L"; table.Cell(6, 1).Range.Text = "√"; break;   // Superfluous
                         }
                     }
                     else if (g.GreenPAK.PAK_family.Equals(4) ||
@@ -1362,24 +1418,24 @@ public static class MainProgram
             {
                 if (g.GreenPAK.pin[i].PT.Equals("VDD"))
                 {
-                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = "VDD";
                     g.GreenPAK.pin[i].name = "VDD";
+                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
                     g.GreenPAK.pin[i].resistor = "--";
                     g.GreenPAK.pin[i].type = "PWR";
                     g.GreenPAK.pin[i].description = "Supply Voltage";
                 }
                 else if (g.GreenPAK.pin[i].PT.Equals("GND"))
                 {
-                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = "GND";
                     g.GreenPAK.pin[i].name = "GND";
+                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
                     g.GreenPAK.pin[i].resistor = "--";
                     g.GreenPAK.pin[i].type = "GND";
                     g.GreenPAK.pin[i].description = "Ground";
                 }
                 else if (g.GreenPAK.pin[i].PT.Equals("VDD2"))
                 {
-                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = "VDD2";
                     g.GreenPAK.pin[i].name = "VDD2";
+                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
                     g.GreenPAK.pin[i].resistor = "--";
                     g.GreenPAK.pin[i].type = "PWR";
                     g.GreenPAK.pin[i].description = "Supply Voltage";
@@ -1398,11 +1454,20 @@ public static class MainProgram
                     g.GreenPAK.pin[i].type = "LDO Output";
                     g.GreenPAK.pin[i].description = "Low Drop Out Regulator Output";
                 }
+                else if (g.GreenPAK.pin[i].PT.Equals("NA"))
+                {
+                    g.GreenPAK.pin[i].name = "NC";
+                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "--";
+                    g.GreenPAK.pin[i].description = "Keep Floating or Connect to GND";
+                }
                 else
                 {
                     // Look for xml elements called "item" with caption "PIN ?" and check if they have textLabel Element
                     foreach (XElement pin in g.ELEMENT.Descendants("item")
-                        .Where(pin => (string)pin.Attribute("caption") == ("PIN " + (i).ToString())))
+                        .Where(pin => pin.Attribute("caption").ToString().StartsWith("caption=\"PIN " + i.ToString())))
+                    //.Where(pin => (string)pin.Attribute("caption") == ("PIN " + (i).ToString())))
                     {
                         if (pin.Element("graphics").Attribute("hidden").Value.Equals("0") &&
                             TryGetElementValue(pin, "textLabel") == null)
@@ -1433,6 +1498,7 @@ public static class MainProgram
                             g.GreenPAK.pin[i].description = "Keep Floating or Connect to GND";
                             g.GreenPAK.pin[i].resistor = "--";
                         }
+                        break;
                     }
                 }
             }
@@ -1502,31 +1568,32 @@ public static class MainProgram
 
         if (g.new_part_update)
         {
+            foreach (Shape shape in g.doc.Shapes)
+            {
+                if (shape.Title == "pinout_diagram")
+                {
+                    int left = (int)shape.Left;
+                    int top = (int)shape.Top;
+                    int width = (int)shape.Width;
+                    int height = (int)shape.Height;
+
+                    shape.Delete();
+
+                    Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"Resources\" + g.GreenPAK.package + ".png");
+                    newShape.Title = "pinout_diagram";
+                    newShape.RelativeHorizontalPosition = WdRelativeHorizontalPosition.wdRelativeHorizontalPositionPage;
+                    newShape.RelativeVerticalPosition = WdRelativeVerticalPosition.wdRelativeVerticalPositionPage;
+                    newShape.Left = left;
+                    newShape.Top = top;
+                    newShape.Width = width;
+                    newShape.Height = height;
+                    break;
+                }
+            }
+
             switch (g.GreenPAK.package)
             {
                 case "STQFN-20L":
-                    foreach (Shape shape in g.doc.Shapes)
-                    {
-                        if (shape.Title == "pinout_diagram")
-                        {
-                            int left = (int)shape.Left;
-                            int top = (int)shape.Top;
-                            int width = (int)shape.Width;
-                            int height = (int)shape.Height;
-
-                            shape.Delete();
-
-                            Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"Resources\STQFN_20.png");
-                            newShape.Title = "pinout_diagram";
-                            newShape.RelativeHorizontalPosition = WdRelativeHorizontalPosition.wdRelativeHorizontalPositionPage;
-                            newShape.RelativeVerticalPosition = WdRelativeVerticalPosition.wdRelativeVerticalPositionPage;
-                            newShape.Left = left;
-                            newShape.Top = top;
-                            newShape.Width = width;
-                            newShape.Height = height;
-                            break;
-                        }
-                    }
                     pin_cell_config(01, 264, 222, 'L');
                     pin_cell_config(02, 264, 242, 'L');
                     pin_cell_config(03, 264, 262, 'L');
@@ -1547,80 +1614,38 @@ public static class MainProgram
                     pin_cell_config(18, 420, 120, 'U');
                     pin_cell_config(19, 400, 120, 'U');
                     pin_cell_config(20, 380, 120, 'U');
-
                     break;
 
-                case "MSTQFN-22L":
-                    foreach (Shape shape in g.doc.Shapes)
-                    {
-                        if (shape.Title == "pinout_diagram")
-                        {
-                            int left = (int)shape.Left;
-                            int top = (int)shape.Top;
-                            int width = (int)shape.Width;
-                            int height = (int)shape.Height;
+                case "STQFN-22L": break;          //###
 
-                            shape.Delete();
-
-                            Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"Resources\MSTQFN_22.png");
-                            newShape.Title = "pinout_diagram";
-                            newShape.RelativeHorizontalPosition = WdRelativeHorizontalPosition.wdRelativeHorizontalPositionPage;
-                            newShape.RelativeVerticalPosition = WdRelativeVerticalPosition.wdRelativeVerticalPositionPage;
-                            newShape.Left = left;
-                            newShape.Top = top;
-                            newShape.Width = width;
-                            newShape.Height = height;
-                            break;
-                        }
-                    }
+                case "MSTQFN-22L":          //###
                     pin_cell_config(01, 264, 222, 'L');
                     pin_cell_config(02, 264, 242, 'L');
-                    pin_cell_config(03, 264, 262, 'L');
-                    pin_cell_config(04, 264, 282, 'L');
-                    pin_cell_config(05, 264, 302, 'L');
-                    pin_cell_config(06, 380, 335, 'D');
-                    pin_cell_config(07, 400, 335, 'D');
-                    pin_cell_config(08, 420, 335, 'D');
-                    pin_cell_config(09, 472, 302, 'R');
-                    pin_cell_config(10, 472, 282, 'R');
-                    pin_cell_config(11, 472, 262, 'R');
+                    pin_cell_config(03, 264, 272, 'L');
+                    pin_cell_config(04, 264, 302, 'L');
+                    pin_cell_config(05, 264, 332, 'L');
+                    pin_cell_config(06, 380, 365, 'D');
+                    pin_cell_config(07, 400, 365, 'D');
+                    pin_cell_config(08, 420, 365, 'D');
+                    pin_cell_config(09, 472, 332, 'R');
+                    pin_cell_config(10, 472, 302, 'R');
+                    pin_cell_config(11, 472, 272, 'R');
                     pin_cell_config(12, 472, 242, 'R');
                     pin_cell_config(13, 472, 222, 'R');
                     pin_cell_config(14, 420, 120, 'U');
                     pin_cell_config(15, 400, 120, 'U');
                     pin_cell_config(16, 380, 120, 'U');
-                    pin_cell_config(17, 264, 252, 'L');
-                    pin_cell_config(18, 264, 272, 'L');
-                    pin_cell_config(19, 264, 292, 'L');
-                    pin_cell_config(20, 472, 292, 'R');
-                    pin_cell_config(21, 472, 272, 'R');
-                    pin_cell_config(22, 472, 252, 'R');
+                    pin_cell_config(17, 264, 257, 'L');
+                    pin_cell_config(18, 264, 287, 'L');
+                    pin_cell_config(19, 264, 317, 'L');
+                    pin_cell_config(20, 472, 317, 'R');
+                    pin_cell_config(21, 472, 287, 'R');
+                    pin_cell_config(22, 472, 257, 'R');
 
                     break;
 
-                case "STQFN-14L":
-                    foreach (Shape shape in g.doc.Shapes)
-                    {
-                        if (shape.Title == "pinout_diagram")
-                        {
-                            int left = (int)shape.Left;
-                            int top = (int)shape.Top;
-                            int width = (int)shape.Width;
-                            int height = (int)shape.Height;
-
-                            shape.Delete();
-
-                            Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"Resources\STQFN_14.png");
-                            newShape.Title = "pinout_diagram";
-                            newShape.RelativeHorizontalPosition = WdRelativeHorizontalPosition.wdRelativeHorizontalPositionPage;
-                            newShape.RelativeVerticalPosition = WdRelativeVerticalPosition.wdRelativeVerticalPositionPage;
-                            newShape.Left = left;
-                            newShape.Top = top;
-                            newShape.Width = width;
-                            newShape.Height = height;
-                            break;
-                        }
-                    }
+                case "STQFN-14L_a":
+                case "STQFN-14L_c":
                     pin_cell_config(01, 264, 222, 'L');
                     pin_cell_config(02, 264, 242, 'L');
                     pin_cell_config(03, 264, 262, 'L');
@@ -1637,29 +1662,24 @@ public static class MainProgram
                     pin_cell_config(14, 380, 120, 'U');
                     break;
 
+                case "STQFN-14L_b":
+                    pin_cell_config(01, 264, 225, 'L');
+                    pin_cell_config(02, 264, 251, 'L');
+                    pin_cell_config(03, 264, 276, 'L');
+                    pin_cell_config(04, 264, 302, 'L');
+                    pin_cell_config(05, 372, 340, 'D');
+                    pin_cell_config(06, 392, 340, 'D');
+                    pin_cell_config(07, 412, 340, 'D');
+                    pin_cell_config(08, 450, 302, 'R');
+                    pin_cell_config(09, 450, 276, 'R');
+                    pin_cell_config(10, 450, 251, 'R');
+                    pin_cell_config(11, 450, 225, 'R');
+                    pin_cell_config(12, 412, 120, 'U');
+                    pin_cell_config(13, 392, 120, 'U');
+                    pin_cell_config(14, 372, 120, 'U');
+                    break;
+
                 case "STQFN-12L":
-                    foreach (Shape shape in g.doc.Shapes)
-                    {
-                        if (shape.Title == "pinout_diagram")
-                        {
-                            int left = (int)shape.Left;
-                            int top = (int)shape.Top;
-                            int width = (int)shape.Width;
-                            int height = (int)shape.Height;
-
-                            shape.Delete();
-
-                            Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"Resources\STQFN_12.png");
-                            newShape.Title = "pinout_diagram";
-                            newShape.RelativeHorizontalPosition = WdRelativeHorizontalPosition.wdRelativeHorizontalPositionPage;
-                            newShape.RelativeVerticalPosition = WdRelativeVerticalPosition.wdRelativeVerticalPositionPage;
-                            newShape.Left = left;
-                            newShape.Top = top;
-                            newShape.Width = width;
-                            newShape.Height = height;
-                            break;
-                        }
-                    }
                     pin_cell_config(01, 264, 222, 'L');
                     pin_cell_config(02, 264, 242, 'L');
                     pin_cell_config(03, 264, 262, 'L');
@@ -1675,28 +1695,6 @@ public static class MainProgram
                     break;
 
                 case "STQFN-8L":
-                    foreach (Shape shape in g.doc.Shapes)
-                    {
-                        if (shape.Title == "pinout_diagram")
-                        {
-                            int left = (int)shape.Left;
-                            int top = (int)shape.Top;
-                            int width = (int)shape.Width;
-                            int height = (int)shape.Height;
-
-                            shape.Delete();
-
-                            Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"Resources\STQFN_8.png");
-                            newShape.Title = "pinout_diagram";
-                            newShape.RelativeHorizontalPosition = WdRelativeHorizontalPosition.wdRelativeHorizontalPositionPage;
-                            newShape.RelativeVerticalPosition = WdRelativeVerticalPosition.wdRelativeVerticalPositionPage;
-                            newShape.Left = left;
-                            newShape.Top = top;
-                            newShape.Width = width;
-                            newShape.Height = height;
-                            break;
-                        }
-                    }
                     pin_cell_config(01, 264, 222, 'L');
                     pin_cell_config(02, 264, 242, 'L');
                     pin_cell_config(03, 264, 262, 'L');
@@ -2368,6 +2366,32 @@ public static class MainProgram
                     table.Cell(row, 7).Range.Text = "ns";
                 }
 
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                //  PowerPAK Specs
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (worker.CancellationPending) { e.Cancel = true; return; }
+                form.backgroundWorker.ReportProgress(3, "Populating EC Table: PowerPAK");
+
+                if (g.new_part_update &&
+                   (g.GreenPAK.base_die.Equals("SLG46116") || g.GreenPAK.base_die.Equals("SLG46117")))
+                {
+                    Document TABLES = g.app.Documents.Add(@"C:\Users\driedell\Desktop\TABLES.docx", oMissing, oMissing, true);
+
+                    foreach (Table newTable in TABLES.Tables)
+                    {
+                        if (newTable.Title.Equals("PowerPAK"))
+                        {
+                            newTable.Range.Copy();
+                            table.Rows.Add();
+                            table.Rows[table.Rows.Count].Range.PasteAppendTable();
+                            EC_row_merge(table, table.Rows.Count - 1, table.Rows.Count);
+
+                            break;
+                        }
+                    }
+                    TABLES.Close();
+                }
+
                 g.connection.Close();
                 table.Rows.SetHeight(1, WdRowHeightRule.wdRowHeightAuto);
                 break;
@@ -2393,22 +2417,27 @@ public static class MainProgram
                 g.doc.Variables["TM_note"].Value = "";
             }
 
-            foreach (InlineShape shape in g.doc.InlineShapes)
-            {
-                if (shape.Title == "TM") { InlineShapeReplace(shape, "TM"); break; }
-            }
-            foreach (InlineShape shape in g.doc.InlineShapes)
-            {
-                if (shape.Title == "size") { InlineShapeReplace(shape, "size"); break; }
-            }
-            foreach (InlineShape shape in g.doc.InlineShapes)
-            {
-                if (shape.Title == "TR_specs") { InlineShapeReplace(shape, "TR_specs"); break; }
-            }
-            foreach (InlineShape shape in g.doc.InlineShapes)
-            {
-                if (shape.Title == "TR") { InlineShapeReplace(shape, "TR"); break; }
-            }
+            InlineShapeReplace("TM");
+            InlineShapeReplace("size");
+            InlineShapeReplace("TR_specs");
+            InlineShapeReplace("TR");
+
+            //foreach (InlineShape shape in g.doc.InlineShapes)
+            //{
+            //    if (shape.Title == "TM") { InlineShapeReplace(shape, "TM"); break; }
+            //}
+            //foreach (InlineShape shape in g.doc.InlineShapes)
+            //{
+            //    if (shape.Title == "size") { InlineShapeReplace(shape, "size"); break; }
+            //}
+            //foreach (InlineShape shape in g.doc.InlineShapes)
+            //{
+            //    if (shape.Title == "TR_specs") { InlineShapeReplace(shape, "TR_specs"); break; }
+            //}
+            //foreach (InlineShape shape in g.doc.InlineShapes)
+            //{
+            //    if (shape.Title == "TR") { InlineShapeReplace(shape, "TR"); break; }
+            //}
         }
 
         if (g.TM_part_code_update)

@@ -505,8 +505,8 @@
                 new PIN() { PT = "GPIO_OE", RV = 1058, UD = 1057, IM = 1060, OM = 1062, OE = 0368,            VS = 1  },    // 05
                 new PIN() { PT = "GPI",     RV = 1068, IM = 1070,                                             VS = 1  },    // 06
                 new PIN() { PT = "VDD",                                                                               },    // 07
-                new PIN() { PT = "I2C",     RV = 0000, UD = 0000, IO = 0000, DR = 0000,                       VS = 1  },    // 08   //###
-                new PIN() { PT = "I2C",     RV = 0000, UD = 0000, IO = 0000, DR = 0000,                       VS = 1  },    // 09   //###
+                new PIN() { PT = "I2C",     RV = 1075, UD = 1074, IO = 1077, DR = 1073,                       VS = 1  },    // 08   //###
+                new PIN() { PT = "I2C",     RV = 1083, UD = 1082, IO = 1085, DR = 1081,                       VS = 1  },    // 09   //###
                 new PIN() { PT = "GPIO_OE", RV = 1090, UD = 1089, IM = 1092, OM = 1094, OE = 0384,            VS = 1  },    // 10
                 new PIN() { PT = "LDO_OUT", name = "LDO_VOUT0"                                                        },    // 11
                 new PIN() { PT = "LDO_IN",  name = "LDO_VIN0"                                                         },    // 12
@@ -1306,6 +1306,9 @@
                 new CNT() { CK = 0286, DA = 0289, LN = 08, MD = 0285, SL = 0301 },    // 2
                 new CNT() { CK = 0343, DA = 0346, LN = 08, MD = 0342, SL = 0000 },    // 3
             };
+            PAKs.SLG46116.acmp = new ACMP[]
+            {
+            };
             PAKs.SLG46116.RC_osc_freq = 25000;
             PAKs.SLG46116.RC_osc_freq_alt = 2000000;
             PAKs.SLG46116.RC_osc_src = 0303;
@@ -1350,6 +1353,9 @@
                 new CNT() { CK = 0329, DA = 0332, LN = 08, MD = 0328, SL = 0000 },    // 1
                 new CNT() { CK = 0286, DA = 0289, LN = 08, MD = 0285, SL = 0301 },    // 2
                 new CNT() { CK = 0343, DA = 0346, LN = 08, MD = 0342, SL = 0000 },    // 3
+            };
+            PAKs.SLG46117.acmp = new ACMP[]
+            {
             };
             PAKs.SLG46117.RC_osc_freq = 25000;
             PAKs.SLG46117.RC_osc_freq_alt = 2000000;

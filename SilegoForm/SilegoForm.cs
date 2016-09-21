@@ -10,6 +10,7 @@ namespace SilegoForm
         {
             InitializeComponent();
             MaximumSize = new System.Drawing.Size(400, 500);
+            new_part_checkbox.Checked = true;           //### Erase this later
         }
 
         public void progressIncrement(int value)
