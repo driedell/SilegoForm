@@ -19,6 +19,7 @@
         public mTM vdd;
         public mTM vdd2;
         public mTM temp;
+        public int VDD_bypass_enable;
 
         public struct mTM           // Min Typ Max
         {
@@ -184,6 +185,7 @@
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                 new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46531.VDD_bypass_enable = 1475;
             PAKs.SLG46531.RC_osc_freq = 25000;
             PAKs.SLG46531.RC_osc_freq_alt = 2000000;
             PAKs.SLG46531.RC_osc_src = 1342;
@@ -248,6 +250,7 @@
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                 new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46532.VDD_bypass_enable = 1475;
             PAKs.SLG46532.RC_osc_freq = 25000;
             PAKs.SLG46532.RC_osc_freq_alt = 2000000;
             PAKs.SLG46532.RC_osc_src = 1342;
@@ -309,6 +312,7 @@
                     new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                     new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46533.VDD_bypass_enable = 1475;
             PAKs.SLG46533.RC_osc_freq = 25000;
             PAKs.SLG46533.RC_osc_freq_alt = 2000000;
             PAKs.SLG46533.RC_osc_src = 1342;
@@ -363,6 +367,7 @@
                 new ACMP() { TH = 1632, GN = 1637, LB = 1639, HY = 1170 },    // 1
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
             };
+            PAKs.SLG46534.VDD_bypass_enable = 1475;
             PAKs.SLG46534.RC_osc_freq = 25000;
             PAKs.SLG46534.RC_osc_freq_alt = 2000000;
             PAKs.SLG46534.RC_osc_src = 1342;
@@ -420,6 +425,7 @@
                 new ACMP() { TH = 1632, GN = 1637, LB = 1639, HY = 1170 },    // 1
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
             };
+            PAKs.SLG46535.VDD_bypass_enable = 1475;
             PAKs.SLG46535.RC_osc_freq = 25000;
             PAKs.SLG46535.RC_osc_freq_alt = 2000000;
             PAKs.SLG46535.RC_osc_src = 1342;
@@ -474,6 +480,7 @@
                 new ACMP() { TH = 1632, GN = 1637, LB = 1639, HY = 1170 },    // 1
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
             };
+            PAKs.SLG46536.VDD_bypass_enable = 1475;
             PAKs.SLG46536.RC_osc_freq = 25000;
             PAKs.SLG46536.RC_osc_freq_alt = 2000000;
             PAKs.SLG46536.RC_osc_src = 1342;
@@ -597,6 +604,7 @@
                     new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                     new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46533M.VDD_bypass_enable = 1475;
             PAKs.SLG46533M.RC_osc_freq = 25000;
             PAKs.SLG46533M.RC_osc_freq_alt = 2000000;
             PAKs.SLG46533M.RC_osc_src = 1342;
@@ -658,6 +666,7 @@
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                 new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46537.VDD_bypass_enable = 1475;
             PAKs.SLG46537.RC_osc_freq = 25000;
             PAKs.SLG46537.RC_osc_freq_alt = 2000000;
             PAKs.SLG46537.RC_osc_src = 1342;
@@ -722,6 +731,7 @@
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                 new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46538.VDD_bypass_enable = 1475;
             PAKs.SLG46538.RC_osc_freq = 25000;
             PAKs.SLG46538.RC_osc_freq_alt = 2000000;
             PAKs.SLG46538.RC_osc_src = 1342;
@@ -785,6 +795,7 @@
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                 new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46537M.VDD_bypass_enable = 1475;
             PAKs.SLG46537M.RC_osc_freq = 25000;
             PAKs.SLG46537M.RC_osc_freq_alt = 2000000;
             PAKs.SLG46537M.RC_osc_src = 1342;
@@ -851,6 +862,7 @@
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                 new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46538M.VDD_bypass_enable = 1475;
             PAKs.SLG46538M.RC_osc_freq = 25000;
             PAKs.SLG46538M.RC_osc_freq_alt = 2000000;
             PAKs.SLG46538M.RC_osc_src = 1342;
@@ -1453,7 +1465,7 @@
             PAKs.SLG46108.RC_osc_src = 0287;
             PAKs.SLG46108.RC_osc_pre_div = 0288;
             PAKs.SLG46108.TM_note = "Note: The SN Code (Line 1 and Line 2) is generated during production, " +
-                "and encodes information including part number, programming code number, date code and lot code." +
+                "and encodes information including part number, programming code number, date code and lot code. " +
                 "This same information is provided in plain text form on a label placed on the reel. If you " +
                 "need assistance in decoding the SN Code, please contact Silego.";
             PAKs.SLG46108.lock_status = 402;

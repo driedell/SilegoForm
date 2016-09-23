@@ -1016,38 +1016,6 @@ public static class MainProgram
                 return;
             }
         }
-
-        //try
-        //{
-        //    if ((title == "size" || title == "TR_specs") &&
-        //        g.GreenPAK.base_die.Equals("SLG46140"))
-        //    {
-        //        newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
-        //        (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_a.png");
-        //    }
-        //    else if ((title == "size" || title == "TR_specs") &&
-        //        (g.GreenPAK.base_die.Equals("SLG46116") ||
-        //         g.GreenPAK.base_die.Equals("SLG46117")))
-        //    {
-        //        newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
-        //        (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_b.png");
-        //    }
-        //    else if ((title == "size" || title == "TR_specs") &&
-        //        (g.GreenPAK.base_die.Equals("SLG46534") ||
-        //         g.GreenPAK.base_die.Equals("SLG46535") ||
-        //         g.GreenPAK.base_die.Equals("SLG46536")))
-        //    {
-        //        newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
-        //        (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + "_c.png");
-        //    }
-        //    else
-        //    {
-        //        newShape = range.InlineShapes.AddPicture(g.templatePath + @"Resources\STQFN_" +
-        //            (g.GreenPAK.pin.Length - 1).ToString() + "_" + title + ".png");
-        //    }
-        //    newShape.Title = title;
-        //}
-        //catch { }
     }
 
     private static string accessQuery(string returnField, string param1, string param2 = "-1", string param3 = "-1")
@@ -1288,7 +1256,7 @@ public static class MainProgram
                 return;
             }
 
-        g.GreenPAK.temp = new PAK.mTM();
+            g.GreenPAK.temp = new PAK.mTM();
             g.GreenPAK.temp.min = xEle.Attribute("tempMin").Value;
             g.GreenPAK.temp.typ = xEle.Attribute("tempTyp").Value;
             g.GreenPAK.temp.max = xEle.Attribute("tempMax").Value;
@@ -1306,18 +1274,45 @@ public static class MainProgram
             foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
                  .Where(xEle => (string)xEle.Attribute("id") == "2"))
             {
-                g.doc.Variables["Customer_Name"].Value = xEle.Attribute("text").Value;
+                if (xEle.Attribute("text").Value.Length > 0)
+                {
+                    g.doc.Variables["Customer_Name"].Value = xEle.Attribute("text").Value;
+                }
+                else
+                {
+                    e.Cancel = true;
+                    form.backgroundWorker.ReportProgress(0, "Error: Missing Customer Name");
+                    return;
+                }
             }
             foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
                  .Where(xEle => (string)xEle.Attribute("id") == "3"))
             {
-                g.doc.Variables["Customer_Project_Name"].Value = xEle.Attribute("text").Value;
+                if (xEle.Attribute("text").Value.Length > 0)
+                {
+                    g.doc.Variables["Customer_Project_Name"].Value = xEle.Attribute("text").Value;
+                }
+                else
+                {
+                    e.Cancel = true;
+                    form.backgroundWorker.ReportProgress(0, "Error: Missing Customer Project Name");
+                    return;
+                }
             }
             foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
                  .Where(xEle => (string)xEle.Attribute("id") == "4"))
             {
-                g.doc.Variables["Customer_Part_Number"].Value = xEle.Attribute("text").Value;
-                g.part_number = xEle.Attribute("text").Value;
+                if (xEle.Attribute("text").Value.Length > 0)
+                {
+                    g.doc.Variables["Customer_Part_Number"].Value = xEle.Attribute("text").Value;
+                    g.part_number = xEle.Attribute("text").Value;
+                }
+                else
+                {
+                    e.Cancel = true;
+                    form.backgroundWorker.ReportProgress(0, "Error: Missing Customer Part Number");
+                    return;
+                }
             }
             foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
                 .Where(xEle => (string)xEle.Attribute("id") == "5"))
@@ -1356,6 +1351,27 @@ public static class MainProgram
                     else if (g.GreenPAK.PAK_family.Equals(4) ||
                              g.GreenPAK.PAK_family.Equals(3))
                     {
+                        foreach (Paragraph p in g.doc.Paragraphs)
+                        {
+                            if (p.Range.Text.StartsWith("Lock coverage "))
+                            {
+                                Console.WriteLine("Found lock coverage");
+                                p.Range.Select();
+                                g.app.Selection.Delete();
+                                p.Range.Select();
+                                g.app.Selection.Delete();
+                                break;
+                            }
+                        }
+
+                        //foreach (Paragraph p in g.doc.Paragraphs)
+                        //{
+                        //    if (p.Range.Text.Trim() == string.Empty)
+                        //    {
+                        //        p.Range.Select();
+                        //    }
+                        //}
+
                         table.Delete();
                         break;
                     }
@@ -1367,11 +1383,11 @@ public static class MainProgram
         {
             string nvm_lock = null;
 
-            foreach (Table table in g.doc.Tables)
+            if (g.GreenPAK.PAK_family.Equals(5))
             {
-                if (table.Title == "lock_table")
+                foreach (Table table in g.doc.Tables)
                 {
-                    if (g.GreenPAK.PAK_family.Equals(5))
+                    if (table.Title == "lock_table")
                     {
                         for (int i = 0; i < table.Rows.Count; i++)
                         {
@@ -1392,15 +1408,15 @@ public static class MainProgram
                             case "111": nvm_lock = "L"; table.Cell(6, 1).Range.Text = "√"; break;   // Superfluous
                         }
                     }
-                    else if (g.GreenPAK.PAK_family.Equals(4) ||
-                             g.GreenPAK.PAK_family.Equals(3))
-                    {
-                        switch (g.nvmData[g.GreenPAK.lock_status].ToString())
-                        {
-                            case "0": nvm_lock = "U"; break;
-                            case "1": nvm_lock = "L"; break;
-                        }
-                    }
+                }
+            }
+            else if (g.GreenPAK.PAK_family.Equals(4) ||
+                     g.GreenPAK.PAK_family.Equals(3))
+            {
+                switch (g.nvmData[g.GreenPAK.lock_status].ToString())
+                {
+                    case "0": nvm_lock = "U"; break;
+                    case "1": nvm_lock = "L"; break;
                 }
             }
             g.doc.Variables["NVM_lock"].Value = nvm_lock;
@@ -1616,9 +1632,30 @@ public static class MainProgram
                     pin_cell_config(20, 380, 120, 'U');
                     break;
 
-                case "STQFN-22L": break;          //###
+                case "STQFN-22L":
+                    pin_cell_config(01, 264, 227, 'L');
+                    pin_cell_config(02, 264, 247, 'L');
+                    pin_cell_config(03, 264, 267, 'L');
+                    pin_cell_config(04, 264, 287, 'L');
+                    pin_cell_config(05, 264, 307, 'L');
+                    pin_cell_config(06, 264, 327, 'L');
+                    pin_cell_config(07, 372, 370, 'D');
+                    pin_cell_config(08, 392, 370, 'D');
+                    pin_cell_config(09, 412, 370, 'D');
+                    pin_cell_config(10, 432, 370, 'D');
+                    pin_cell_config(11, 470, 327, 'R');
+                    pin_cell_config(12, 470, 307, 'R');
+                    pin_cell_config(13, 470, 287, 'R');
+                    pin_cell_config(14, 470, 267, 'R');
+                    pin_cell_config(15, 470, 247, 'R');
+                    pin_cell_config(16, 470, 227, 'R');
+                    pin_cell_config(17, 432, 120, 'U');
+                    pin_cell_config(18, 412, 120, 'U');
+                    pin_cell_config(19, 392, 120, 'U');
+                    pin_cell_config(20, 372, 120, 'U');
+                    break;
 
-                case "MSTQFN-22L":          //###
+                case "MSTQFN-22L":
                     pin_cell_config(01, 264, 222, 'L');
                     pin_cell_config(02, 264, 242, 'L');
                     pin_cell_config(03, 264, 272, 'L');
@@ -1934,6 +1971,22 @@ public static class MainProgram
             {
                 g.asm_used = true;
             }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  Absolute Maximum Conditions Table
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (worker.CancellationPending) { e.Cancel = true; return; }
+        form.backgroundWorker.ReportProgress(3, "Populating Absolute Maximum Conditions Table");
+
+        if (g.GreenPAK.VDD_bypass_enable > 0 &&
+            g.nvmData[g.GreenPAK.VDD_bypass_enable].ToString().Equals("1"))
+        {
+            g.doc.Variables["VDD_MAX"].Value = "3";
+        }
+        else
+        {
+            g.doc.Variables["VDD_MAX"].Value = "7";
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2414,30 +2467,13 @@ public static class MainProgram
             }
             else
             {
-                g.doc.Variables["TM_note"].Value = "";
+                g.doc.Variables["TM_note"].Value = " ";
             }
 
             InlineShapeReplace("TM");
             InlineShapeReplace("size");
             InlineShapeReplace("TR_specs");
             InlineShapeReplace("TR");
-
-            //foreach (InlineShape shape in g.doc.InlineShapes)
-            //{
-            //    if (shape.Title == "TM") { InlineShapeReplace(shape, "TM"); break; }
-            //}
-            //foreach (InlineShape shape in g.doc.InlineShapes)
-            //{
-            //    if (shape.Title == "size") { InlineShapeReplace(shape, "size"); break; }
-            //}
-            //foreach (InlineShape shape in g.doc.InlineShapes)
-            //{
-            //    if (shape.Title == "TR_specs") { InlineShapeReplace(shape, "TR_specs"); break; }
-            //}
-            //foreach (InlineShape shape in g.doc.InlineShapes)
-            //{
-            //    if (shape.Title == "TR") { InlineShapeReplace(shape, "TR"); break; }
-            //}
         }
 
         if (g.TM_part_code_update)

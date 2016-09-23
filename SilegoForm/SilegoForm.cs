@@ -79,6 +79,7 @@ namespace SilegoForm
                 lock_status_checkbox.Enabled = true;
 
                 progressBar.Visible = false;
+                progressBar.Value = 0;
             }
             else
             {
