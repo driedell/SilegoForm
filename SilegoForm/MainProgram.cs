@@ -1768,8 +1768,6 @@ public static class MainProgram
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(3, "Loading OSC Settings");
 
-        //### is there a better way to do this?
-
         if (g.CNTs_DLYs_update)
         {
             //////////////////////////////////////////////////
@@ -1988,6 +1986,8 @@ public static class MainProgram
         {
             g.doc.Variables["VDD_MAX"].Value = "7";
         }
+
+        g.doc.Variables["ESD_cdm"].Value = g.GreenPAK.ESD_cdm.ToString();
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  Electrical Characteristics Table
@@ -2376,8 +2376,6 @@ public static class MainProgram
                         accessQuery(VDD_DB, "POFFTHR", null, "typ"),
                         accessQuery(VDD_DB, "POFFTHR", null, "max"));
                 }
-
-                // ### insert PAK specific stuff like the PAK5 state machine
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  ASM Asynchronous State Machine

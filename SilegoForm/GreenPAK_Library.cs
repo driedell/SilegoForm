@@ -520,8 +520,8 @@
                 new PIN() { PT = "GPIO_OE", RV = 1058, UD = 1057, IM = 1060, OM = 1062, OE = 0368,            VS = 1  },    // 05
                 new PIN() { PT = "GPI",     RV = 1068, IM = 1070,                                             VS = 1  },    // 06
                 new PIN() { PT = "VDD",                                                                               },    // 07
-                new PIN() { PT = "I2C",     RV = 1075, UD = 1074, IO = 1077, DR = 1073,                       VS = 1  },    // 08   //###
-                new PIN() { PT = "I2C",     RV = 1083, UD = 1082, IO = 1085, DR = 1081,                       VS = 1  },    // 09   //###
+                new PIN() { PT = "I2C",     RV = 0000, UD = 0000, IO = 0000, DR = 0000,                       VS = 1  },    // 08   //###
+                new PIN() { PT = "I2C",     RV = 0000, UD = 0000, IO = 0000, DR = 0000,                       VS = 1  },    // 09   //###
                 new PIN() { PT = "GPIO_OE", RV = 1090, UD = 1089, IM = 1092, OM = 1094, OE = 0384,            VS = 1  },    // 10
                 new PIN() { PT = "LDO_OUT", name = "LDO_VOUT0"                                                        },    // 11
                 new PIN() { PT = "LDO_IN",  name = "LDO_VIN0"                                                         },    // 12
@@ -1308,7 +1308,7 @@
         {
             PAKs.SLG46116 = new PAK();
             PAKs.SLG46116.base_die = "SLG46116";
-            PAKs.SLG46116.package = "STQFN-14L_b";         //### this may change
+            PAKs.SLG46116.package = "STQFN-14L_b";
             PAKs.SLG46116.package_size = "1.6mm x 2.5mm";
             PAKs.SLG46116.PAK_family = 3;
             PAKs.SLG46116.power_PAK = true;
@@ -1357,7 +1357,7 @@
         {
             PAKs.SLG46117 = new PAK();
             PAKs.SLG46117.base_die = "SLG46117";
-            PAKs.SLG46117.package = "STQFN-14L_b";         //### this may change
+            PAKs.SLG46117.package = "STQFN-14L_b";
             PAKs.SLG46117.package_size = "1.6mm x 2.5mm";
             PAKs.SLG46117.PAK_family = 3;
             PAKs.SLG46117.power_PAK = true;
@@ -1561,7 +1561,7 @@
             PAKs.SLG46170.package = "STQFN-14L_c";
             PAKs.SLG46170.package_size = "2mm x 2.2mm";
             PAKs.SLG46170.PAK_family = 3;
-            PAKs.SLG46170.package_weight = "0.0xx g";   //###
+            PAKs.SLG46170.package_weight = "0.00xx g";   //###
             PAKs.SLG46170.pattern_id_address = 992;
             PAKs.SLG46170.pin = new PIN[]
             {
