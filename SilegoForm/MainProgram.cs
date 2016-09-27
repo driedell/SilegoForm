@@ -822,28 +822,34 @@ public static class MainProgram
         table.Cell(row, 7).Merge(table.Cell(symbolRow, 7));
     }
 
-    private static void EC_IH_IL(Table table, string symbol, string VDD_DB, double VDD_typ, g.pin_IOs VICTOR)
+    private static void EC_IH_IL(Table table, string symbol, string VDD_DB, double VDD_typ, g.pin_IOs VDD_IOs)
     {
-        string level = null;
-        if (symbol.Contains("H")) { level = "HIGH"; }
-        else if (symbol.Contains("L")) { level = "LOW"; }
-
         int symbolRow = EC_row_symbol(table, symbol);
         int row = symbolRow; ;
-
         EC_clearSection(table, row);
-        table.Cell(row, 2).Range.Text = level + "-Level Input Voltage";
+
+        if (symbol.StartsWith("VIH"))
+        {
+            table.Cell(row, 2).Range.Text = "HIGH-Level Output Voltage";
+            table.Cell(row, 7).Range.Text = "V";
+        }
+        if (symbol.StartsWith("VIL"))
+        {
+            table.Cell(row, 2).Range.Text = "LOW-Level Output Voltage";
+            table.Cell(row, 7).Range.Text = "V";
+        }
+
         if (g.GreenPAK.dual_supply_PAK && !symbol.Contains("2"))
         {
-            table.Cell(row, 2).Range.Text += g.GreenPAK.dual_supply_vdd_pins;
+            table.Cell(row, 2).Range.Text += "\n" + g.GreenPAK.dual_supply_vdd_pins;
         }
         else if (g.GreenPAK.dual_supply_PAK && symbol.Contains("2"))
         {
-            table.Cell(row, 2).Range.Text += g.GreenPAK.dual_supply_vdd2_pins;
+            table.Cell(row, 2).Range.Text += "\n" + g.GreenPAK.dual_supply_vdd2_pins;
         }
         table.Cell(row, 7).Range.Text = "V";
 
-        if (VICTOR.woSchmitt)
+        if (VDD_IOs.woSchmitt)
         {
             EC_row_populate(table, row, "Logic Input at VDD = " + VDD_typ.ToString() + "V",
                 accessQuery(VDD_DB, symbol.Substring(0, 3), "woSchmitt", "min"),
@@ -852,7 +858,7 @@ public static class MainProgram
             EC_row_split(table, row);
             row++;
         }
-        if (VICTOR.wSchmitt)
+        if (VDD_IOs.wSchmitt)
         {
             EC_row_populate(table, row, "Logic Input with Schmitt Trigger at VDD = " + VDD_typ.ToString() + "V",
                 accessQuery(VDD_DB, symbol.Substring(0, 3), "wSchmitt", "min"),
@@ -861,7 +867,7 @@ public static class MainProgram
             EC_row_split(table, row);
             row++;
         }
-        if (VICTOR.LVDI)
+        if (VDD_IOs.LVDI)
         {
             EC_row_populate(table, row, "LVDI Logic Input at VDD = " + VDD_typ.ToString() + "V",
                 accessQuery(VDD_DB, symbol.Substring(0, 3), "LVDI", "min"),
@@ -873,45 +879,86 @@ public static class MainProgram
         EC_row_merge(table, symbolRow, row);
     }
 
-    private static void EC_OH_OL(Table table, string symbol, string VDD_DB, double VDD_typ, g.pin_IOs VICTOR)
+    private static void EC_OH_OL(Table table, string symbol, string VDD_DB, double VDD_typ, g.pin_IOs VDD_IOs)
     {
         string level = null;
-        if (symbol.Contains("H")) { level = "HIGH"; }
-        else if (symbol.Contains("L")) { level = "LOW"; }
-
-        string VC = null;
-        if (symbol.StartsWith("V")) { VC = "Voltage"; }
-        else if (symbol.StartsWith("I")) { VC = "Current"; }
 
         int symbolRow = EC_row_symbol(table, symbol);
         int row = symbolRow;
         EC_clearSection(table, row);
 
-        table.Cell(row, 2).Range.Text = level + "-Level Output " + VC;
+        if (symbol.StartsWith("VOH"))
+        {
+            level = "HIGH";
+            table.Cell(row, 2).Range.Text = "HIGH-Level Output Voltage";
+            switch (VDD_DB)
+            {
+                case "1_8": table.Cell(row, 2).Range.Text += "\nIOH = 100 µA"; break;
+                case "3_3": table.Cell(row, 2).Range.Text += "\nIOH = 3 mA"; break;
+                case "5_0": table.Cell(row, 2).Range.Text += "\nIOH = 5 mA"; break;
+            }
+            table.Cell(row, 7).Range.Text = "V";
+        }
+        else if (symbol.StartsWith("VOL"))
+        {
+            level = "LOW";
+            table.Cell(row, 2).Range.Text = "LOW-Level Output Voltage";
+            switch (VDD_DB)
+            {
+                case "1_8": table.Cell(row, 2).Range.Text += "\nIOL = 100 µA"; break;
+                case "3_3": table.Cell(row, 2).Range.Text += "\nIOL = 3 mA"; break;
+                case "5_0": table.Cell(row, 2).Range.Text += "\nIOL = 5 mA"; break;
+            }
+            table.Cell(row, 7).Range.Text = "V";
+        }
+        else if (symbol.StartsWith("IOH"))
+        {
+            level = "HIGH";
+            table.Cell(row, 2).Range.Text = "HIGH-Level Output Current";
+            switch (VDD_DB)
+            {
+                case "1_8": table.Cell(row, 2).Range.Text += "\nVOH = VDD - 0.2 V"; break;
+                case "3_3": table.Cell(row, 2).Range.Text += "\nVOH = 2.4 V"; break;
+                case "5_0": table.Cell(row, 2).Range.Text += "\nVOH = 2.4 V"; break;
+            }
+            table.Cell(row, 7).Range.Text = "mA";
+        }
+        else if (symbol.StartsWith("IOL"))
+        {
+            level = "LOW";
+            table.Cell(row, 2).Range.Text = "LOW-Level Output Current";
+            switch (VDD_DB)
+            {
+                case "1_8": table.Cell(row, 2).Range.Text += "\nVOL = 0.15 V"; break;
+                case "3_3": table.Cell(row, 2).Range.Text += "\nVOL = 0.4 V"; break;
+                case "5_0": table.Cell(row, 2).Range.Text += "\nVOL = 0.4 V"; break;
+            }
+            table.Cell(row, 7).Range.Text = "mA";
+        }
+
         if (g.GreenPAK.dual_supply_PAK && !symbol.Contains("2"))
         {
-            table.Cell(row, 2).Range.Text += g.GreenPAK.dual_supply_vdd_pins;
+            table.Cell(row, 2).Range.Text += "\n" + g.GreenPAK.dual_supply_vdd_pins;
         }
         else if (g.GreenPAK.dual_supply_PAK && symbol.Contains("2"))
         {
-            table.Cell(row, 2).Range.Text += g.GreenPAK.dual_supply_vdd2_pins;
+            table.Cell(row, 2).Range.Text += "\n" + g.GreenPAK.dual_supply_vdd2_pins;
         }
-        table.Cell(row, 7).Range.Text = "V";
 
         if (level.Equals("HIGH"))
         {
-            if (VICTOR.PP1x > 0 || VICTOR.ODP1x > 0)
+            if (VDD_IOs.PP1x > 0 || VDD_IOs.ODP1x > 0)
             {
-                EC_row_populate(table, row, "Push Pull & PMOS OD 1x Driver at VDD=" + g.GreenPAK.vdd.typ + "V",
+                EC_row_populate(table, row, "Push Pull & PMOS OD 1x Driver at VDD = " + VDD_typ.ToString() + "V",
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "PP1x", "min"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "PP1x", "typ"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "PP1x", "max"));
                 EC_row_split(table, row);
                 row++;
             }
-            if (VICTOR.PP2x > 0 || VICTOR.ODP2x > 0)
+            if (VDD_IOs.PP2x > 0 || VDD_IOs.ODP2x > 0)
             {
-                EC_row_populate(table, row, "Push Pull & PMOS OD 2x Driver at VDD=" + g.GreenPAK.vdd.typ + "V",
+                EC_row_populate(table, row, "Push Pull & PMOS OD 2x Driver at VDD = " + VDD_typ.ToString() + "V",
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "PP2x", "min"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "PP2x", "typ"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "PP2x", "max"));
@@ -921,45 +968,45 @@ public static class MainProgram
         }
         else if (level.Equals("LOW"))
         {
-            if (VICTOR.PP1x > 0)
+            if (VDD_IOs.PP1x > 0)
             {
-                EC_row_populate(table, row, "Push Pull 1x Driver at VDD = " + g.GreenPAK.vdd.typ + "V",
+                EC_row_populate(table, row, "Push Pull 1x Driver at VDD = " + VDD_typ.ToString() + "V",
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "PP1x", "min"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "PP1x", "typ"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "PP1x", "max"));
                 EC_row_split(table, row);
                 row++;
             }
-            if (VICTOR.PP2x > 0)
+            if (VDD_IOs.PP2x > 0)
             {
-                EC_row_populate(table, row, "Push Pull 2x Driver at VDD = " + g.GreenPAK.vdd.typ + "V",
+                EC_row_populate(table, row, "Push Pull 2x Driver at VDD = " + VDD_typ.ToString() + "V",
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "PP2x", "min"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "PP2x", "typ"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "PP2x", "max"));
                 EC_row_split(table, row);
                 row++;
             }
-            if (VICTOR.ODN1x > 0)
+            if (VDD_IOs.ODN1x > 0)
             {
-                EC_row_populate(table, row, "Open Drain 1x Driver at VDD = " + g.GreenPAK.vdd.typ + "V",
+                EC_row_populate(table, row, "Open Drain 1x Driver at VDD = " + VDD_typ.ToString() + "V",
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN1x", "min"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN1x", "typ"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN1x", "max"));
                 EC_row_split(table, row);
                 row++;
             }
-            if (VICTOR.ODN2x > 0)
+            if (VDD_IOs.ODN2x > 0)
             {
-                EC_row_populate(table, row, "Open Drain 2x Driver at VDD = " + g.GreenPAK.vdd.typ + "V",
+                EC_row_populate(table, row, "Open Drain 2x Driver at VDD = " + VDD_typ.ToString() + "V",
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN2x", "min"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN2x", "typ"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN2x", "max"));
                 EC_row_split(table, row);
                 row++;
             }
-            if (VICTOR.ODN4x > 0)
+            if (VDD_IOs.ODN4x > 0)
             {
-                EC_row_populate(table, row, "Open Drain 4x Driver at VDD = " + g.GreenPAK.vdd.typ + "V",
+                EC_row_populate(table, row, "Open Drain 4x Driver at VDD = " + VDD_typ.ToString() + "V",
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN4x", "min"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN4x", "typ"),
                     accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN4x", "max"));

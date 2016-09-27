@@ -325,7 +325,7 @@ namespace SilegoForm
             this.version_label.Name = "version_label";
             this.version_label.Size = new System.Drawing.Size(37, 13);
             this.version_label.TabIndex = 43;
-            this.version_label.Text = "v0.0.5";
+            this.version_label.Text = "v0.0.6";
             this.version_label.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // TM_Part_Code_textbox
@@ -414,7 +414,7 @@ namespace SilegoForm
             this.help_textbox.Multiline = true;
             this.help_textbox.Name = "help_textbox";
             this.help_textbox.ReadOnly = true;
-            this.help_textbox.Size = new System.Drawing.Size(293, 425);
+            this.help_textbox.Size = new System.Drawing.Size(293, 345);
             this.help_textbox.TabIndex = 50;
             this.help_textbox.Text = resources.GetString("help_textbox.Text");
             this.help_textbox.Visible = false;
@@ -512,7 +512,7 @@ namespace SilegoForm
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(384, 382);
+            this.ClientSize = new System.Drawing.Size(684, 382);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.ds_rev_change_label);
