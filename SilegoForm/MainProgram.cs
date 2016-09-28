@@ -81,8 +81,8 @@ public static class MainProgram
 
         closeDontSave();
 
-        //Console.WriteLine("press a key");
-        //Console.ReadLine();
+        Console.WriteLine("press a key");
+        Console.ReadLine();
     }
 
     public static void closeDontSave()
@@ -322,14 +322,14 @@ public static class MainProgram
         {
             if (g.GreenPAK.pin[i].UD.Equals(0))
             {
-                g.GreenPAK.pin[i].resistor += "\npulldown";
+                g.GreenPAK.pin[i].resistor += " pulldown";
             }
             else
             {
                 switch (g.nvmData[g.GreenPAK.pin[i].UD].ToString())
                 {
-                    case "0": g.GreenPAK.pin[i].resistor += "\npulldown"; break;
-                    case "1": g.GreenPAK.pin[i].resistor += "\npullup"; break;
+                    case "0": g.GreenPAK.pin[i].resistor += " pulldown"; break;
+                    case "1": g.GreenPAK.pin[i].resistor += " pullup"; break;
                 }
             }
         }
@@ -890,48 +890,48 @@ public static class MainProgram
         if (symbol.StartsWith("VOH"))
         {
             level = "HIGH";
-            table.Cell(row, 2).Range.Text = "HIGH-Level Output Voltage";
+            table.Cell(row, 2).Range.Text = "HIGH-Level Output Voltage,";
             switch (VDD_DB)
             {
-                case "1_8": table.Cell(row, 2).Range.Text += "\nIOH = 100 µA"; break;
-                case "3_3": table.Cell(row, 2).Range.Text += "\nIOH = 3 mA"; break;
-                case "5_0": table.Cell(row, 2).Range.Text += "\nIOH = 5 mA"; break;
+                case "1_8": table.Cell(row, 2).Range.Text += "IOH = 100 µA"; break;
+                case "3_3": table.Cell(row, 2).Range.Text += "IOH = 3 mA"; break;
+                case "5_0": table.Cell(row, 2).Range.Text += "IOH = 5 mA"; break;
             }
             table.Cell(row, 7).Range.Text = "V";
         }
         else if (symbol.StartsWith("VOL"))
         {
             level = "LOW";
-            table.Cell(row, 2).Range.Text = "LOW-Level Output Voltage";
+            table.Cell(row, 2).Range.Text = "LOW-Level Output Voltage,";
             switch (VDD_DB)
             {
-                case "1_8": table.Cell(row, 2).Range.Text += "\nIOL = 100 µA"; break;
-                case "3_3": table.Cell(row, 2).Range.Text += "\nIOL = 3 mA"; break;
-                case "5_0": table.Cell(row, 2).Range.Text += "\nIOL = 5 mA"; break;
+                case "1_8": table.Cell(row, 2).Range.Text += "IOL = 100 µA"; break;
+                case "3_3": table.Cell(row, 2).Range.Text += "IOL = 3 mA"; break;
+                case "5_0": table.Cell(row, 2).Range.Text += "IOL = 5 mA"; break;
             }
             table.Cell(row, 7).Range.Text = "V";
         }
         else if (symbol.StartsWith("IOH"))
         {
             level = "HIGH";
-            table.Cell(row, 2).Range.Text = "HIGH-Level Output Current";
+            table.Cell(row, 2).Range.Text = "HIGH-Level Output Current,";
             switch (VDD_DB)
             {
-                case "1_8": table.Cell(row, 2).Range.Text += "\nVOH = VDD - 0.2 V"; break;
-                case "3_3": table.Cell(row, 2).Range.Text += "\nVOH = 2.4 V"; break;
-                case "5_0": table.Cell(row, 2).Range.Text += "\nVOH = 2.4 V"; break;
+                case "1_8": table.Cell(row, 2).Range.Text += "VOH = VDD - 0.2 V"; break;
+                case "3_3": table.Cell(row, 2).Range.Text += "VOH = 2.4 V"; break;
+                case "5_0": table.Cell(row, 2).Range.Text += "VOH = 2.4 V"; break;
             }
             table.Cell(row, 7).Range.Text = "mA";
         }
         else if (symbol.StartsWith("IOL"))
         {
             level = "LOW";
-            table.Cell(row, 2).Range.Text = "LOW-Level Output Current";
+            table.Cell(row, 2).Range.Text = "LOW-Level Output Current,";
             switch (VDD_DB)
             {
-                case "1_8": table.Cell(row, 2).Range.Text += "\nVOL = 0.15 V"; break;
-                case "3_3": table.Cell(row, 2).Range.Text += "\nVOL = 0.4 V"; break;
-                case "5_0": table.Cell(row, 2).Range.Text += "\nVOL = 0.4 V"; break;
+                case "1_8": table.Cell(row, 2).Range.Text += "VOL = 0.15 V"; break;
+                case "3_3": table.Cell(row, 2).Range.Text += "VOL = 0.4 V"; break;
+                case "5_0": table.Cell(row, 2).Range.Text += "VOL = 0.4 V"; break;
             }
             table.Cell(row, 7).Range.Text = "mA";
         }
@@ -1017,6 +1017,30 @@ public static class MainProgram
         EC_row_merge(table, symbolRow, row);
     }
 
+    private static void EC_subscripts(Table table, string symbol, string subscript)
+    {
+        foreach (Cell cell in table.Range.Cells)
+        {
+            if (cell.Range.Text.Contains(symbol + subscript))
+            {
+                Console.WriteLine(cell.Range.Text);
+                Console.WriteLine("Found " + symbol + subscript + " in cell " + cell.RowIndex.ToString() + "," + cell.ColumnIndex.ToString());
+
+                Range r = cell.Range;
+
+                r.SetRange(r.Start + r.Text.IndexOf(symbol),
+                           r.Start + r.Text.IndexOf(symbol) + symbol.Length);
+                r.Select();
+                r.Font.Subscript = 0;
+
+                r = cell.Range;
+                r.SetRange(r.Start + r.Text.IndexOf(subscript), 
+                           r.Start + r.Text.IndexOf(subscript) + subscript.Length);
+                r.Select();
+                r.Font.Subscript = 1;
+            }
+        }
+    }
     private static void saveFileAndOpen()
     {
         try
@@ -1367,6 +1391,13 @@ public static class MainProgram
                 g.doc.Variables["Customer_Version_Number"].Value = xEle.Attribute("text").Value;
             }
         }
+        else
+        {
+            g.part_number = g.DataSheet_File.Substring(g.DataSheet_File.LastIndexOf("\\") + 1);
+            g.part_number = g.part_number.Substring(0, g.part_number.IndexOf("_"));
+            Console.WriteLine("Part Number: " + g.part_number);
+            g.doc.Variables["Customer_Part_Number"].Value = g.part_number;
+        }
 
         // Pattern ID
         string pattern = Reverse(g.nvmData.Substring(g.GreenPAK.pattern_id_address, 8));
@@ -1410,14 +1441,6 @@ public static class MainProgram
                                 break;
                             }
                         }
-
-                        //foreach (Paragraph p in g.doc.Paragraphs)
-                        //{
-                        //    if (p.Range.Text.Trim() == string.Empty)
-                        //    {
-                        //        p.Range.Select();
-                        //    }
-                        //}
 
                         table.Delete();
                         break;
@@ -2489,6 +2512,25 @@ public static class MainProgram
                     }
                     TABLES.Close();
                 }
+
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                //  Format EC table
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (worker.CancellationPending) { e.Cancel = true; return; }
+                form.backgroundWorker.ReportProgress(3, "Populating EC Table: Fixing Subscripts");
+
+                EC_subscripts(table, "V", "OH");
+                EC_subscripts(table, "V", "OH2");
+                EC_subscripts(table, "V", "OL");
+                EC_subscripts(table, "V", "OL2");
+                EC_subscripts(table, "I", "OH");
+                EC_subscripts(table, "I", "OH2");
+                EC_subscripts(table, "I", "OL");
+                EC_subscripts(table, "I", "OL2");
+                EC_subscripts(table, "V", "DD");
+                EC_subscripts(table, "V", "DD2");
+                EC_subscripts(table, "PON", "THR");     // ### fix
+                EC_subscripts(table, "POFF", "THR");    // ### fix
 
                 g.connection.Close();
                 table.Rows.SetHeight(1, WdRowHeightRule.wdRowHeightAuto);
