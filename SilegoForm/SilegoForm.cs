@@ -9,7 +9,7 @@ namespace SilegoForm
         public SilegoForm()
         {
             InitializeComponent();
-            MaximumSize = new System.Drawing.Size(400, 500);
+            MaximumSize = new System.Drawing.Size(400, 420);
             new_part_checkbox.Checked = true;           //### Erase this later
         }
 
@@ -130,15 +130,15 @@ namespace SilegoForm
             if (help_checkbox.Checked)
             {
                 Size = new System.Drawing.Size(700, 500);
-                MaximumSize = new System.Drawing.Size(700, 500);
-                MinimumSize = new System.Drawing.Size(700, 500);
+                MaximumSize = new System.Drawing.Size(700, 420);
+                MinimumSize = new System.Drawing.Size(700, 420);
                 help_textbox.Visible = true;
             }
             else if (!help_checkbox.Checked)
             {
                 Size = new System.Drawing.Size(400, 500);
-                MaximumSize = new System.Drawing.Size(400, 500);
-                MinimumSize = new System.Drawing.Size(400, 500);
+                MaximumSize = new System.Drawing.Size(400, 420);
+                MinimumSize = new System.Drawing.Size(400, 420);
                 help_textbox.Visible = false;
             }
         }

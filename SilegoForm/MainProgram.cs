@@ -183,7 +183,10 @@ public static class MainProgram
                     g.GreenPAK.base_die.Equals("SLG46117"))
                 {
                     if (g.nvmData.Substring(OE, 5).Equals("00000")) { g.GreenPAK.pin[i].type = "Digital Input"; }
-                    else if (g.nvmData.Substring(OE, 5).Equals("11111")) { g.GreenPAK.pin[i].type = "Digital Output"; }
+                    else if (g.nvmData.Substring(OE, 5).Equals("11111") || g.nvmData.Substring(OE, 5).Equals("11101"))
+                    {
+                        g.GreenPAK.pin[i].type = "Digital Output";
+                    }
                     else { g.GreenPAK.pin[i].type = "Digital I/O"; }
                 }
                 else
@@ -337,8 +340,8 @@ public static class MainProgram
 
     private static void pin_config_OE_input(int i)
     {
-        switch (g.nvmData[g.GreenPAK.pin[i].OM + 1].ToString() +
-                g.nvmData[g.GreenPAK.pin[i].OM + 1].ToString())
+        switch (g.nvmData[g.GreenPAK.pin[i].IM + 1].ToString() +
+                g.nvmData[g.GreenPAK.pin[i].IM + 1].ToString())
         {
             case "00": g.GreenPAK.pin[i].description += "Digital Input without Schmitt trigger"; break;
             case "01": g.GreenPAK.pin[i].description += "Digital Input with Schmitt trigger"; break;
@@ -1034,13 +1037,14 @@ public static class MainProgram
                 r.Font.Subscript = 0;
 
                 r = cell.Range;
-                r.SetRange(r.Start + r.Text.IndexOf(subscript), 
+                r.SetRange(r.Start + r.Text.IndexOf(subscript),
                            r.Start + r.Text.IndexOf(subscript) + subscript.Length);
                 r.Select();
                 r.Font.Subscript = 1;
             }
         }
     }
+
     private static void saveFileAndOpen()
     {
         try
@@ -2452,7 +2456,7 @@ public static class MainProgram
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (worker.CancellationPending) { e.Cancel = true; return; }
                 form.backgroundWorker.ReportProgress(3, "Populating EC Table: ASM");
-                if (g.asm_used && g.new_part_update)
+                if (g.asm_used && (g.new_part_update || g.temp_vdd_update))
                 {
                     row = EC_row_symbol(table, "tst_out_delay");
                     table.Cell(row, 2).Range.Text = "State Machine Output Delay";
@@ -2514,23 +2518,26 @@ public static class MainProgram
                 }
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
-                //  Format EC table
+                //  Format EC table subscripts and exit EC table
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (worker.CancellationPending) { e.Cancel = true; return; }
                 form.backgroundWorker.ReportProgress(3, "Populating EC Table: Fixing Subscripts");
 
-                EC_subscripts(table, "V", "OH");
-                EC_subscripts(table, "V", "OH2");
-                EC_subscripts(table, "V", "OL");
-                EC_subscripts(table, "V", "OL2");
-                EC_subscripts(table, "I", "OH");
-                EC_subscripts(table, "I", "OH2");
-                EC_subscripts(table, "I", "OL");
-                EC_subscripts(table, "I", "OL2");
-                EC_subscripts(table, "V", "DD");
-                EC_subscripts(table, "V", "DD2");
-                EC_subscripts(table, "PON", "THR");     // ### fix
-                EC_subscripts(table, "POFF", "THR");    // ### fix
+                if (g.new_part_update || g.pin_settings_update || g.temp_vdd_update)
+                {
+                    EC_subscripts(table, "V", "OH");
+                    EC_subscripts(table, "V", "OH2");
+                    EC_subscripts(table, "V", "OL");
+                    EC_subscripts(table, "V", "OL2");
+                    EC_subscripts(table, "I", "OH");
+                    EC_subscripts(table, "I", "OH2");
+                    EC_subscripts(table, "I", "OL");
+                    EC_subscripts(table, "I", "OL2");
+                    EC_subscripts(table, "V", "DD");
+                    EC_subscripts(table, "V", "DD2");
+                    EC_subscripts(table, "PON", "THR");
+                    EC_subscripts(table, "POFF", "THR");
+                }
 
                 g.connection.Close();
                 table.Rows.SetHeight(1, WdRowHeightRule.wdRowHeightAuto);

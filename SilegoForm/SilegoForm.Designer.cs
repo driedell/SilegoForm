@@ -532,8 +532,8 @@ namespace SilegoForm
             this.Controls.Add(this.cancel_button);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(700, 500);
-            this.MinimumSize = new System.Drawing.Size(400, 400);
+            this.MaximumSize = new System.Drawing.Size(700, 420);
+            this.MinimumSize = new System.Drawing.Size(400, 420);
             this.Name = "SilegoForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Silego DataSheet Automation Tool";

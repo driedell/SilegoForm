@@ -1476,10 +1476,10 @@
             };
             PAKs.SLG46108.cnt = new CNT[]
             {
-                new CNT() { CK = 0303, DA = 0306, LN = 08, MD = 0301, SL = 0001 },    // 0
-                new CNT() { CK = 0320, DA = 0323, LN = 08, MD = 0318, SL = 0001 },    // 1
+                new CNT() { CK = 0303, DA = 0306, LN = 08, MD = 0301, SL = 0000 },    // 0
+                new CNT() { CK = 0320, DA = 0323, LN = 08, MD = 0318, SL = 0000 },    // 1
                 new CNT() { CK = 0270, DA = 0273, LN = 08, MD = 0269, SL = 0285 },    // 2
-                new CNT() { CK = 0336, DA = 0339, LN = 08, MD = 0335, SL = 0001 },    // 3
+                new CNT() { CK = 0336, DA = 0339, LN = 08, MD = 0335, SL = 0000 },    // 3
             };
             PAKs.SLG46108.acmp = new ACMP[]
             {
