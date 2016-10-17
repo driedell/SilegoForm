@@ -45,7 +45,6 @@ public static class MainProgram
         public static string part_number = "SLG~~~~~";
         public static int ext_clk_freq = 0;
 
-        //public static PAK GreenPAK;
         public static PAK GreenPAK;
 
         public static bool VHYS;
@@ -176,25 +175,20 @@ public static class MainProgram
 
                 pin_config_resistor(i);
 
-                // ### check this section
-
-                if (g.GreenPAK.base_die.Equals("SLG46108") ||
-                    g.GreenPAK.base_die.Equals("SLG46116") ||
-                    g.GreenPAK.base_die.Equals("SLG46117"))
+                if (g.nvmData.Substring(OE, g.GreenPAK.matrix_VDD.Length).Equals(g.GreenPAK.matrix_GND))
                 {
-                    if (g.nvmData.Substring(OE, 5).Equals("00000")) { g.GreenPAK.pin[i].type = "Digital Input"; }
-                    else if (g.nvmData.Substring(OE, 5).Equals("11111") || g.nvmData.Substring(OE, 5).Equals("11101"))
-                    {
-                        g.GreenPAK.pin[i].type = "Digital Output";
-                    }
-                    else { g.GreenPAK.pin[i].type = "Digital I/O"; }
+                    g.GreenPAK.pin[i].type = "Digital Input";
+                }
+                else if (g.nvmData.Substring(OE, g.GreenPAK.matrix_VDD.Length).Equals(g.GreenPAK.matrix_VDD) ||
+                         g.nvmData.Substring(OE, g.GreenPAK.matrix_VDD.Length).Equals(g.GreenPAK.matrix_POR))
+                {
+                    g.GreenPAK.pin[i].type = "Digital Output";
                 }
                 else
                 {
-                    if (g.nvmData.Substring(OE, 6).Equals("000000")) { g.GreenPAK.pin[i].type = "Digital Input"; }
-                    else if (g.nvmData.Substring(OE, 6).Equals("111111")) { g.GreenPAK.pin[i].type = "Digital Output"; }
-                    else { g.GreenPAK.pin[i].type = "Digital I/O"; }
+                    g.GreenPAK.pin[i].type = "Digital I/O";
                 }
+                
                 switch (g.GreenPAK.pin[i].type)
                 {
                     case "Digital Input": pin_config_OE_input(i); break;
@@ -341,7 +335,7 @@ public static class MainProgram
     private static void pin_config_OE_input(int i)
     {
         switch (g.nvmData[g.GreenPAK.pin[i].IM + 1].ToString() +
-                g.nvmData[g.GreenPAK.pin[i].IM + 1].ToString())
+                g.nvmData[g.GreenPAK.pin[i].IM + 0].ToString())
         {
             case "00": g.GreenPAK.pin[i].description += "Digital Input without Schmitt trigger"; break;
             case "01": g.GreenPAK.pin[i].description += "Digital Input with Schmitt trigger"; break;
@@ -481,7 +475,6 @@ public static class MainProgram
                 //case "11011": acmpVIH = EXT_VREF; break;
                 //case "11100": acmpVIH = EXT_VREF / 2; break;
                 //case "11101": acmpVIH = EXT_VREF / 2; break;
-                //### include field for External VREF??
         }
 
         if (g.GreenPAK.base_die.Equals("SLG50003"))
@@ -1144,10 +1137,12 @@ public static class MainProgram
         try
         {
             g.app = new Microsoft.Office.Interop.Word.Application();
-            g.doc = g.app.Documents.Add(g.DataSheet_File, oMissing, oMissing, true);
+            //g.doc = g.app.Documents.Add(g.DataSheet_File, oMissing, oMissing, true);
+            g.doc = g.app.Documents.Add(g.DataSheet_File);
         }
-        catch
+        catch (Exception ex)
         {
+            MessageBox.Show(ex.ToString());
             form.backgroundWorker.ReportProgress(0, "Error: Could not load DataSheet file!");
             e.Cancel = true;
             return;
@@ -1667,7 +1662,11 @@ public static class MainProgram
                     int width = (int)shape.Width;
                     int height = (int)shape.Height;
 
+                    //Console.WriteLine("Left: " + left.ToString() + " Top: " + top.ToString());
+                    //Console.ReadLine();
                     shape.Delete();
+
+                    Range r = g.doc.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToAbsolute, 1);
 
                     Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"Resources\" + g.GreenPAK.package + ".png");
                     newShape.Title = "pinout_diagram";
@@ -1677,6 +1676,7 @@ public static class MainProgram
                     newShape.Top = top;
                     newShape.Width = width;
                     newShape.Height = height;
+
                     break;
                 }
             }

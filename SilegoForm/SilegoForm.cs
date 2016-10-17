@@ -77,6 +77,7 @@ namespace SilegoForm
                 TM_Part_Code_checkbox.Enabled = true;
                 TM_Revision_checkbox.Enabled = true;
                 lock_status_checkbox.Enabled = true;
+                DS_rev_change_textbox.ReadOnly = false;
 
                 progressBar.Visible = false;
                 progressBar.Value = 0;
@@ -304,6 +305,8 @@ namespace SilegoForm
             start_button.Visible = false;
             cancel_button.Visible = true;
             cancel_button.Enabled = true;
+            error_label.Visible = false;
+            error_label.Text = "";
 
             new_part_checkbox.Enabled = false;
             metadata_checkbox.Enabled = false;
@@ -317,6 +320,7 @@ namespace SilegoForm
             TM_Part_Code_checkbox.Enabled = false;
             TM_Revision_checkbox.Enabled = false;
             lock_status_checkbox.Enabled = false;
+            DS_rev_change_textbox.ReadOnly = true;
 
             progressBar.Visible = true;
             status_label.Visible = true;
@@ -367,6 +371,16 @@ namespace SilegoForm
         private void TM_Revision_textbox_TextChanged(object sender, EventArgs e)
         {
             MainProgram.g.TM_revision = TM_Revision_textbox.Text;
+        }
+
+        private void GP_file_textbox_TextChanged(object sender, EventArgs e)
+        {
+            Console.WriteLine(MainProgram.g.GreenPAK_File);
+        }
+
+        private void DS_file_textbox_TextChanged(object sender, EventArgs e)
+        {
+            Console.WriteLine(MainProgram.g.DataSheet_File);
         }
     }
 }

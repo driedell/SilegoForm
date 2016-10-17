@@ -110,6 +110,10 @@
         public int VDD_bypass_enable;
         public int ESD_cdm;         // ESD Charged Device Model
 
+        public string matrix_VDD;
+        public string matrix_POR;
+        public string matrix_GND;
+
         // OSC stuff
 
         public int LF_osc_freq;
@@ -187,6 +191,9 @@
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                 new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46531.matrix_GND = "000000";
+            PAKs.SLG46531.matrix_VDD = "111111";
+            PAKs.SLG46531.matrix_POR = "011111";
             PAKs.SLG46531.VDD_bypass_enable = 1475;
             PAKs.SLG46531.ESD_cdm = 1300;
             PAKs.SLG46531.RC_osc_freq = 25000;
@@ -253,6 +260,9 @@
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                 new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46532.matrix_GND = "000000";
+            PAKs.SLG46532.matrix_VDD = "111111";
+            PAKs.SLG46532.matrix_POR = "011111";
             PAKs.SLG46532.VDD_bypass_enable = 1475;
             PAKs.SLG46532.ESD_cdm = 500;
             PAKs.SLG46532.RC_osc_freq = 25000;
@@ -316,6 +326,9 @@
                     new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                     new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46533.matrix_GND = "000000";
+            PAKs.SLG46533.matrix_VDD = "111111";
+            PAKs.SLG46533.matrix_POR = "011111";
             PAKs.SLG46533.VDD_bypass_enable = 1475;
             PAKs.SLG46533.ESD_cdm = 1300;
             PAKs.SLG46533.RC_osc_freq = 25000;
@@ -372,6 +385,9 @@
                 new ACMP() { TH = 1632, GN = 1637, LB = 1639, HY = 1170 },    // 1
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
             };
+            PAKs.SLG46534.matrix_GND = "000000";
+            PAKs.SLG46534.matrix_VDD = "111111";
+            PAKs.SLG46534.matrix_POR = "011111";
             PAKs.SLG46534.VDD_bypass_enable = 1475;
             PAKs.SLG46534.ESD_cdm = 1300;
             PAKs.SLG46534.RC_osc_freq = 25000;
@@ -431,6 +447,9 @@
                 new ACMP() { TH = 1632, GN = 1637, LB = 1639, HY = 1170 },    // 1
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
             };
+            PAKs.SLG46535.matrix_GND = "000000";
+            PAKs.SLG46535.matrix_VDD = "111111";
+            PAKs.SLG46535.matrix_POR = "011111";
             PAKs.SLG46535.VDD_bypass_enable = 1475;
             PAKs.SLG46535.ESD_cdm = 500;
             PAKs.SLG46535.RC_osc_freq = 25000;
@@ -487,6 +506,9 @@
                 new ACMP() { TH = 1632, GN = 1637, LB = 1639, HY = 1170 },    // 1
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
             };
+            PAKs.SLG46536.matrix_GND = "000000";
+            PAKs.SLG46536.matrix_VDD = "111111";
+            PAKs.SLG46536.matrix_POR = "011111";
             PAKs.SLG46536.VDD_bypass_enable = 1475;
             PAKs.SLG46536.ESD_cdm = 1300;
             PAKs.SLG46536.RC_osc_freq = 25000;
@@ -549,6 +571,9 @@
                     new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1125 },    // 2
                     new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1121 },    // 3
             };
+            PAKs.SLG50003.matrix_GND = "000000";
+            PAKs.SLG50003.matrix_VDD = "111111";
+            PAKs.SLG50003.matrix_POR = "011111";
             PAKs.SLG50003.ESD_cdm = 1300;
             PAKs.SLG50003.RC_osc_freq = 25000;
             PAKs.SLG50003.RC_osc_freq_alt = 2000000;
@@ -613,6 +638,9 @@
                     new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                     new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46533M.matrix_GND = "000000";
+            PAKs.SLG46533M.matrix_VDD = "111111";
+            PAKs.SLG46533M.matrix_POR = "011111";
             PAKs.SLG46533M.VDD_bypass_enable = 1475;
             PAKs.SLG46533M.ESD_cdm = 1300;
             PAKs.SLG46533M.RC_osc_freq = 25000;
@@ -676,6 +704,9 @@
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                 new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46537.matrix_GND = "000000";
+            PAKs.SLG46537.matrix_VDD = "111111";
+            PAKs.SLG46537.matrix_POR = "011111";
             PAKs.SLG46537.VDD_bypass_enable = 1475;
             PAKs.SLG46537.ESD_cdm = 1300;
             PAKs.SLG46537.RC_osc_freq = 25000;
@@ -742,6 +773,9 @@
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                 new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46538.matrix_GND = "000000";
+            PAKs.SLG46538.matrix_VDD = "111111";
+            PAKs.SLG46538.matrix_POR = "011111";
             PAKs.SLG46538.VDD_bypass_enable = 1475;
             PAKs.SLG46538.ESD_cdm = 500;
             PAKs.SLG46538.RC_osc_freq = 25000;
@@ -807,6 +841,9 @@
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                 new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46537M.matrix_GND = "000000";
+            PAKs.SLG46537M.matrix_VDD = "111111";
+            PAKs.SLG46537M.matrix_POR = "011111";
             PAKs.SLG46537M.VDD_bypass_enable = 1475;
             PAKs.SLG46537M.ESD_cdm = 1300;
             PAKs.SLG46537M.RC_osc_freq = 25000;
@@ -875,6 +912,9 @@
                 new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1181 },    // 2
                 new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1178 },    // 3
             };
+            PAKs.SLG46538M.matrix_GND = "000000";
+            PAKs.SLG46538M.matrix_VDD = "111111";
+            PAKs.SLG46538M.matrix_POR = "011111";
             PAKs.SLG46538M.VDD_bypass_enable = 1475;
             PAKs.SLG46538M.ESD_cdm = 500;
             PAKs.SLG46538M.RC_osc_freq = 25000;
@@ -927,6 +967,9 @@
                 new ACMP() { TH = 0496, HY = 0510, GN = 0522, LB = 0524 },    // 0
                 new ACMP() { TH = 0501, HY = 0508, GN = 0519, LB = 0518 },    // 1
             };
+            PAKs.SLG46140.matrix_GND = "000000";
+            PAKs.SLG46140.matrix_VDD = "111111";
+            PAKs.SLG46140.matrix_POR = "011111";
             PAKs.SLG46140.ESD_cdm = 500;
             PAKs.SLG46140.LF_osc_freq = 1743;
             PAKs.SLG46140.LF_osc_pre_div = 560;
@@ -997,6 +1040,9 @@
                 new ACMP() { TH = 0912, HY = 0926, GN = 0871, LB = 0875 },  // 4
                 new ACMP() { TH = 0917, HY = 0924, GN = 0000, LB = 0880 },  // 5
             };
+            PAKs.SLG46620.matrix_GND = "000000";
+            PAKs.SLG46620.matrix_VDD = "111111";
+            PAKs.SLG46620.matrix_POR = "011111";
             PAKs.SLG46620.ESD_cdm = 500;
             PAKs.SLG46620.LF_osc_freq = 1743;
             PAKs.SLG46620.LF_osc_pre_div = 1654;
@@ -1070,6 +1116,9 @@
                 new ACMP() { TH = 0912, HY = 0926, GN = 0871, LB = 0875 },  // 4
                 new ACMP() { TH = 0917, HY = 0924, GN = 0000, LB = 0880 },  // 5
             };
+            PAKs.SLG46621.matrix_GND = "000000";
+            PAKs.SLG46621.matrix_VDD = "111111";
+            PAKs.SLG46621.matrix_POR = "011111";
             PAKs.SLG46621.ESD_cdm = 500;
             PAKs.SLG46621.LF_osc_freq = 1743;
             PAKs.SLG46621.LF_osc_pre_div = 1654;
@@ -1104,7 +1153,7 @@
                 new PIN() { PT = "GPIO_OE", RV = 0851, UD = 0853, IM = 0847, OM = 0849, OE = 0024,            VS = 1  },    // 05
                 new PIN() { PT = "GPIO",    RV = 0857, UD = 0859, IO = 0854, DR = 0860,                       VS = 1  },    // 06
                 new PIN() { PT = "GPIO_OE", RV = 0865, UD = 0867, IM = 0861, OM = 0863, OE = 0042,            VS = 1  },    // 07
-                new PIN() { PT = "GPIO",    RV = 0871, UD = 0873, IO = 0867, DR = 0874,                       VS = 1  },    // 08
+                new PIN() { PT = "GPIO",    RV = 0871, UD = 0873, IO = 0868, DR = 0874,                       VS = 1  },    // 08
                 new PIN() { PT = "GPIO_OE", RV = 0879, UD = 0881, IM = 0875, OM = 0877, OE = 0060,            VS = 1  },    // 09
                 new PIN() { PT = "SD",      RV = 0885, UD = 0887, IO = 0882, DR = 0888,            SD = 0889, VS = 1  },    // 10
                 new PIN() { PT = "GND",                                                                               },    // 11
@@ -1135,6 +1184,9 @@
                 new ACMP() { TH = 0818, HY = 0823, GN = 0825, LB = 0827 },  // 2
                 new ACMP() { TH = 0552, HY = 0557, GN = 0559, LB = 0561 },  // 3
             };
+            PAKs.SLG46721.matrix_GND = "000000";
+            PAKs.SLG46721.matrix_VDD = "111111";
+            PAKs.SLG46721.matrix_POR = "011111";
             PAKs.SLG46721.ESD_cdm = 1300;
             PAKs.SLG46721.RC_osc_freq = 25000;
             PAKs.SLG46721.RC_osc_freq_alt = 2000000;
@@ -1197,6 +1249,9 @@
                 new ACMP() { TH = 0818, HY = 0823, GN = 0825, LB = 0827 },  // 2
                 new ACMP() { TH = 0552, HY = 0557, GN = 0559, LB = 0561 },  // 3
             };
+            PAKs.SLG46722.matrix_GND = "000000";
+            PAKs.SLG46722.matrix_VDD = "111111";
+            PAKs.SLG46722.matrix_POR = "011111";
             PAKs.SLG46722.ESD_cdm = 1300;
             PAKs.SLG46722.RC_osc_freq = 25000;
             PAKs.SLG46722.RC_osc_freq_alt = 2000000;
@@ -1245,6 +1300,9 @@
                 new ACMP() { TH = 0356, HY = 0361, GN = 0363, LB = 0365 },    // 0
                 new ACMP() { TH = 0367, HY = 0372, GN = 0374, LB = 0377 },    // 1
             };
+            PAKs.SLG46110.matrix_GND = "00000";
+            PAKs.SLG46110.matrix_VDD = "11111";
+            PAKs.SLG46110.matrix_POR = "01011";
             PAKs.SLG46110.ESD_cdm = 1000;
             PAKs.SLG46110.RC_osc_freq = 25000;
             PAKs.SLG46110.RC_osc_freq_alt = 2000000;
@@ -1293,6 +1351,9 @@
                 new ACMP() { TH = 0596, HY = 0601, GN = 0603, LB = 0605 },    // 0
                 new ACMP() { TH = 0607, HY = 0612, GN = 0614, LB = 0617 },    // 1
             };
+            PAKs.SLG46120.matrix_GND = "000000";
+            PAKs.SLG46120.matrix_VDD = "111001";
+            PAKs.SLG46120.matrix_POR = "100001";
             PAKs.SLG46120.ESD_cdm = 1000;
             PAKs.SLG46120.RC_osc_freq = 25000;
             PAKs.SLG46120.RC_osc_freq_alt = 2000000;
@@ -1342,6 +1403,9 @@
             PAKs.SLG46116.acmp = new ACMP[]
             {
             };
+            PAKs.SLG46116.matrix_GND = "00000";
+            PAKs.SLG46116.matrix_VDD = "11111";
+            PAKs.SLG46116.matrix_POR = "01011";
             PAKs.SLG46116.ESD_cdm = 1000;
             PAKs.SLG46116.RC_osc_freq = 25000;
             PAKs.SLG46116.RC_osc_freq_alt = 2000000;
@@ -1391,6 +1455,9 @@
             PAKs.SLG46117.acmp = new ACMP[]
             {
             };
+            PAKs.SLG46117.matrix_GND = "00000";
+            PAKs.SLG46117.matrix_VDD = "11111";
+            PAKs.SLG46117.matrix_POR = "01011";
             PAKs.SLG46117.ESD_cdm = 1000;
             PAKs.SLG46117.RC_osc_freq = 25000;
             PAKs.SLG46117.RC_osc_freq_alt = 2000000;
@@ -1442,6 +1509,9 @@
                 new ACMP() { TH = 0596, HY = 0601, GN = 0603, LB = 0605 },    // 0
                 new ACMP() { TH = 0607, HY = 0612, GN = 0614, LB = 0617 },    // 1
             };
+            PAKs.SLG46121.matrix_GND = "000000";
+            PAKs.SLG46121.matrix_VDD = "111001";
+            PAKs.SLG46121.matrix_POR = "100001";
             PAKs.SLG46121.ESD_cdm = 500;
             PAKs.SLG46121.RC_osc_freq = 25000;
             PAKs.SLG46121.RC_osc_freq_alt = 2000000;
@@ -1484,6 +1554,9 @@
             PAKs.SLG46108.acmp = new ACMP[]
             {
             };
+            PAKs.SLG46108.matrix_GND = "00000";
+            PAKs.SLG46108.matrix_VDD = "11111";
+            PAKs.SLG46108.matrix_POR = "11101";
             PAKs.SLG46108.ESD_cdm = 1000;
             PAKs.SLG46108.RC_osc_freq = 25000;
             PAKs.SLG46108.RC_osc_freq_alt = 2000000;

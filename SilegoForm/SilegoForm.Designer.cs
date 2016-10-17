@@ -104,6 +104,7 @@ namespace SilegoForm
             this.DS_file_textbox.Size = new System.Drawing.Size(275, 40);
             this.DS_file_textbox.TabIndex = 26;
             this.DS_file_textbox.Text = "Drop DS File";
+            this.DS_file_textbox.TextChanged += new System.EventHandler(this.DS_file_textbox_TextChanged);
             // 
             // GP_file_textbox
             // 
@@ -115,6 +116,7 @@ namespace SilegoForm
             this.GP_file_textbox.Size = new System.Drawing.Size(275, 41);
             this.GP_file_textbox.TabIndex = 25;
             this.GP_file_textbox.Text = "Drop GP File";
+            this.GP_file_textbox.TextChanged += new System.EventHandler(this.GP_file_textbox_TextChanged);
             // 
             // start_button
             // 
@@ -325,7 +327,7 @@ namespace SilegoForm
             this.version_label.Name = "version_label";
             this.version_label.Size = new System.Drawing.Size(37, 13);
             this.version_label.TabIndex = 43;
-            this.version_label.Text = "v0.0.6";
+            this.version_label.Text = "v0.0.8";
             this.version_label.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // TM_Part_Code_textbox

@@ -8,13 +8,13 @@ C:\Users\driedell\Desktop\Silego_DS_Project\ConsoleApplication4\ConsoleApplicati
 C:\Users\driedell\Desktop\Silego_DS_Project\ConsoleApplication4\ConsoleApplication4\obj\Debug\SilegoForm.Properties.Resources.resources
 C:\Users\driedell\Desktop\Silego_DS_Project\ConsoleApplication4\ConsoleApplication4\obj\Debug\SilegoForm.exe
 C:\Users\driedell\Desktop\Silego_DS_Project\ConsoleApplication4\ConsoleApplication4\obj\Debug\SilegoForm.pdb
-C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\bin\Debug\SilegoForm.exe.config
 C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\obj\Debug\SilegoForm.csproj.ResolveComReference.cache
-C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\obj\Debug\SilegoForm.exe
 C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\obj\Debug\SilegoForm.pdb
-C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\bin\Debug\SilegoForm.exe
 C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\bin\Debug\SilegoForm.pdb
 C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\obj\Debug\SilegoForm.csprojResolveAssemblyReference.cache
 C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\obj\Debug\SilegoForm.SilegoForm.resources
 C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\obj\Debug\SilegoForm.Properties.Resources.resources
 C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\obj\Debug\SilegoForm.csproj.GenerateResource.Cache
+C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\bin\Debug\SilegoForm.exe.config
+C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\bin\Debug\SilegoForm.exe
+C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\obj\Debug\SilegoForm.exe
