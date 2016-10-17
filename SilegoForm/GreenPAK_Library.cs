@@ -935,7 +935,7 @@
             PAKs.SLG46140.package = "STQFN-14L_a";
             PAKs.SLG46140.package_size = "1.6mm x 2mm";
             PAKs.SLG46140.PAK_family = 4;
-            PAKs.SLG46140.package_weight = "0.00xx g";  //###
+            PAKs.SLG46140.package_weight = "0.0045 g";  //###
             PAKs.SLG46140.pattern_id_address = 1007;
             PAKs.SLG46140.pin = new PIN[]
             {
@@ -1579,7 +1579,7 @@
             PAKs.SLG46169.package = "STQFN-14L_c";
             PAKs.SLG46169.package_size = "2mm x 2.2mm";
             PAKs.SLG46169.PAK_family = 3;
-            PAKs.SLG46169.package_weight = "0.00xx g";      // ###
+            PAKs.SLG46169.package_weight = "0.0068 g";
             PAKs.SLG46169.pattern_id_address = 0970;
             PAKs.SLG46169.pin = new PIN[]
             {
@@ -1634,7 +1634,7 @@
             PAKs.SLG46170.package = "STQFN-14L_c";
             PAKs.SLG46170.package_size = "2mm x 2.2mm";
             PAKs.SLG46170.PAK_family = 3;
-            PAKs.SLG46170.package_weight = "0.00xx g";   //###
+            PAKs.SLG46170.package_weight = "0.0068 g";   //###
             PAKs.SLG46170.pattern_id_address = 992;
             PAKs.SLG46170.pin = new PIN[]
             {

@@ -10,7 +10,7 @@ namespace SilegoForm
         {
             InitializeComponent();
             MaximumSize = new System.Drawing.Size(400, 420);
-            new_part_checkbox.Checked = true;           //### Erase this later
+            new_part_checkbox.Checked = true;           //### Erase this later?
         }
 
         public void progressIncrement(int value)
@@ -38,7 +38,6 @@ namespace SilegoForm
 
             string message = (string)e.UserState;
 
-            // ### figure out how to wait until user presses continue/cancel button?
             if (message.StartsWith("Error:"))
             {
                 error_label.Visible = true;
