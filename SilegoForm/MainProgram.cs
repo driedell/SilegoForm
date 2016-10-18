@@ -188,7 +188,7 @@ public static class MainProgram
                 {
                     g.GreenPAK.pin[i].type = "Digital I/O";
                 }
-                
+
                 switch (g.GreenPAK.pin[i].type)
                 {
                     case "Digital Input": pin_config_OE_input(i); break;
@@ -2521,21 +2521,33 @@ public static class MainProgram
                 //  Format EC table subscripts and exit EC table
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (worker.CancellationPending) { e.Cancel = true; return; }
-                form.backgroundWorker.ReportProgress(3, "Populating EC Table: Fixing Subscripts");
+                //form.backgroundWorker.ReportProgress(3, "Populating EC Table: Fixing Subscripts");
 
                 if (g.new_part_update || g.pin_settings_update || g.temp_vdd_update)
                 {
+                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: VOH Subscripts");
                     EC_subscripts(table, "V", "OH");
+                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: VOH2 Subscripts");
                     EC_subscripts(table, "V", "OH2");
+                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: VOL Subscripts");
                     EC_subscripts(table, "V", "OL");
+                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: VOL2 Subscripts");
                     EC_subscripts(table, "V", "OL2");
+                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: IOH Subscripts");
                     EC_subscripts(table, "I", "OH");
+                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: IOH2 Subscripts");
                     EC_subscripts(table, "I", "OH2");
+                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: IOL Subscripts");
                     EC_subscripts(table, "I", "OL");
+                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: IOL2 Subscripts");
                     EC_subscripts(table, "I", "OL2");
+                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: VDD Subscripts");
                     EC_subscripts(table, "V", "DD");
+                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: VDD2 Subscripts");
                     EC_subscripts(table, "V", "DD2");
+                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: PONTHR Subscripts");
                     EC_subscripts(table, "PON", "THR");
+                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: POFFTHR Subscripts");
                     EC_subscripts(table, "POFF", "THR");
                 }
 
@@ -2597,6 +2609,46 @@ public static class MainProgram
                 table.Cell(DRH_row, 3).Range.Text = g.DS_rev_change;
 
                 break;
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  I2C Slave Address table
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (worker.CancellationPending) { e.Cancel = true; return; }
+        form.backgroundWorker.ReportProgress(3, "Populating I2C Chip Address Table");
+
+        if (g.GreenPAK.i2c_PAK)
+        {
+            string SA_bin = Reverse(g.nvmData.Substring(g.GreenPAK.i2c_slave_address, 4));
+            SA_bin = "0" + SA_bin + "000";
+            string SA_dec = Convert.ToInt32(SA_bin, 2).ToString();
+            string SA_hex = "0x" + Convert.ToInt32(SA_bin, 2).ToString("X");
+
+            Console.WriteLine(SA_bin + " " + SA_dec + " " + SA_hex);
+
+            g.doc.Variables["Slave_Address_BIN"].Value = SA_bin;
+            g.doc.Variables["Slave_Address_DEC"].Value = SA_dec;
+            g.doc.Variables["Slave_Address_HEX"].Value = SA_hex;
+        }
+        else if (g.new_part_update)
+        {
+            foreach (Table table in g.doc.Tables)
+            {
+                if (table.Title == "i2c_chip_address")
+                {
+                    table.Delete();
+                    break;
+                }
+            }
+            foreach (Paragraph p in g.doc.Paragraphs)
+            {
+                if (p.Range.Text.StartsWith("I2C Chip Address"))
+                {
+                    p.Range.Select();
+                    g.app.Selection.Delete();
+                    break;
+                }
             }
         }
 

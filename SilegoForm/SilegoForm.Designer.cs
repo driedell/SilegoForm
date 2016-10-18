@@ -327,7 +327,7 @@ namespace SilegoForm
             this.version_label.Name = "version_label";
             this.version_label.Size = new System.Drawing.Size(37, 13);
             this.version_label.TabIndex = 43;
-            this.version_label.Text = "v0.0.8";
+            this.version_label.Text = "v0.0.9";
             this.version_label.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // TM_Part_Code_textbox

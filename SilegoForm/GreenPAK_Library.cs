@@ -15,6 +15,8 @@
 
         public bool power_PAK = false;
         public bool LDO_PAK = false;
+        public bool i2c_PAK = false;
+        public int i2c_slave_address;
 
         public mTM vdd;
         public mTM vdd2;
@@ -150,6 +152,8 @@
             PAKs.SLG46531.PAK_family = 5;
             PAKs.SLG46531.package_weight = "0.0090 g";
             PAKs.SLG46531.pattern_id_address = 1840;
+            PAKs.SLG46531.i2c_PAK = true;
+            PAKs.SLG46531.i2c_slave_address = 1864;
             PAKs.SLG46531.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
@@ -219,6 +223,8 @@
             PAKs.SLG46532.dual_supply_PAK = true;
             PAKs.SLG46532.dual_supply_vdd_pins = "PIN2-PIN10";
             PAKs.SLG46532.dual_supply_vdd2_pins = "PIN12-PIN20";
+            PAKs.SLG46532.i2c_PAK = true;
+            PAKs.SLG46532.i2c_slave_address = 1864;
             PAKs.SLG46532.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
@@ -285,6 +291,8 @@
             PAKs.SLG46533.PAK_family = 5;
             PAKs.SLG46533.package_weight = "0.0090 g";
             PAKs.SLG46533.pattern_id_address = 1840;
+            PAKs.SLG46533.i2c_PAK = true;
+            PAKs.SLG46533.i2c_slave_address = 1864;
             PAKs.SLG46533.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
@@ -351,6 +359,8 @@
             PAKs.SLG46534.PAK_family = 5;
             PAKs.SLG46534.package_weight = "0.0067 g";
             PAKs.SLG46534.pattern_id_address = 1840;
+            PAKs.SLG46534.i2c_PAK = true;
+            PAKs.SLG46534.i2c_slave_address = 1864;
             PAKs.SLG46534.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
@@ -413,6 +423,8 @@
             PAKs.SLG46535.dual_supply_vdd_pins = "PIN2-PIN8";
             PAKs.SLG46535.dual_supply_vdd2_pins = "PIN10-PIN14";
             PAKs.SLG46535.pattern_id_address = 1840;
+            PAKs.SLG46535.i2c_PAK = true;
+            PAKs.SLG46535.i2c_slave_address = 1864;
             PAKs.SLG46535.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
@@ -472,6 +484,8 @@
             PAKs.SLG46536.PAK_family = 5;
             PAKs.SLG46536.package_weight = "0.0066 g";
             PAKs.SLG46536.pattern_id_address = 1840;
+            PAKs.SLG46536.i2c_PAK = true;
+            PAKs.SLG46536.i2c_slave_address = 1864;
             PAKs.SLG46536.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
@@ -532,6 +546,8 @@
             PAKs.SLG50003.LDO_PAK = true;
             PAKs.SLG50003.package_weight = "0.00xx g";
             PAKs.SLG50003.pattern_id_address = 1840;
+            PAKs.SLG50003.i2c_PAK = true;
+            PAKs.SLG50003.i2c_slave_address = 1864;     //###
             PAKs.SLG50003.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
@@ -595,6 +611,8 @@
             PAKs.SLG46533M.PAK_family = 5;
             PAKs.SLG46533M.package_weight = "0.0058 g";
             PAKs.SLG46533M.pattern_id_address = 1840;
+            PAKs.SLG46533M.i2c_PAK = true;
+            PAKs.SLG46533M.i2c_slave_address = 1864;
             PAKs.SLG46533M.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
@@ -663,6 +681,8 @@
             PAKs.SLG46537.PAK_family = 5;
             PAKs.SLG46537.package_weight = "0.0090 g";
             PAKs.SLG46537.pattern_id_address = 1840;
+            PAKs.SLG46537.i2c_PAK = true;
+            PAKs.SLG46537.i2c_slave_address = 1864;
             PAKs.SLG46537.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
@@ -732,6 +752,8 @@
             PAKs.SLG46538.dual_supply_PAK = true;
             PAKs.SLG46538.dual_supply_vdd_pins = "PIN2-PIN10";
             PAKs.SLG46538.dual_supply_vdd2_pins = "PIN12-PIN20";
+            PAKs.SLG46538.i2c_PAK = true;
+            PAKs.SLG46538.i2c_slave_address = 1864;
             PAKs.SLG46538.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
@@ -798,6 +820,8 @@
             PAKs.SLG46537M.PAK_family = 5;
             PAKs.SLG46537M.package_weight = "0.0058 g";
             PAKs.SLG46537M.pattern_id_address = 1840;
+            PAKs.SLG46537M.i2c_PAK = true;
+            PAKs.SLG46537M.i2c_slave_address = 1864;
             PAKs.SLG46537M.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
@@ -869,6 +893,8 @@
             PAKs.SLG46538M.dual_supply_PAK = true;
             PAKs.SLG46538M.dual_supply_vdd_pins = "IOs 0, 1, 2, 3, 4, 5, 6, 7, 8";
             PAKs.SLG46538M.dual_supply_vdd2_pins = "IOs 9, 10, 12, 13, 14, 15, 16, 17";
+            PAKs.SLG46538M.i2c_PAK = true;
+            PAKs.SLG46538M.i2c_slave_address = 1864;
             PAKs.SLG46538M.pin = new PIN[]
             {
                 new PIN() { PT = "NA",                                                                                },    // 00
@@ -1704,7 +1730,7 @@
 
         public static PAK SLG46721;
         public static PAK SLG46722;
-        public static PAK SLG46110;
+        public static PAK SLG46110;   
         public static PAK SLG46120;
         public static PAK SLG46116;
         public static PAK SLG46117;
