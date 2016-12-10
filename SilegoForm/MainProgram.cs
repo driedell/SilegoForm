@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Data.OleDb;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -67,11 +68,35 @@ public static class MainProgram
             public bool wSchmitt;
             public bool woSchmitt;
         };
+
+        public static bool[] VDD_EC = new bool[3];
+        public static bool[] VDD2_EC = new bool[3];
+
+        public static Table table;
+        public static int row = 0;
+        public static string VDD_DB = null;
+        public static string VDD_typ = null;
+        public static string subSymbol = null;
+        public static string extraInfo = null;
     }
+
+    private const int SWP_NOSIZE = 0x0001;
+
+    [DllImport("kernel32.dll", ExactSpelling = true)]
+    private static extern IntPtr GetConsoleWindow();
+
+    private static IntPtr MyConsole = GetConsoleWindow();
+
+    [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
+    public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, int wFlags);
 
     [STAThread]
     public static void Main()
     {
+        int xpos = 800;
+        int ypos = 500;
+        SetWindowPos(MyConsole, 0, xpos, ypos, 0, 0, SWP_NOSIZE);
+
         // Start the SilegoForm which will begin the BackgroundWorker and enter theProgram
         System.Windows.Forms.Application.EnableVisualStyles();
         System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
@@ -589,7 +614,7 @@ public static class MainProgram
                             freq = g.GreenPAK.LF_osc_freq; break;
                         }
                         else break;
-                    case "110": freq = g.ext_clk_freq; break;
+                    case "110": freq = -1; break;
                     case "111": freq = -1; g.GreenPAK.cnt[i].used = false; return;
                 }
                 break;
@@ -688,7 +713,14 @@ public static class MainProgram
         g.GreenPAK.cnt[i].mode = mode;
         g.GreenPAK.cnt[i].mode_alt = mode_alt;
         g.GreenPAK.cnt[i].time.min = "--";        // ### Build in support for min/max values?
-        g.GreenPAK.cnt[i].time.typ = Math.Round(time, 3).ToString();
+        if (freq < 0)
+        {
+            g.GreenPAK.cnt[i].time.typ = "Ext Clk";
+        }
+        else
+        {
+            g.GreenPAK.cnt[i].time.typ = Math.Round(time, 3).ToString();
+        }
         g.GreenPAK.cnt[i].time.max = "--";        // ### Build in support for min/max values?
     }
 
@@ -737,35 +769,35 @@ public static class MainProgram
         }
     }
 
-    private static void EC_clearSection(Table table, int row)
+    private static void EC_clearSection()
     {
-        while (row < table.Rows.Count)
+        while (g.row < g.table.Rows.Count)
         {
             try
             {
-                if (table.Cell(row + 1, 1).Range.Text != "")
+                if (g.table.Cell(g.row + 1, 1).Range.Text != "")
                 {
                     return;
                 }
             }
             catch
             {
-                table.Cell(row, 3).Merge(table.Cell(row + 1, 3));
-                table.Cell(row, 4).Merge(table.Cell(row + 1, 4));
-                table.Cell(row, 5).Merge(table.Cell(row + 1, 5));
-                table.Cell(row, 6).Merge(table.Cell(row + 1, 6));
+                g.table.Cell(g.row, 3).Merge(g.table.Cell(g.row + 1, 3));
+                g.table.Cell(g.row, 4).Merge(g.table.Cell(g.row + 1, 4));
+                g.table.Cell(g.row, 5).Merge(g.table.Cell(g.row + 1, 5));
+                g.table.Cell(g.row, 6).Merge(g.table.Cell(g.row + 1, 6));
             }
         }
     }
 
-    private static int EC_row_symbol(Table table, string symbol)
+    private static int EC_row_symbol(string symbol)
     {
-        for (int i = 1; i <= table.Rows.Count; i++)
+        for (int i = 1; i <= g.table.Rows.Count; i++)
         {
             // if the cell doesn't exist skip it
             try
             {
-                if (table.Cell(i, 1).Range.Text.Contains(symbol))
+                if (g.table.Cell(i, 1).Range.Text.Contains(symbol))
                 {
                     return i;
                 }
@@ -775,15 +807,15 @@ public static class MainProgram
         int new_row;
         if (symbol.Equals("VDD2"))
         {
-            table.Rows.Add(table.Rows[3]);
+            g.table.Rows.Add(g.table.Rows[3]);
             new_row = 3;
         }
         else
         {
-            table.Rows.Add();
-            new_row = table.Rows.Count;
+            g.table.Rows.Add();
+            new_row = g.table.Rows.Count;
         }
-        Range range = table.Cell(new_row, 1).Range;
+        Range range = g.table.Cell(new_row, 1).Range;
         range.Text = symbol;
         range.SetRange(range.Start + 1, range.End);
         range.Select();
@@ -799,222 +831,286 @@ public static class MainProgram
         table.Cell(row, 6).Range.Text = max;
     }
 
-    private static void EC_row_split(Table table, int row)
+    private static void EC_row_split()
     {
-        for (int i = 1; i <= table.Columns.Count; i++)
+        //Console.WriteLine("row count1 = " + g.table.Rows.Count);
+        try
         {
-            table.Cell(row, i).Split(2, 1);
+            g.table.Rows[g.row].Range.Cells.Split(2, 1);
         }
+        catch { }
+        //Console.WriteLine("row count2 = " + g.table.Rows.Count);
+
+        //for (int i = 1; i <= g.table.Columns.Count; i++)
+        //{
+        //    g.table.Cell(g.row, i).Split(2, 1);
+        //}
+        g.row++;
     }
 
-    private static void EC_row_merge(Table table, int symbolRow, int row)
+    private static void EC_row_merge(int symbolRow)
     {
-        table.Cell(row, 1).Merge(table.Cell(symbolRow, 1));
-        table.Cell(row, 2).Merge(table.Cell(symbolRow, 2));
-        table.Cell(row, 3).Merge(table.Cell(row - 1, 3));
-        table.Cell(row, 4).Merge(table.Cell(row - 1, 4));
-        table.Cell(row, 5).Merge(table.Cell(row - 1, 5));
-        table.Cell(row, 6).Merge(table.Cell(row - 1, 6));
-        table.Cell(row, 7).Merge(table.Cell(symbolRow, 7));
+        //g.table.Cell(g.row, 1).Merge(g.table.Cell(symbolRow, 1));
+        //g.table.Cell(g.row, 2).Merge(g.table.Cell(symbolRow, 2));
+        //g.table.Cell(g.row, 3).Merge(g.table.Cell(g.row - 1, 3));
+        //g.table.Cell(g.row, 4).Merge(g.table.Cell(g.row - 1, 4));
+        //g.table.Cell(g.row, 5).Merge(g.table.Cell(g.row - 1, 5));
+        //g.table.Cell(g.row, 6).Merge(g.table.Cell(g.row - 1, 6));
+        //g.table.Cell(g.row, 7).Merge(g.table.Cell(symbolRow, 7));
     }
 
-    private static void EC_IH_IL(Table table, string symbol, string VDD_DB, double VDD_typ, g.pin_IOs VDD_IOs)
+    private static void EC_row_merge2()
     {
-        int symbolRow = EC_row_symbol(table, symbol);
-        int row = symbolRow; ;
-        EC_clearSection(table, row);
+        try
+        {
+            foreach (Row row in g.table.Rows)
+            {
+                if (row.Cells[5].Range.Text.Length < 3)
+                {
+                    Console.WriteLine("blank line: " + row.Index.ToString());
+                    row.Delete();
+                }
+            }
+        }
+        catch { }
+
+        foreach (Cell c in g.table.Range.Cells)
+        {
+            try
+            {
+                if (c.Range.Text.Length >= 3 &&
+                    g.table.Cell(c.RowIndex + 1, c.ColumnIndex).Range.Text.Length < 3)
+                {
+                    Console.WriteLine(c.RowIndex.ToString() + ", " + c.ColumnIndex.ToString() + ", " + c.Range.Text);
+                    int i = 1;
+
+                    while (g.table.Cell(c.RowIndex + i, c.ColumnIndex).Range.Text.Length < 3)
+                    {
+                        i++;
+                    }
+                    Console.WriteLine((i - 1).ToString());
+                    c.Merge(g.table.Cell(c.RowIndex + i - 1, c.ColumnIndex));
+                }
+            }
+            catch { }
+        }
+
+        //foreach (Cell c in g.table.Range.Cells)
+        //{
+        //    try
+        //    {
+        //        if (c.Range.Text.Length < 3)
+        //        {
+        //            Console.WriteLine("blank: " + c.RowIndex.ToString() + ", " + c.ColumnIndex.ToString());
+        //            c.Merge(g.table.Cell(c.RowIndex - 1, c.ColumnIndex));
+        //        }
+        //        else
+        //        {
+        //            Console.WriteLine("not blank: " + c.RowIndex.ToString() + ", " +
+        //                c.ColumnIndex.ToString() + ", " + c.Range.Text.Length + ", " + c.Range.Text);
+        //        }
+        //    }
+        //    catch { }
+        //}
+    }
+
+    private static void EC_IH_IL(string symbol, bool[] VDD_EC, g.pin_IOs VDD_IOs)
+    {
+        int symbolRow = EC_row_symbol(symbol);
+        g.subSymbol = symbol.Substring(0, 3);
+        g.row = symbolRow;
+        EC_clearSection();
 
         if (symbol.StartsWith("VIH"))
         {
-            table.Cell(row, 2).Range.Text = "HIGH-Level Output Voltage";
-            table.Cell(row, 7).Range.Text = "V";
+            g.table.Cell(g.row, 2).Range.Text = "HIGH-Level Output Voltage";
+            g.table.Cell(g.row, 7).Range.Text = "V";
         }
         if (symbol.StartsWith("VIL"))
         {
-            table.Cell(row, 2).Range.Text = "LOW-Level Output Voltage";
-            table.Cell(row, 7).Range.Text = "V";
+            g.table.Cell(g.row, 2).Range.Text = "LOW-Level Output Voltage";
+            g.table.Cell(g.row, 7).Range.Text = "V";
         }
 
         if (g.GreenPAK.dual_supply_PAK && !symbol.Contains("2"))
         {
-            table.Cell(row, 2).Range.Text += "\n" + g.GreenPAK.dual_supply_vdd_pins;
+            g.table.Cell(g.row, 2).Range.Text += g.GreenPAK.dual_supply_vdd_pins;
         }
         else if (g.GreenPAK.dual_supply_PAK && symbol.Contains("2"))
         {
-            table.Cell(row, 2).Range.Text += "\n" + g.GreenPAK.dual_supply_vdd2_pins;
+            g.table.Cell(g.row, 2).Range.Text += g.GreenPAK.dual_supply_vdd2_pins;
         }
-        table.Cell(row, 7).Range.Text = "V";
+        g.table.Cell(g.row, 7).Range.Text = "V";
 
-        if (VDD_IOs.woSchmitt)
+        for (int i = 0; i < 3; i++)
         {
-            EC_row_populate(table, row, "Logic Input at VDD = " + VDD_typ.ToString() + "V",
-                accessQuery(VDD_DB, symbol.Substring(0, 3), "woSchmitt", "min"),
-                accessQuery(VDD_DB, symbol.Substring(0, 3), "woSchmitt", "typ"),
-                accessQuery(VDD_DB, symbol.Substring(0, 3), "woSchmitt", "max"));
-            EC_row_split(table, row);
-            row++;
+            switch (i)
+            {
+                case 0: g.VDD_DB = "1_8"; g.extraInfo = " at VDD = 1.8v"; break;
+                case 1: g.VDD_DB = "3_3"; g.extraInfo = " at VDD = 3.3v"; break;
+                case 2: g.VDD_DB = "5_0"; g.extraInfo = " at VDD = 5.0v"; break;
+            }
+
+            if (VDD_IOs.woSchmitt)
+            {
+                queryAndWrite("Logic Input", "woSchmitt");
+                EC_row_split();
+            }
+            if (VDD_IOs.wSchmitt)
+            {
+                queryAndWrite("Logic Input with Schmitt Trigger", "wSchmitt");
+                EC_row_split();
+            }
+            if (VDD_IOs.LVDI)
+            {
+                queryAndWrite("LVDI Logic Input", "LVDI");
+                EC_row_split();
+            }
         }
-        if (VDD_IOs.wSchmitt)
-        {
-            EC_row_populate(table, row, "Logic Input with Schmitt Trigger at VDD = " + VDD_typ.ToString() + "V",
-                accessQuery(VDD_DB, symbol.Substring(0, 3), "wSchmitt", "min"),
-                accessQuery(VDD_DB, symbol.Substring(0, 3), "wSchmitt", "typ"),
-                accessQuery(VDD_DB, symbol.Substring(0, 3), "wSchmitt", "max"));
-            EC_row_split(table, row);
-            row++;
-        }
-        if (VDD_IOs.LVDI)
-        {
-            EC_row_populate(table, row, "LVDI Logic Input at VDD = " + VDD_typ.ToString() + "V",
-                accessQuery(VDD_DB, symbol.Substring(0, 3), "LVDI", "min"),
-                accessQuery(VDD_DB, symbol.Substring(0, 3), "LVDI", "typ"),
-                accessQuery(VDD_DB, symbol.Substring(0, 3), "LVDI", "max"));
-            EC_row_split(table, row);
-            row++;
-        }
-        EC_row_merge(table, symbolRow, row);
+        EC_row_merge(symbolRow);
     }
 
-    private static void EC_OH_OL(Table table, string symbol, string VDD_DB, double VDD_typ, g.pin_IOs VDD_IOs)
+    private static void EC_OH_OL(string symbol, bool[] VDD_EC, g.pin_IOs VDD_IOs)
     {
-        string level = null;
+        string highlow = null;
 
-        int symbolRow = EC_row_symbol(table, symbol);
-        int row = symbolRow;
-        EC_clearSection(table, row);
+        int symbolRow = EC_row_symbol(symbol);
+        g.subSymbol = symbol.Substring(0, 3);
+        g.row = symbolRow;
+        EC_clearSection();
 
         if (symbol.StartsWith("VOH"))
         {
-            level = "HIGH";
-            table.Cell(row, 2).Range.Text = "HIGH-Level Output Voltage,";
-            switch (VDD_DB)
-            {
-                case "1_8": table.Cell(row, 2).Range.Text += "IOH = 100 µA"; break;
-                case "3_3": table.Cell(row, 2).Range.Text += "IOH = 3 mA"; break;
-                case "5_0": table.Cell(row, 2).Range.Text += "IOH = 5 mA"; break;
-            }
-            table.Cell(row, 7).Range.Text = "V";
+            g.table.Cell(g.row, 2).Range.Text = "HIGH-Level Output Voltage";
+            g.table.Cell(g.row, 7).Range.Text = "V";
         }
         else if (symbol.StartsWith("VOL"))
         {
-            level = "LOW";
-            table.Cell(row, 2).Range.Text = "LOW-Level Output Voltage,";
-            switch (VDD_DB)
-            {
-                case "1_8": table.Cell(row, 2).Range.Text += "IOL = 100 µA"; break;
-                case "3_3": table.Cell(row, 2).Range.Text += "IOL = 3 mA"; break;
-                case "5_0": table.Cell(row, 2).Range.Text += "IOL = 5 mA"; break;
-            }
-            table.Cell(row, 7).Range.Text = "V";
+            g.table.Cell(g.row, 2).Range.Text = "LOW-Level Output Voltage";
+            g.table.Cell(g.row, 7).Range.Text = "V";
         }
         else if (symbol.StartsWith("IOH"))
         {
-            level = "HIGH";
-            table.Cell(row, 2).Range.Text = "HIGH-Level Output Current,";
-            switch (VDD_DB)
-            {
-                case "1_8": table.Cell(row, 2).Range.Text += "VOH = VDD - 0.2 V"; break;
-                case "3_3": table.Cell(row, 2).Range.Text += "VOH = 2.4 V"; break;
-                case "5_0": table.Cell(row, 2).Range.Text += "VOH = 2.4 V"; break;
-            }
-            table.Cell(row, 7).Range.Text = "mA";
+            g.table.Cell(g.row, 2).Range.Text = "HIGH-Level Output Current";
+            g.table.Cell(g.row, 7).Range.Text = "mA";
         }
         else if (symbol.StartsWith("IOL"))
         {
-            level = "LOW";
-            table.Cell(row, 2).Range.Text = "LOW-Level Output Current,";
-            switch (VDD_DB)
-            {
-                case "1_8": table.Cell(row, 2).Range.Text += "VOL = 0.15 V"; break;
-                case "3_3": table.Cell(row, 2).Range.Text += "VOL = 0.4 V"; break;
-                case "5_0": table.Cell(row, 2).Range.Text += "VOL = 0.4 V"; break;
-            }
-            table.Cell(row, 7).Range.Text = "mA";
+            g.table.Cell(g.row, 2).Range.Text = "LOW-Level Output Current";
+            g.table.Cell(g.row, 7).Range.Text = "mA";
         }
 
         if (g.GreenPAK.dual_supply_PAK && !symbol.Contains("2"))
         {
-            table.Cell(row, 2).Range.Text += "\n" + g.GreenPAK.dual_supply_vdd_pins;
+            g.table.Cell(g.row, 2).Range.Text += g.GreenPAK.dual_supply_vdd_pins;
         }
         else if (g.GreenPAK.dual_supply_PAK && symbol.Contains("2"))
         {
-            table.Cell(row, 2).Range.Text += "\n" + g.GreenPAK.dual_supply_vdd2_pins;
+            g.table.Cell(g.row, 2).Range.Text += g.GreenPAK.dual_supply_vdd2_pins;
         }
 
-        if (level.Equals("HIGH"))
+        for (int i = 0; i < 3; i++)
         {
-            if (VDD_IOs.PP1x > 0 || VDD_IOs.ODP1x > 0)
+            switch (i)
             {
-                EC_row_populate(table, row, "Push Pull & PMOS OD 1x Driver at VDD = " + VDD_typ.ToString() + "V",
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "PP1x", "min"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "PP1x", "typ"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "PP1x", "max"));
-                EC_row_split(table, row);
-                row++;
+                case 0: g.VDD_DB = "1_8"; g.extraInfo = "\nat VDD = 1.8v"; break;
+                case 1: g.VDD_DB = "3_3"; g.extraInfo = "\nat VDD = 3.3v"; break;
+                case 2: g.VDD_DB = "5_0"; g.extraInfo = "\nat VDD = 5.0v"; break;
             }
-            if (VDD_IOs.PP2x > 0 || VDD_IOs.ODP2x > 0)
+
+            if (symbol.StartsWith("VOH"))
             {
-                EC_row_populate(table, row, "Push Pull & PMOS OD 2x Driver at VDD = " + VDD_typ.ToString() + "V",
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "PP2x", "min"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "PP2x", "typ"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "PP2x", "max"));
-                EC_row_split(table, row);
-                row++;
+                highlow = "HIGH";
+                switch (g.VDD_DB)
+                {
+                    case "1_8": g.extraInfo += ", IOH = 100 µA"; break;
+                    case "3_3": g.extraInfo += ", IOH = 3 mA"; break;
+                    case "5_0": g.extraInfo += ", IOH = 5 mA"; break;
+                }
+            }
+            else if (symbol.StartsWith("VOL"))
+            {
+                highlow = "LOW";
+                switch (g.VDD_DB)
+                {
+                    case "1_8": g.extraInfo += ", IOL = 100 µA"; break;
+                    case "3_3": g.extraInfo += ", IOL = 3 mA"; break;
+                    case "5_0": g.extraInfo += ", IOL = 5 mA"; break;
+                }
+            }
+            else if (symbol.StartsWith("IOH"))
+            {
+                highlow = "HIGH";
+                switch (g.VDD_DB)
+                {
+                    case "1_8": g.extraInfo += ", VOH = VDD - 0.2 V"; break;
+                    case "3_3": g.extraInfo += ", VOH = 2.4 V"; break;
+                    case "5_0": g.extraInfo += ", VOH = 2.4 V"; break;
+                }
+            }
+            else if (symbol.StartsWith("IOL"))
+            {
+                highlow = "LOW";
+                switch (g.VDD_DB)
+                {
+                    case "1_8": g.extraInfo += ", VOL = 0.15 V"; break;
+                    case "3_3": g.extraInfo += ", VOL = 0.4 V"; break;
+                    case "5_0": g.extraInfo += ", VOL = 0.4 V"; break;
+                }
+            }
+
+            if (highlow.Equals("HIGH"))
+            {
+                if (VDD_IOs.PP1x > 0 || VDD_IOs.ODP1x > 0)
+                {
+                    queryAndWrite("Push Pull & PMOS OD 1x Driver", "PP1x");
+                    EC_row_split();
+                }
+                if (VDD_IOs.PP2x > 0 || VDD_IOs.ODP2x > 0)
+                {
+                    queryAndWrite("Push Pull & PMOS OD 2x Driver", "PP2x");
+                    EC_row_split();
+                }
+            }
+            else if (highlow.Equals("LOW"))
+            {
+                if (VDD_IOs.PP1x > 0)
+                {
+                    queryAndWrite("Push Pull 1x Driver", "PP1x");
+                    EC_row_split();
+                }
+                if (VDD_IOs.PP2x > 0)
+                {
+                    queryAndWrite("Push Pull 2x Driver", "PP2x");
+                    EC_row_split();
+                }
+                if (VDD_IOs.ODN1x > 0)
+                {
+                    queryAndWrite("Open Drain 1x Driver", "ODN1x");
+                    EC_row_split();
+                }
+                if (VDD_IOs.ODN2x > 0)
+                {
+                    queryAndWrite("Open Drain 2x Driver", "ODN2x");
+                    EC_row_split();
+                }
+                if (VDD_IOs.ODN4x > 0)
+                {
+                    queryAndWrite("Open Drain 4x Driver", "ODN4x");
+                    EC_row_split();
+                }
             }
         }
-        else if (level.Equals("LOW"))
-        {
-            if (VDD_IOs.PP1x > 0)
-            {
-                EC_row_populate(table, row, "Push Pull 1x Driver at VDD = " + VDD_typ.ToString() + "V",
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "PP1x", "min"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "PP1x", "typ"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "PP1x", "max"));
-                EC_row_split(table, row);
-                row++;
-            }
-            if (VDD_IOs.PP2x > 0)
-            {
-                EC_row_populate(table, row, "Push Pull 2x Driver at VDD = " + VDD_typ.ToString() + "V",
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "PP2x", "min"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "PP2x", "typ"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "PP2x", "max"));
-                EC_row_split(table, row);
-                row++;
-            }
-            if (VDD_IOs.ODN1x > 0)
-            {
-                EC_row_populate(table, row, "Open Drain 1x Driver at VDD = " + VDD_typ.ToString() + "V",
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN1x", "min"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN1x", "typ"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN1x", "max"));
-                EC_row_split(table, row);
-                row++;
-            }
-            if (VDD_IOs.ODN2x > 0)
-            {
-                EC_row_populate(table, row, "Open Drain 2x Driver at VDD = " + VDD_typ.ToString() + "V",
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN2x", "min"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN2x", "typ"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN2x", "max"));
-                EC_row_split(table, row);
-                row++;
-            }
-            if (VDD_IOs.ODN4x > 0)
-            {
-                EC_row_populate(table, row, "Open Drain 4x Driver at VDD = " + VDD_typ.ToString() + "V",
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN4x", "min"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN4x", "typ"),
-                    accessQuery(VDD_DB, symbol.Substring(0, 3), "ODN4x", "max"));
-                EC_row_split(table, row);
-                row++;
-            }
-        }
-        EC_row_merge(table, symbolRow, row);
+        EC_row_merge(symbolRow);
     }
 
     private static void EC_subscripts(Table table, string symbol, string subscript)
     {
+        if (subscript.EndsWith("2"))
+        {
+            return;
+        }
+
         foreach (Cell cell in table.Range.Cells)
         {
             if (cell.Range.Text.Contains(symbol + subscript))
@@ -1086,6 +1182,7 @@ public static class MainProgram
         }
     }
 
+    //### Maybe make a more succint version that queries min/typ/max all at once?
     private static string accessQuery(string returnField, string param1, string param2 = "-1", string param3 = "-1")
     {
         string returnValue = null;
@@ -1116,11 +1213,43 @@ public static class MainProgram
         return returnValue;
     }
 
+    private static void queryAndWrite(string note, string param2 = "-1")
+    {
+        //g.connection.Open();
+        OleDbCommand command = new OleDbCommand();
+        command.Connection = g.connection;
+        command.CommandText = "SELECT * FROM " + g.GreenPAK.base_die + " WHERE param1 = '" + g.subSymbol + "'";
+        if (param2 != "-1" && param2 != null) { command.CommandText += " AND param2 = '" + param2 + "'"; }
+
+        g.table.Cell(g.row, 3).Range.Text = note + g.extraInfo;
+
+        try
+        {
+            OleDbDataReader reader = command.ExecuteReader();
+
+            int i = 4;
+            while (reader.Read())
+            {
+                Console.WriteLine(reader[g.VDD_DB].ToString());
+                g.table.Cell(g.row, i).Range.Text = reader[g.VDD_DB].ToString();
+
+                i++;
+            }
+            reader.Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Error " + ex);
+        }
+
+        //g.connection.Close();
+    }
+
     public static void theProgram(BackgroundWorker worker, DoWorkEventArgs e)
     {
         var form = Form.ActiveForm as SilegoForm.SilegoForm;
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Loading files...");
+        form.backgroundWorker.ReportProgress(2, "Loading files...");
 
         object oMissing = System.Reflection.Missing.Value;
 
@@ -1149,7 +1278,7 @@ public static class MainProgram
         }
 
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Getting Date / I_Q / DS_rev");
+        form.backgroundWorker.ReportProgress(2, "Getting Date / I_Q / DS_rev");
 
         g.doc.Variables["Date"].Value = DateTime.Now.ToString("MM/dd/yyyy");
         g.doc.Variables["Date_long"].Value = DateTime.Now.ToString("MMMM dd, yyyy");
@@ -1166,7 +1295,7 @@ public static class MainProgram
         //  Determine what chip this is for and assign to g.GreenPAK
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Creating PAKs");
+        form.backgroundWorker.ReportProgress(2, "Creating PAKs");
 
         // GreenPAK5
         foreach (XElement chip in g.ELEMENT.Descendants("chip")
@@ -1241,7 +1370,7 @@ public static class MainProgram
         //  Grab NVM, store in g.nvmData
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Loading NVM");
+        form.backgroundWorker.ReportProgress(2, "Loading NVM");
 
         foreach (XElement xEle in g.ELEMENT.Descendants("nvmData"))
         {
@@ -1262,7 +1391,7 @@ public static class MainProgram
         //  VDD / Temp Specs
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Grabbing VDD / Temp specs");
+        form.backgroundWorker.ReportProgress(2, "Grabbing VDD / Temp specs");
 
         // VDD specs
         foreach (XElement xEle in g.ELEMENT.Descendants("vddSpecs"))
@@ -1276,7 +1405,7 @@ public static class MainProgram
             catch
             {
                 e.Cancel = true;
-                form.backgroundWorker.ReportProgress(3, "Error: Missing VDD Specs");
+                form.backgroundWorker.ReportProgress(2, "Error: Missing VDD Specs");
                 return;
             }
             g.GreenPAK.vdd = new PAK.mTM();
@@ -1299,7 +1428,7 @@ public static class MainProgram
                 catch
                 {
                     e.Cancel = true;
-                    form.backgroundWorker.ReportProgress(3, "Error: Missing VDD2 Specs");
+                    form.backgroundWorker.ReportProgress(2, "Error: Missing VDD2 Specs");
                     return;
                 }
 
@@ -1322,7 +1451,7 @@ public static class MainProgram
             catch
             {
                 e.Cancel = true;
-                form.backgroundWorker.ReportProgress(3, "Error: Missing TEMP Specs");
+                form.backgroundWorker.ReportProgress(2, "Error: Missing TEMP Specs");
                 return;
             }
 
@@ -1336,7 +1465,7 @@ public static class MainProgram
         //  Project Metadata
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Gathering MetaData");
+        form.backgroundWorker.ReportProgress(2, "Gathering MetaData");
 
         if (g.metadata_update)
         {
@@ -1495,7 +1624,7 @@ public static class MainProgram
         //  Pin Labels and Settings
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Creating Pins");
+        form.backgroundWorker.ReportProgress(2, "Creating Pins");
 
         if (g.pin_labels_update || g.pin_settings_update)
         {
@@ -1593,7 +1722,7 @@ public static class MainProgram
         //  Output Summary
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Creating Output Summary");
+        form.backgroundWorker.ReportProgress(2, "Creating Output Summary");
 
         if (g.pin_settings_update)
         {
@@ -1616,7 +1745,7 @@ public static class MainProgram
         //  Pin Configuration Table
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Populating Pin Configuration Table");
+        form.backgroundWorker.ReportProgress(2, "Populating Pin Configuration Table");
 
         if (g.pin_labels_update || g.pin_settings_update)
         {
@@ -1649,7 +1778,7 @@ public static class MainProgram
         //  First Page Pinout Diagram
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Populating First Page Pinout Diagram");
+        form.backgroundWorker.ReportProgress(2, "Populating First Page Pinout Diagram");
 
         if (g.new_part_update)
         {
@@ -1666,7 +1795,8 @@ public static class MainProgram
                     //Console.ReadLine();
                     shape.Delete();
 
-                    Range r = g.doc.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToAbsolute, 1);
+                    g.doc.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToFirst);
+                    //Range r = g.doc.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToAbsolute, 1);
 
                     Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"Resources\" + g.GreenPAK.package + ".png");
                     newShape.Title = "pinout_diagram";
@@ -1840,7 +1970,7 @@ public static class MainProgram
         //  Oscillators
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Loading OSC Settings");
+        form.backgroundWorker.ReportProgress(2, "Loading OSC Settings");
 
         if (g.CNTs_DLYs_update)
         {
@@ -1955,7 +2085,7 @@ public static class MainProgram
         //  Counters
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Loading Counter settings");
+        form.backgroundWorker.ReportProgress(2, "Loading Counter settings");
 
         if (g.CNTs_DLYs_update)
         {
@@ -2015,7 +2145,7 @@ public static class MainProgram
         //  ACMPs
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Loading ACMP settings");
+        form.backgroundWorker.ReportProgress(2, "Loading ACMP settings");
 
         if (g.ACMPs_update && (g.GreenPAK.acmp.Length > 0))
         {
@@ -2049,7 +2179,7 @@ public static class MainProgram
         //  Absolute Maximum Conditions Table
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Populating Absolute Maximum Conditions Table");
+        form.backgroundWorker.ReportProgress(2, "Populating Absolute Maximum Conditions Table");
 
         if (g.GreenPAK.VDD_bypass_enable > 0 &&
             g.nvmData[g.GreenPAK.VDD_bypass_enable].ToString().Equals("1"))
@@ -2067,61 +2197,64 @@ public static class MainProgram
         //  Electrical Characteristics Table
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Populating EC Table");
+        form.backgroundWorker.ReportProgress(2, "Populating EC Table");
 
-        int row = 0;
         int symbolRow = 0;
 
-        string VDD_DB = null;
-        double VDD_min = Convert.ToDouble(g.GreenPAK.vdd.min);
+        double VDD_min = Convert.ToDouble(g.GreenPAK.vdd.min);          //### Change this so that it includes all VDDs within Min/Max range?
         double VDD_max = Convert.ToDouble(g.GreenPAK.vdd.max);
 
-        double VDD_typ = (VDD_max + VDD_min) / 2;
+        if (VDD_min <= 1.8)
+        {
+            g.VDD_EC[0] = true;
+            g.VDD_EC[1] = true;
+            g.VDD_EC[2] = true;
+        }
+        else if (VDD_min <= 3.3)
+        {
+            g.VDD_EC[1] = true;
+            g.VDD_EC[2] = true;
+        }
+        else if (VDD_min <= 5.0)
+        {
+            g.VDD_EC[2] = true;
+        }
+        if (VDD_max < 3.3)
+        {
+            g.VDD_EC[1] = false;
+            g.VDD_EC[2] = false;
+        }
+        else if (VDD_max < 5.0)
+        {
+            g.VDD_EC[2] = false;
+        }
 
-        if ((Math.Abs(VDD_typ - 1.8) < Math.Abs(VDD_typ - 3.3)) &&
-            (Math.Abs(VDD_typ - 1.8) < Math.Abs(VDD_typ - 5.0)))
-        {
-            VDD_DB = "1_8";
-            VDD_typ = 1.8;
-        }
-        else if ((Math.Abs(VDD_typ - 3.3) < Math.Abs(VDD_typ - 1.8)) &&
-                 (Math.Abs(VDD_typ - 3.3) < Math.Abs(VDD_typ - 5.0)))
-        {
-            VDD_DB = "3_3";
-            VDD_typ = 3.3;
-        }
-        else if ((Math.Abs(VDD_typ - 5.0) < Math.Abs(VDD_typ - 1.8)) &&
-                 (Math.Abs(VDD_typ - 5.0) < Math.Abs(VDD_typ - 3.3)))
-        {
-            VDD_DB = "5_0";
-            VDD_typ = 3.3;
-        }
-
-        string VDD2_DB = null;
         double VDD2_min = Convert.ToDouble(g.GreenPAK.vdd2.min);
         double VDD2_max = Convert.ToDouble(g.GreenPAK.vdd2.max);
 
-        double VDD2_typ = (VDD2_max + VDD2_min) / 2; if (g.GreenPAK.dual_supply_PAK)
-
+        if (VDD2_min <= 1.8)
         {
-            if ((Math.Abs(VDD2_typ - 1.8) < Math.Abs(VDD2_typ - 3.3)) &&
-                (Math.Abs(VDD2_typ - 1.8) < Math.Abs(VDD2_typ - 5.0)))
-            {
-                VDD2_DB = "1_8";
-                VDD2_typ = 1.8;
-            }
-            else if ((Math.Abs(VDD2_typ - 3.3) < Math.Abs(VDD2_typ - 1.8)) &&
-                     (Math.Abs(VDD2_typ - 3.3) < Math.Abs(VDD2_typ - 5.0)))
-            {
-                VDD2_DB = "3_3";
-                VDD2_typ = 3.3;
-            }
-            else if ((Math.Abs(VDD2_typ - 5.0) < Math.Abs(VDD2_typ - 1.8)) &&
-                     (Math.Abs(VDD2_typ - 5.0) < Math.Abs(VDD2_typ - 3.3)))
-            {
-                VDD2_DB = "5_0";
-                VDD2_typ = 3.3;
-            }
+            g.VDD2_EC[0] = true;
+            g.VDD2_EC[1] = true;
+            g.VDD2_EC[2] = true;
+        }
+        else if (VDD2_min <= 3.3)
+        {
+            g.VDD2_EC[1] = true;
+            g.VDD2_EC[2] = true;
+        }
+        else if (VDD2_min <= 5.0)
+        {
+            g.VDD2_EC[2] = true;
+        }
+        if (VDD2_max < 3.3)
+        {
+            g.VDD2_EC[1] = false;
+            g.VDD2_EC[2] = false;
+        }
+        else if (VDD2_max < 5.0)
+        {
+            g.VDD2_EC[2] = false;
         }
 
         g.connection.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=" + g.templatePath + "Base_Die_DB.accdb;";
@@ -2131,14 +2264,14 @@ public static class MainProgram
             {
                 g.connection.Open();
                 if (worker.CancellationPending) { e.Cancel = true; return; }
-                form.backgroundWorker.ReportProgress(3, "Connection Successful");
+                form.backgroundWorker.ReportProgress(2, "Connection Successful");
                 g.connection.Close();
                 break;
             }
             catch (Exception exception)
             {
                 MessageBox.Show(exception.ToString());
-                form.backgroundWorker.ReportProgress(0, "Error: Connection Unsuccessful. Close the Database!");
+                form.backgroundWorker.ReportProgress(0, "Error: Connection Unsuccessful. Try closing the Database!");
                 e.Cancel = true;
                 return;
             }
@@ -2146,10 +2279,11 @@ public static class MainProgram
 
         g.connection.Open();
 
-        foreach (Table table in g.doc.Tables)
+        foreach (Table EC_TABLE in g.doc.Tables)
         {
-            if (table.Title == "ec_table")
+            if (EC_TABLE.Title == "ec_table")
             {
+                g.table = EC_TABLE;
                 if (g.pin_settings_update || g.temp_vdd_update)
                 {
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2157,13 +2291,13 @@ public static class MainProgram
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     if (g.GreenPAK.dual_supply_PAK)
                     {
-                        symbolRow = EC_row_symbol(table, "VDD2");
-                        row = symbolRow;
+                        symbolRow = EC_row_symbol("VDD2");
+                        g.row = symbolRow;
 
-                        table.Cell(row, 2).Range.Text = "Supply Voltage";
-                        table.Cell(row, 7).Range.Text = "V";
+                        g.table.Cell(g.row, 2).Range.Text = "Supply Voltage";
+                        g.table.Cell(g.row, 7).Range.Text = "V";
 
-                        EC_row_populate(table, row, "VDD2 ≤ VDD",
+                        EC_row_populate(g.table, g.row, "VDD2 ≤ VDD",
                             g.GreenPAK.vdd2.min,
                             g.GreenPAK.vdd2.typ,
                             g.GreenPAK.vdd2.max);
@@ -2173,150 +2307,153 @@ public static class MainProgram
                     //  V_IH
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(3, "Populating EC Table: V_IH");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_IH");
 
                     if (g.VDD.woSchmitt || g.VDD.wSchmitt || g.VDD.LVDI)
                     {
-                        EC_IH_IL(table, "VIH", VDD_DB, VDD_typ, g.VDD);
+                        EC_IH_IL("VIH", g.VDD_EC, g.VDD);
                     }
                     else if (g.VDD2.woSchmitt || g.VDD2.wSchmitt || g.VDD2.LVDI)
                     {
-                        EC_IH_IL(table, "VIH2", VDD2_DB, VDD2_typ, g.VDD2);
+                        EC_IH_IL("VIH2", g.VDD2_EC, g.VDD2);
                     }
 
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     //  V_IL
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(3, "Populating EC Table: V_IL");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_IL");
 
                     if (g.VDD.woSchmitt || g.VDD.wSchmitt || g.VDD.LVDI)
                     {
-                        EC_IH_IL(table, "VIL", VDD_DB, VDD_typ, g.VDD);
+                        EC_IH_IL("VIL", g.VDD_EC, g.VDD);
                     }
                     else if (g.VDD2.woSchmitt || g.VDD2.wSchmitt || g.VDD2.LVDI)
                     {
-                        EC_IH_IL(table, "VIL2", VDD2_DB, VDD2_typ, g.VDD2);
+                        EC_IH_IL("VIL2", g.VDD2_EC, g.VDD2);
                     }
 
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //  I_IH
+                    //  I_IH / I_IL
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(3, "Populating EC Table: I_IH");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: I_IH");
 
                     if (g.VDD.woSchmitt || g.VDD.wSchmitt || g.VDD.LVDI ||
                         g.VDD2.woSchmitt || g.VDD2.wSchmitt || g.VDD2.LVDI)
                     {
-                        symbolRow = EC_row_symbol(table, "IIH");
-                        row = symbolRow;
+                        symbolRow = EC_row_symbol("IIH");
+                        g.row = symbolRow;
 
-                        table.Cell(row, 2).Range.Text = "HIGH-Level Input Current";
-                        table.Cell(row, 7).Range.Text = "µA";
+                        g.table.Cell(g.row, 2).Range.Text = "HIGH-Level Input Current";
+                        g.table.Cell(g.row, 7).Range.Text = "µA";
 
-                        EC_row_populate(table, row, "Logic Input PINs; VIN = VDD",
-                            accessQuery(VDD_DB, "IIH", null, "min"),
-                            accessQuery(VDD_DB, "IIH", null, "typ"),
-                            accessQuery(VDD_DB, "IIH", null, "max"));
-                    }
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //  I_IL
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(3, "Populating EC Table: I_IL");
+                        EC_row_populate(g.table, g.row, "Logic Input PINs; VIN = VDD",
+                            "-1.0",
+                            "--",
+                            "1.0");
 
-                    if (g.VDD.woSchmitt || g.VDD.wSchmitt || g.VDD.LVDI ||
-                        g.VDD2.woSchmitt || g.VDD2.wSchmitt || g.VDD2.LVDI)
-                    {
-                        symbolRow = EC_row_symbol(table, "IIL");
-                        row = symbolRow;
+                        symbolRow = EC_row_symbol("IIL");
+                        g.row = symbolRow;
 
-                        table.Cell(row, 2).Range.Text = "LOW-Level Input Current";
-                        table.Cell(row, 7).Range.Text = "µA";
+                        g.table.Cell(g.row, 2).Range.Text = "LOW-Level Input Current";
+                        g.table.Cell(g.row, 7).Range.Text = "µA";
 
-                        EC_row_populate(table, row, "Logic Input PINs; VIN = 0V",
-                            accessQuery(VDD_DB, "IIL", null, "min"),
-                            accessQuery(VDD_DB, "IIL", null, "typ"),
-                            accessQuery(VDD_DB, "IIL", null, "max"));
+                        EC_row_populate(g.table, g.row, "Logic Input PINs; VIN = 0V",
+                            "-1.0",
+                            "--",
+                            "1.0");
                     }
 
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     //  V_HYS
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(3, "Populating EC Table: V_HYS");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_HYS");
                     if (g.VHYS)
                     {
-                        symbolRow = EC_row_symbol(table, "VHYS");
-                        row = symbolRow;
+                        symbolRow = EC_row_symbol("VHYS");
+                        g.row = symbolRow;
 
-                        table.Cell(row, 2).Range.Text = "Schmitt Trigger Hysteresis Voltage";
-                        table.Cell(row, 7).Range.Text = "V";
+                        g.table.Cell(g.row, 2).Range.Text = "Schmitt Trigger Hysteresis Voltage";
+                        g.table.Cell(g.row, 7).Range.Text = "V";
 
-                        EC_row_populate(table, row, "Logic Input with Schmitt Trigger at VDD = " + VDD_typ.ToString() + "V",
-                            accessQuery(VDD_DB, "VHYS", null, "min"),
-                            accessQuery(VDD_DB, "VHYS", null, "typ"),
-                            accessQuery(VDD_DB, "VHYS", null, "max"));
+                        for (int i = 0; i < 3; i++)
+                        {
+                            string VDD_DB = null;
+                            string VDD_typ = null;
+                            switch (i)
+                            {
+                                case 0: VDD_DB = "1_8"; VDD_typ = "1.8v"; break;
+                                case 1: VDD_DB = "3_3"; VDD_typ = "3.3v"; break;
+                                case 2: VDD_DB = "5_0"; VDD_typ = "5.0v"; break;
+                            }
+
+                            EC_row_populate(g.table, g.row, "Logic Input with Schmitt Trigger at VDD = " + VDD_typ,
+                                accessQuery(VDD_DB, "VHYS", null, "min"),
+                                accessQuery(VDD_DB, "VHYS", null, "typ"),
+                                accessQuery(VDD_DB, "VHYS", null, "max"));
+                        }
                     }
 
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     //  V_OH
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(3, "Populating EC Table: V_OH");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_OH");
 
                     if (g.VDD.PP1x > 0 || g.VDD.PP2x > 0 || g.VDD.ODP1x > 0 || g.VDD.ODP2x > 0)
                     {
-                        EC_OH_OL(table, "VOH", VDD_DB, VDD_typ, g.VDD);
+                        EC_OH_OL("VOH", g.VDD_EC, g.VDD);
                     }
                     if (g.VDD2.PP1x > 0 || g.VDD2.PP2x > 0 || g.VDD2.ODP1x > 0 || g.VDD2.ODP2x > 0)
                     {
-                        EC_OH_OL(table, "VOH2", VDD2_DB, VDD2_typ, g.VDD2);
+                        EC_OH_OL("VOH2", g.VDD2_EC, g.VDD2);
                     }
 
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     //  V_OL
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(3, "Populating EC Table: V_OL");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_OL");
 
                     if (g.VDD.PP1x > 0 || g.VDD.PP2x > 0 || g.VDD.ODN1x > 0 || g.VDD.ODN2x > 0 || g.VDD.ODN4x > 0)
                     {
-                        EC_OH_OL(table, "VOL", VDD_DB, VDD_typ, g.VDD);
+                        EC_OH_OL("VOL", g.VDD_EC, g.VDD);
                     }
                     if (g.VDD2.PP1x > 0 || g.VDD2.PP2x > 0 || g.VDD2.ODN1x > 0 || g.VDD2.ODN2x > 0 || g.VDD2.ODN4x > 0)
                     {
-                        EC_OH_OL(table, "VOL2", VDD2_DB, VDD2_typ, g.VDD2);
+                        EC_OH_OL("VOL2", g.VDD2_EC, g.VDD2);
                     }
 
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     //  I_OH
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(3, "Populating EC Table: I_OH");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: I_OH");
 
                     if (g.VDD.PP1x > 0 || g.VDD.PP2x > 0 || g.VDD.ODP1x > 0 || g.VDD.ODP2x > 0)
                     {
-                        EC_OH_OL(table, "IOH", VDD_DB, VDD_typ, g.VDD);
+                        EC_OH_OL("IOH", g.VDD_EC, g.VDD);
                     }
                     if (g.VDD2.PP1x > 0 || g.VDD2.PP2x > 0 || g.VDD2.ODP1x > 0 || g.VDD2.ODP2x > 0)
                     {
-                        EC_OH_OL(table, "IOH2", VDD2_DB, VDD2_typ, g.VDD2);
+                        EC_OH_OL("IOH2", g.VDD2_EC, g.VDD2);
                     }
 
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     //  I_OL
                     ////////////////////////////////////////////////////////////////////////////////////////////////////
                     if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(3, "Populating EC Table: I_OL");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: I_OL");
 
                     if (g.VDD.PP1x > 0 || g.VDD.PP2x > 0 || g.VDD.ODN1x > 0 || g.VDD.ODN2x > 0 || g.VDD.ODN4x > 0)
                     {
-                        EC_OH_OL(table, "IOL", VDD_DB, VDD_typ, g.VDD);
+                        EC_OH_OL("IOL", g.VDD_EC, g.VDD);
                     }
                     if (g.VDD2.PP1x > 0 || g.VDD2.PP2x > 0 || g.VDD2.ODN1x > 0 || g.VDD2.ODN2x > 0 || g.VDD2.ODN4x > 0)
                     {
-                        EC_OH_OL(table, "IOL2", VDD2_DB, VDD2_typ, g.VDD2);
+                        EC_OH_OL("IOL2", g.VDD2_EC, g.VDD2);
                     }
                 }
 
@@ -2326,25 +2463,24 @@ public static class MainProgram
                 // ### Update this with Access Data at some point
 
                 if (worker.CancellationPending) { e.Cancel = true; return; }
-                form.backgroundWorker.ReportProgress(3, "Populating EC Table: CNTs/DLYs");
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: CNTs/DLYs");
                 if (g.CNTs_DLYs_update)
                 {
                     for (int i = 0; i < g.GreenPAK.cnt.Length; i++)
                     {
                         if (g.GreenPAK.cnt[i].used)
                         {
-                            symbolRow = EC_row_symbol(table, "t" + g.GreenPAK.cnt[i].mode_alt + i.ToString());
-                            row = symbolRow;
-                            table.Cell(row, 2).Range.Text = g.GreenPAK.cnt[i].mode + " " + i.ToString() + " Time";
-                            table.Cell(row, 7).Range.Text = g.GreenPAK.cnt[i].timeSI;
+                            symbolRow = EC_row_symbol("t" + g.GreenPAK.cnt[i].mode_alt + i.ToString());
+                            g.row = symbolRow;
+                            g.table.Cell(g.row, 2).Range.Text = g.GreenPAK.cnt[i].mode + " " + i.ToString() + " Time";
+                            g.table.Cell(g.row, 7).Range.Text = g.GreenPAK.cnt[i].timeSI;
 
                             Console.WriteLine(g.GreenPAK.cnt[i].time.typ);
-                            EC_row_populate(table, row, "At temperature " + g.GreenPAK.temp.typ + "\u00B0C",
+                            EC_row_populate(g.table, g.row, "At temperature " + g.GreenPAK.temp.typ + "\u00B0C",
                                 "--",
                                 g.GreenPAK.cnt[i].time.typ,
                                 "--");
-                            EC_row_split(table, row);
-                            row++;
+                            EC_row_split();
                             //EC_row_populate(table, row,
                             //    "At temperature " + g.GreenPAK.temp.min + "\u00B0C" + " to " + g.GreenPAK.temp.max + "\u00B0C",
                             //    "--",
@@ -2353,7 +2489,7 @@ public static class MainProgram
                             //EC_row_split(table, row);
                             //row++;
 
-                            EC_row_merge(table, symbolRow, row);
+                            EC_row_merge(symbolRow);
                         }
                     }
                 }
@@ -2364,50 +2500,48 @@ public static class MainProgram
                 // ### Update this with Access Data at some point
 
                 if (worker.CancellationPending) { e.Cancel = true; return; }
-                form.backgroundWorker.ReportProgress(3, "Populating EC Table: ACMPs");
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: ACMPs");
                 if (g.ACMPs_update)
                 {
                     for (int i = 0; i < g.GreenPAK.acmp.Length; i++)
                     {
                         if (g.GreenPAK.acmp[i].used)
                         {
-                            symbolRow = EC_row_symbol(table, "VACMP" + i.ToString());
-                            row = symbolRow;
-                            EC_clearSection(table, row);
-                            table.Cell(row, 2).Range.Text = "Analog Comparator" + i.ToString() + " Threshold Voltage";
-                            table.Cell(row, 7).Range.Text = "mV";
+                            symbolRow = EC_row_symbol("VACMP" + i.ToString());
+                            g.row = symbolRow;
+                            EC_clearSection();
+                            g.table.Cell(g.row, 2).Range.Text = "Analog Comparator" + i.ToString() + " Threshold Voltage";
+                            g.table.Cell(g.row, 7).Range.Text = "mV";
 
-                            EC_row_populate(table, row, "Low to High transition at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].acmpVIH, "--");
-                            EC_row_split(table, row);
-                            row++;
+                            EC_row_populate(g.table, g.row, "Low to High transition at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].acmpVIH, "--");
+                            EC_row_split();
                             //EC_row_populate(table, row, "Low to High transition at temperature " + g.GreenPAK.temp.min + "\u00B0C" + " to " + g.GreenPAK.temp.max + "\u00B0C", "--", g.GreenPAK.acmp[i].threshold, "--");
                             //EC_row_split(table, row);
                             //row++;
-                            EC_row_populate(table, row, "High to Low transition at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].acmpVIL, "--");
-                            EC_row_split(table, row);
-                            row++;
+
+                            EC_row_populate(g.table, g.row, "High to Low transition at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].acmpVIL, "--");
+                            EC_row_split();
                             //EC_row_populate(table, row, "High to Low transition at temperature " + g.GreenPAK.temp.min + "\u00B0C" + " to " + g.GreenPAK.temp.max + "\u00B0C", "--", g.GreenPAK.acmp[i].threshold, "--");
                             //EC_row_split(table, row);
                             //row++;
 
-                            EC_row_merge(table, symbolRow, row);
+                            EC_row_merge(symbolRow);
 
                             if (g.GreenPAK.acmp[i].hysteresis != "0")
                             {
-                                symbolRow = EC_row_symbol(table, "VHYST" + i.ToString());
-                                row = symbolRow;
-                                EC_clearSection(table, row);
-                                table.Cell(row, 2).Range.Text = "Analog Comparator" + i.ToString() + " Hysteresis Voltage (note 1)";
-                                table.Cell(row, 7).Range.Text = "mV";
+                                symbolRow = EC_row_symbol("VHYST" + i.ToString());
+                                g.row = symbolRow;
+                                EC_clearSection();
+                                g.table.Cell(g.row, 2).Range.Text = "Analog Comparator" + i.ToString() + " Hysteresis Voltage (note 1)";
+                                g.table.Cell(g.row, 7).Range.Text = "mV";
 
-                                EC_row_populate(table, row, "ACMP" + i.ToString() + " at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].hysteresis, "--");
-                                EC_row_split(table, row);
-                                row++;
+                                EC_row_populate(g.table, g.row, "ACMP" + i.ToString() + " at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].hysteresis, "--");
+                                EC_row_split();
                                 //EC_row_populate(table, row, "ACMP" + i.ToString() + " at temperature " + g.GreenPAK.temp.min + "\u00B0C" + " to " + g.GreenPAK.temp.max + "\u00B0C", "--", g.GreenPAK.acmp[i].hysteresis, "--");
                                 //EC_row_split(table, row);
                                 //row++;
 
-                                EC_row_merge(table, symbolRow, row);
+                                EC_row_merge(symbolRow);
                             }
                         }
                     }
@@ -2416,86 +2550,130 @@ public static class MainProgram
                 //  TSU / PONTHR / POFFTHR
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (worker.CancellationPending) { e.Cancel = true; return; }
-                form.backgroundWorker.ReportProgress(3, "Populating EC Table: T_SU / P_ONTHR / P_OFFTHR");
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: T_SU / P_ONTHR / P_OFFTHR");
 
                 if (g.temp_vdd_update || g.new_part_update)
                 {
-                    symbolRow = EC_row_symbol(table, "TSU");
-                    row = symbolRow;
-                    table.Cell(row, 2).Range.Text = "Start up Time";
-                    table.Cell(row, 7).Range.Text = "ms";
+                    symbolRow = EC_row_symbol("TSU");
+                    g.row = symbolRow;
+                    g.table.Cell(g.row, 2).Range.Text = "Start up Time";
+                    g.table.Cell(g.row, 7).Range.Text = "ms";
 
-                    EC_row_populate(table, row, "From VDD rising past PONTHR",
-                        accessQuery(VDD_DB, "TSU", null, "min"),
-                        accessQuery(VDD_DB, "TSU", null, "typ"),
-                        accessQuery(VDD_DB, "TSU", null, "max"));
+                    EC_row_populate(g.table, g.row, "From VDD rising past PONTHR",
+                        accessQuery("1_8", "TSU", null, "min"),
+                        accessQuery("1_8", "TSU", null, "typ"),
+                        accessQuery("1_8", "TSU", null, "max"));
 
-                    symbolRow = EC_row_symbol(table, "PONTHR");
-                    row = symbolRow;
-                    table.Cell(row, 2).Range.Text = "Power On Threshold";
-                    table.Cell(row, 7).Range.Text = "V";
+                    symbolRow = EC_row_symbol("PONTHR");
+                    g.row = symbolRow;
+                    g.table.Cell(g.row, 2).Range.Text = "Power On Threshold";
+                    g.table.Cell(g.row, 7).Range.Text = "V";
 
-                    EC_row_populate(table, row, "VDD Level Required to Start Up the Chip",
-                        accessQuery(VDD_DB, "PONTHR", null, "min"),
-                        accessQuery(VDD_DB, "PONTHR", null, "typ"),
-                        accessQuery(VDD_DB, "PONTHR", null, "max"));
+                    EC_row_populate(g.table, g.row, "VDD Level Required to Start Up the Chip",
+                        accessQuery("1_8", "PONTHR", null, "min"),
+                        accessQuery("1_8", "PONTHR", null, "typ"),
+                        accessQuery("1_8", "PONTHR", null, "max"));
 
-                    symbolRow = EC_row_symbol(table, "POFFTHR");
-                    row = symbolRow;
-                    table.Cell(row, 2).Range.Text = "Power OFF Threshold";
-                    table.Cell(row, 7).Range.Text = "V";
+                    symbolRow = EC_row_symbol("POFFTHR");
+                    g.row = symbolRow;
+                    g.table.Cell(g.row, 2).Range.Text = "Power OFF Threshold";
+                    g.table.Cell(g.row, 7).Range.Text = "V";
 
-                    EC_row_populate(table, row, "VDD Level Required to Switch Off the Chip",
-                        accessQuery(VDD_DB, "POFFTHR", null, "min"),
-                        accessQuery(VDD_DB, "POFFTHR", null, "typ"),
-                        accessQuery(VDD_DB, "POFFTHR", null, "max"));
+                    EC_row_populate(g.table, g.row, "VDD Level Required to Switch Off the Chip",
+                        accessQuery("1_8", "POFFTHR", null, "min"),
+                        accessQuery("1_8", "POFFTHR", null, "typ"),
+                        accessQuery("1_8", "POFFTHR", null, "max"));
                 }
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  ASM Asynchronous State Machine
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (worker.CancellationPending) { e.Cancel = true; return; }
-                form.backgroundWorker.ReportProgress(3, "Populating EC Table: ASM");
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: ASM");
                 if (g.asm_used && (g.new_part_update || g.temp_vdd_update))
                 {
-                    row = EC_row_symbol(table, "tst_out_delay");
-                    table.Cell(row, 2).Range.Text = "State Machine Output Delay";
-                    EC_row_populate(table, row, "",
+                    g.row = EC_row_symbol("tst_delay");
+                    g.table.Cell(g.row, 2).Range.Text = "State Machine Output Delay";
+                    for (int i = 0; i < 3; i++)
+                    {
+                        string VDD_DB = null;
+                        string VDD_typ = null;
+                        switch (i)
+                        {
+                            case 0: VDD_DB = "1_8"; VDD_typ = "1.8v"; break;
+                            case 1: VDD_DB = "3_3"; VDD_typ = "3.3v"; break;
+                            case 2: VDD_DB = "5_0"; VDD_typ = "5.0v"; break;
+                        }
+                        EC_row_populate(g.table, g.row, "At VDD = " + VDD_typ,
                         accessQuery(VDD_DB, "tst_out_delay", null, "min"),
                         accessQuery(VDD_DB, "tst_out_delay", null, "typ"),
                         accessQuery(VDD_DB, "tst_out_delay", null, "max"));
-                    table.Cell(row, 7).Range.Text = "ns";
+                    }
+                    g.table.Cell(g.row, 7).Range.Text = "ns";
 
-                    row = EC_row_symbol(table, "tst_out");
-                    table.Cell(row, 2).Range.Text = "State Machine Output Transition Time";
-                    EC_row_populate(table, row, "",
+                    g.row = EC_row_symbol("tst_out");
+                    g.table.Cell(g.row, 2).Range.Text = "State Machine Output Transition Time";
+                    for (int i = 0; i < 3; i++)
+                    {
+                        string VDD_DB = null;
+                        string VDD_typ = null;
+                        switch (i)
+                        {
+                            case 0: VDD_DB = "1_8"; VDD_typ = "1.8v"; break;
+                            case 1: VDD_DB = "3_3"; VDD_typ = "3.3v"; break;
+                            case 2: VDD_DB = "5_0"; VDD_typ = "5.0v"; break;
+                        }
+                        EC_row_populate(g.table, g.row, "At VDD = " + VDD_typ,
                         accessQuery(VDD_DB, "tst_out", null, "min"),
                         accessQuery(VDD_DB, "tst_out", null, "typ"),
                         accessQuery(VDD_DB, "tst_out", null, "max"));
-                    table.Cell(row, 7).Range.Text = "ns";
+                    }
+                    g.table.Cell(g.row, 7).Range.Text = "ns";
 
-                    row = EC_row_symbol(table, "tst_pulse");
-                    table.Cell(row, 2).Range.Text = "State Machine Input Pulse Acceptance Time";
-                    EC_row_populate(table, row, "",
+                    g.row = EC_row_symbol("tst_pulse");
+                    g.table.Cell(g.row, 2).Range.Text = "State Machine Input Pulse Acceptance Time";
+                    for (int i = 0; i < 3; i++)
+                    {
+                        string VDD_DB = null;
+                        string VDD_typ = null;
+                        switch (i)
+                        {
+                            case 0: VDD_DB = "1_8"; VDD_typ = "1.8v"; break;
+                            case 1: VDD_DB = "3_3"; VDD_typ = "3.3v"; break;
+                            case 2: VDD_DB = "5_0"; VDD_typ = "5.0v"; break;
+                        }
+                        EC_row_populate(g.table, g.row, "At VDD = " + VDD_typ,
                         accessQuery(VDD_DB, "tst_pulse", null, "min"),
                         accessQuery(VDD_DB, "tst_pulse", null, "typ"),
                         accessQuery(VDD_DB, "tst_pulse", null, "max"));
-                    table.Cell(row, 7).Range.Text = "ns";
+                    }
+                    g.table.Cell(g.row, 7).Range.Text = "ns";
 
-                    row = EC_row_symbol(table, "tst_comp");
-                    table.Cell(row, 2).Range.Text = "State Machine Input Compete Time";
-                    EC_row_populate(table, row, "",
+                    g.row = EC_row_symbol("tst_comp");
+                    g.table.Cell(g.row, 2).Range.Text = "State Machine Input Compete Time";
+                    for (int i = 0; i < 3; i++)
+                    {
+                        string VDD_DB = null;
+                        string VDD_typ = null;
+                        switch (i)
+                        {
+                            case 0: VDD_DB = "1_8"; VDD_typ = "1.8v"; break;
+                            case 1: VDD_DB = "3_3"; VDD_typ = "3.3v"; break;
+                            case 2: VDD_DB = "5_0"; VDD_typ = "5.0v"; break;
+                        }
+                        EC_row_populate(g.table, g.row, "At VDD = " + VDD_typ,
                         accessQuery(VDD_DB, "tst_comp", null, "min"),
                         accessQuery(VDD_DB, "tst_comp", null, "typ"),
                         accessQuery(VDD_DB, "tst_comp", null, "max"));
-                    table.Cell(row, 7).Range.Text = "ns";
+                    }
+                    g.table.Cell(g.row, 7).Range.Text = "ns";
                 }
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  PowerPAK Specs
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (worker.CancellationPending) { e.Cancel = true; return; }
-                form.backgroundWorker.ReportProgress(3, "Populating EC Table: PowerPAK");
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: PowerPAK");
 
                 if (g.new_part_update &&
                    (g.GreenPAK.base_die.Equals("SLG46116") || g.GreenPAK.base_die.Equals("SLG46117")))
@@ -2507,9 +2685,10 @@ public static class MainProgram
                         if (newTable.Title.Equals("PowerPAK"))
                         {
                             newTable.Range.Copy();
-                            table.Rows.Add();
-                            table.Rows[table.Rows.Count].Range.PasteAppendTable();
-                            EC_row_merge(table, table.Rows.Count - 1, table.Rows.Count);
+                            g.table.Rows.Add();
+                            g.table.Rows[g.table.Rows.Count].Range.PasteAppendTable();
+                            //EC_row_merge(g.table.Rows.Count - 1, g.table.Rows.Count);
+                            EC_row_merge(g.table.Rows.Count - 1);
 
                             break;
                         }
@@ -2521,38 +2700,41 @@ public static class MainProgram
                 //  Format EC table subscripts and exit EC table
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (worker.CancellationPending) { e.Cancel = true; return; }
-                //form.backgroundWorker.ReportProgress(3, "Populating EC Table: Fixing Subscripts");
+                //form.backgroundWorker.ReportProgress(2, "Populating EC Table: Fixing Subscripts");
 
                 if (g.new_part_update || g.pin_settings_update || g.temp_vdd_update)
                 {
-                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: VOH Subscripts");
-                    EC_subscripts(table, "V", "OH");
-                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: VOH2 Subscripts");
-                    EC_subscripts(table, "V", "OH2");
-                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: VOL Subscripts");
-                    EC_subscripts(table, "V", "OL");
-                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: VOL2 Subscripts");
-                    EC_subscripts(table, "V", "OL2");
-                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: IOH Subscripts");
-                    EC_subscripts(table, "I", "OH");
-                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: IOH2 Subscripts");
-                    EC_subscripts(table, "I", "OH2");
-                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: IOL Subscripts");
-                    EC_subscripts(table, "I", "OL");
-                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: IOL2 Subscripts");
-                    EC_subscripts(table, "I", "OL2");
-                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: VDD Subscripts");
-                    EC_subscripts(table, "V", "DD");
-                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: VDD2 Subscripts");
-                    EC_subscripts(table, "V", "DD2");
-                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: PONTHR Subscripts");
-                    EC_subscripts(table, "PON", "THR");
-                    form.backgroundWorker.ReportProgress(1, "Populating EC Table: POFFTHR Subscripts");
-                    EC_subscripts(table, "POFF", "THR");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOH Subscripts");
+                    EC_subscripts(g.table, "V", "OH");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOH2 Subscripts");
+                    EC_subscripts(g.table, "V", "OH2");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOL Subscripts");
+                    EC_subscripts(g.table, "V", "OL");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOL2 Subscripts");
+                    EC_subscripts(g.table, "V", "OL2");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOH Subscripts");
+                    EC_subscripts(g.table, "I", "OH");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOH2 Subscripts");
+                    EC_subscripts(g.table, "I", "OH2");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOL Subscripts");
+                    EC_subscripts(g.table, "I", "OL");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOL2 Subscripts");
+                    EC_subscripts(g.table, "I", "OL2");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: VDD Subscripts");
+                    EC_subscripts(g.table, "V", "DD");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: VDD2 Subscripts");
+                    EC_subscripts(g.table, "V", "DD2");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: PONTHR Subscripts");
+                    EC_subscripts(g.table, "PON", "THR");
+                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: POFFTHR Subscripts");
+                    EC_subscripts(g.table, "POFF", "THR");
                 }
 
                 g.connection.Close();
-                table.Rows.SetHeight(1, WdRowHeightRule.wdRowHeightAuto);
+
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: Formatting for prettiness");
+                g.table.Rows.SetHeight(1, WdRowHeightRule.wdRowHeightAuto);
+                EC_row_merge2();
                 break;
             }
         }
@@ -2561,7 +2743,7 @@ public static class MainProgram
         //  Top Marking, Tape & Reel
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Populating Images");
+        form.backgroundWorker.ReportProgress(2, "Populating Images");
 
         if (g.new_part_update)
         {
@@ -2595,7 +2777,7 @@ public static class MainProgram
         //  Datasheet Revision History table
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Populating Datasheet Revision History table");
+        form.backgroundWorker.ReportProgress(2, "Populating Datasheet Revision History table");
 
         foreach (Table table in g.doc.Tables)
         {
@@ -2616,20 +2798,47 @@ public static class MainProgram
         //  I2C Slave Address table
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(3, "Populating I2C Chip Address Table");
+        form.backgroundWorker.ReportProgress(2, "Populating I2C Chip Address Table");
 
         if (g.GreenPAK.i2c_PAK)
         {
-            string SA_bin = Reverse(g.nvmData.Substring(g.GreenPAK.i2c_slave_address, 4));
-            SA_bin = "0" + SA_bin + "000";
-            string SA_dec = Convert.ToInt32(SA_bin, 2).ToString();
-            string SA_hex = "0x" + Convert.ToInt32(SA_bin, 2).ToString("X");
+            foreach (XElement i2c_block in g.ELEMENT.Descendants("item")
+                .Where(i2c_block => i2c_block.Attribute("caption").ToString().StartsWith("caption=\"I2C")))
+            {
+                if (i2c_block.Element("graphics").Attribute("hidden").Value.Equals("1"))
+                {
+                    foreach (Table table in g.doc.Tables)
+                    {
+                        if (table.Title == "i2c_chip_address")
+                        {
+                            table.Delete();
+                            break;
+                        }
+                    }
+                    foreach (Paragraph p in g.doc.Paragraphs)
+                    {
+                        if (p.Range.Text.StartsWith("I2C Chip Address"))
+                        {
+                            p.Range.Select();
+                            g.app.Selection.Delete();
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    string SA_bin = Reverse(g.nvmData.Substring(g.GreenPAK.i2c_slave_address, 4));
+                    SA_bin = "0" + SA_bin + "000";
+                    string SA_dec = Convert.ToInt32(SA_bin, 2).ToString();
+                    string SA_hex = "0x" + Convert.ToInt32(SA_bin, 2).ToString("X");
 
-            Console.WriteLine(SA_bin + " " + SA_dec + " " + SA_hex);
+                    Console.WriteLine(SA_bin + " " + SA_dec + " " + SA_hex);
 
-            g.doc.Variables["Slave_Address_BIN"].Value = SA_bin;
-            g.doc.Variables["Slave_Address_DEC"].Value = SA_dec;
-            g.doc.Variables["Slave_Address_HEX"].Value = SA_hex;
+                    g.doc.Variables["Slave_Address_BIN"].Value = SA_bin;
+                    g.doc.Variables["Slave_Address_DEC"].Value = SA_dec;
+                    g.doc.Variables["Slave_Address_HEX"].Value = SA_hex;
+                }
+            }
         }
         else if (g.new_part_update)
         {

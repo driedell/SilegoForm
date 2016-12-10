@@ -10,6 +10,7 @@ namespace SilegoForm
         {
             InitializeComponent();
             MaximumSize = new System.Drawing.Size(400, 420);
+            Location = new System.Drawing.Point(800, 0);
             new_part_checkbox.Checked = true;           //### Erase this later?
         }
 
@@ -83,7 +84,38 @@ namespace SilegoForm
             }
             else
             {
-                Close();
+                //Close();
+
+                status_label.Text = "Done!";
+                MainProgram.closeDontSave();
+
+                GP_button.Enabled = true;
+                DS_button.Enabled = true;
+                I_Q_textBox.ReadOnly = false;
+                TM_Part_Code_textbox.ReadOnly = false;
+                TM_Revision_textbox.ReadOnly = false;
+                DS_rev_combobox.Enabled = true;
+                start_button.Enabled = true;
+                start_button.Visible = true;
+                cancel_button.Visible = false;
+                cancel_button.Enabled = false;
+
+                new_part_checkbox.Enabled = true;
+                metadata_checkbox.Enabled = true;
+                pin_labels_checkbox.Enabled = true;
+                temp_vdd_checkbox.Enabled = true;
+                CNTs_DLYs_checkbox.Enabled = true;
+                ACMPs_checkbox.Enabled = true;
+                pin_settings_checkbox.Enabled = true;
+                DS_rev_checkbox.Enabled = true;
+                I_Q_checkbox.Enabled = true;
+                TM_Part_Code_checkbox.Enabled = true;
+                TM_Revision_checkbox.Enabled = true;
+                lock_status_checkbox.Enabled = true;
+                DS_rev_change_textbox.ReadOnly = false;
+
+                progressBar.Visible = false;
+                progressBar.Value = 100;
             }
         }
 
@@ -322,6 +354,7 @@ namespace SilegoForm
             DS_rev_change_textbox.ReadOnly = true;
 
             progressBar.Visible = true;
+            progressBar.Value = 0;
             status_label.Visible = true;
             backgroundWorker.RunWorkerAsync();
         }

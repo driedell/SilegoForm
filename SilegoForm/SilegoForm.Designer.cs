@@ -325,9 +325,9 @@ namespace SilegoForm
             this.version_label.AutoSize = true;
             this.version_label.Location = new System.Drawing.Point(294, 17);
             this.version_label.Name = "version_label";
-            this.version_label.Size = new System.Drawing.Size(37, 13);
+            this.version_label.Size = new System.Drawing.Size(43, 13);
             this.version_label.TabIndex = 43;
-            this.version_label.Text = "v0.0.9";
+            this.version_label.Text = "v0.0.10";
             this.version_label.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // TM_Part_Code_textbox
@@ -537,7 +537,7 @@ namespace SilegoForm
             this.MaximumSize = new System.Drawing.Size(700, 420);
             this.MinimumSize = new System.Drawing.Size(400, 420);
             this.Name = "SilegoForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Silego DataSheet Automation Tool";
             this.Load += new System.EventHandler(this.SilegoForm_Load);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.SilegoForm_DragDrop);
