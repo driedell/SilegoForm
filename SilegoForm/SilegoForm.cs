@@ -12,6 +12,8 @@ namespace SilegoForm
             MaximumSize = new System.Drawing.Size(400, 420);
             Location = new System.Drawing.Point(800, 0);
             new_part_checkbox.Checked = true;           //### Erase this later?
+
+            DS_rev_combobox.Text = "010";
         }
 
         public void progressIncrement(int value)

@@ -12,7 +12,10 @@ using System.Xml.Linq;
 
 public static class MainProgram
 {
-    public static class g       // for global variables
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //  Class for global variables
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static class g
     {
         public static string nvmData = null;
         public static XElement ELEMENT;
@@ -51,10 +54,13 @@ public static class MainProgram
         public static bool VHYS;
         public static bool asm_used;
 
-        public static pin_IOs VDD = new pin_IOs();
-        public static pin_IOs VDD2 = new pin_IOs();
+        // Holds the number of pins for different IO settings for the output summary on the first page.
+        // We have both VDD & VDD2 for dual supply PAKs
+        public static pin_IO_settings VDD = new pin_IO_settings();
 
-        public struct pin_IOs
+        public static pin_IO_settings VDD2 = new pin_IO_settings();
+
+        public struct pin_IO_settings
         {
             public byte PP1x;
             public byte PP2x;
@@ -69,17 +75,27 @@ public static class MainProgram
             public bool woSchmitt;
         };
 
+        // Holds VDD/VDD2 range for populating the EC table.
+        // VDD_EC[0] = 1.8v
+        // VDD_EC[1] = 3.3v
+        // VDD_EC[2] = 5.0v
         public static bool[] VDD_EC = new bool[3];
+
         public static bool[] VDD2_EC = new bool[3];
 
-        public static Table table;
-        public static int row = 0;
-        public static string VDD_DB = null;
-        public static string VDD_typ = null;
-        public static string subSymbol = null;
-        public static string extraInfo = null;
+        // Global variables to reduce paramaters that need to be passed for the EC table
+        public static Table table;                      // Word table
+
+        public static int row = 0;                      // Row of the table
+        public static string VDD_DB = null;             // Access Database column designator (1_8, 3_3, 5_0)
+        public static string VDD_typ = null;            // VDD to print to table (1.8, 3.3, 5.0)
+        public static string subSymbol = null;          // Removes "2" from Dual Supply symbols (VOH2 → VOH)
+        public static string extraInfo = null;          // Holds additional info for the condition/note field
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //  Programmatically move form Window and Console Window
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     private const int SWP_NOSIZE = 0x0001;
 
     [DllImport("kernel32.dll", ExactSpelling = true)]
@@ -90,6 +106,9 @@ public static class MainProgram
     [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
     public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, int wFlags);
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //  Main
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     [STAThread]
     public static void Main()
     {
@@ -111,6 +130,8 @@ public static class MainProgram
 
     public static void closeDontSave()
     {
+        //  Closes and quits the word document. Mainly used in instances where the program does not run to completion.
+
         try
         {
             g.doc.Close(WdSaveOptions.wdDoNotSaveChanges);
@@ -121,6 +142,8 @@ public static class MainProgram
 
     private static void pin_cell_update(Table table, int i)
     {
+        // Updates the pin labels in the first page pinout diagram
+
         if (g.GreenPAK.pin[i].name.Length <= 16)
         {
             table.Cell(1, 1).Range.Text = g.GreenPAK.pin[i].name;
@@ -134,6 +157,9 @@ public static class MainProgram
 
     private static void pin_cell_config(int i, int HP, int VP, char side)
     {
+        // Configures the cells that hold the labels for the first page pinout diagram.
+        // Alters the text orientation and text alignment.
+
         foreach (Table table in g.doc.Tables)
         {
             if (table.Title == "pin" + i.ToString() + "_label")
@@ -187,6 +213,11 @@ public static class MainProgram
 
     private static void pin_config(int i)
     {
+        // Uses GreenPAK_Library.cs to read the nvm and store pin settings in a struct.
+        // Writes pin settings to the Pin Configuration table in the datasheet.
+        // Stores the number of outputs of different types in g.VDD.xxxx for the output summary on
+        // the first page.
+
         switch (g.GreenPAK.pin[i].PT)
         {
             case "GPI":
@@ -330,6 +361,9 @@ public static class MainProgram
 
     private static void pin_config_resistor(int i)
     {
+        // Determines if a pin is floating or if it has a resistor. Stores that information in the
+        // pin's struct.
+
         bool floating = false;
 
         switch (g.nvmData[g.GreenPAK.pin[i].RV + 1].ToString() +
@@ -359,6 +393,8 @@ public static class MainProgram
 
     private static void pin_config_OE_input(int i)
     {
+        // Stores a pin's input settings for pins with OE's.
+
         switch (g.nvmData[g.GreenPAK.pin[i].IM + 1].ToString() +
                 g.nvmData[g.GreenPAK.pin[i].IM + 0].ToString())
         {
@@ -371,6 +407,8 @@ public static class MainProgram
 
     private static void pin_config_OE_output(int i)
     {
+        // Stores a pin's output settings for pins with OE's.
+
         if (g.GreenPAK.pin[i].SD >= 0 &&
             g.nvmData[g.GreenPAK.pin[i].SD].ToString().Equals("1"))
         {
@@ -391,6 +429,8 @@ public static class MainProgram
 
     private static void pin_config_GPIO(int i)
     {
+        // Stores a pin's IO settings for pins without OE's.
+
         switch (g.nvmData[g.GreenPAK.pin[i].IO + 2].ToString() +
                 g.nvmData[g.GreenPAK.pin[i].IO + 1].ToString() +
                 g.nvmData[g.GreenPAK.pin[i].IO + 0].ToString())
@@ -422,6 +462,8 @@ public static class MainProgram
 
     private static string TryGetElementValue(this XElement parentEl, string elementName)
     {
+        // Checks if an element exists. If so, it reterns the element's value. If not, it returns null.
+
         var foundEl = parentEl.Element(elementName);
 
         if (foundEl != null)
@@ -433,6 +475,9 @@ public static class MainProgram
 
     private static void acmp_config(int i)
     {
+        // Uses GreenPAK_Library.cs and nvm to store ACMP information in a struct.
+        // Later this information will be written to the EC table.
+
         int acmpVIH = 0;
         int acmpVIL = 0;
         byte multiplier = 1;
@@ -578,6 +623,9 @@ public static class MainProgram
 
     private static void counter_config(int i)
     {
+        // Uses GreenPAK_Library.cs and nvm to store counter information in a struct.
+        // Later this information will be written to the EC table.
+
         double freq = 0;
         double time = 0;
         string mode = null;
@@ -716,6 +764,7 @@ public static class MainProgram
         if (freq < 0)
         {
             g.GreenPAK.cnt[i].time.typ = "Ext Clk";
+            g.GreenPAK.cnt[i].timeSI = "s";
         }
         else
         {
@@ -726,6 +775,8 @@ public static class MainProgram
 
     private static string HexStringToBinary(string hex)
     {
+        // Converts a hex string into a binary value.
+
         string result = null;
         foreach (char c in hex)
         {
@@ -736,6 +787,8 @@ public static class MainProgram
 
     private static string Reverse(string s)
     {
+        // Reverses an array of chars.
+
         char[] charArray = s.ToCharArray();
         Array.Reverse(charArray);
         return new string(charArray);
@@ -743,27 +796,29 @@ public static class MainProgram
 
     private static void updateFields()
     {
+        // Updates fields in the Word document, including headers and footers.
+
         foreach (Section section in g.doc.Sections)
         {
             g.doc.Fields.Update();  // update each section
 
-            HeadersFooters headers = section.Headers;  //Get all headers
+            HeadersFooters headers = section.Headers;
             foreach (HeaderFooter header in headers)
             {
                 Fields fields = header.Range.Fields;
                 foreach (Field field in fields)
                 {
-                    field.Update();  // update all fields in headers
+                    field.Update();
                 }
             }
 
-            HeadersFooters footers = section.Footers;  //Get all footers
+            HeadersFooters footers = section.Footers;
             foreach (HeaderFooter footer in footers)
             {
                 Fields fields = footer.Range.Fields;
                 foreach (Field field in fields)
                 {
-                    field.Update();  //update all fields in footers
+                    field.Update();
                 }
             }
         }
@@ -771,6 +826,9 @@ public static class MainProgram
 
     private static void EC_clearSection()
     {
+        // Merges together all the rows in the EC table with the symbolRow so that the only row left
+        // is the symbolRow.
+
         while (g.row < g.table.Rows.Count)
         {
             try
@@ -792,6 +850,9 @@ public static class MainProgram
 
     private static int EC_row_symbol(string symbol)
     {
+        // Searches the EC table for the symbol. If the symbol is present, return its row index.
+        // If the symbol is not already present, add it.
+
         for (int i = 1; i <= g.table.Rows.Count; i++)
         {
             // if the cell doesn't exist skip it
@@ -825,6 +886,8 @@ public static class MainProgram
 
     private static void EC_row_populate(Table table, int row, string param, string min, string typ, string max)
     {
+        // Populates the EC table with four string values.
+
         table.Cell(row, 3).Range.Text = param;
         table.Cell(row, 4).Range.Text = min;
         table.Cell(row, 5).Range.Text = typ;
@@ -833,6 +896,9 @@ public static class MainProgram
 
     private static void EC_row_split()
     {
+        // Splits the current row in two by adding a row directly underneath the row's index, then
+        // increments the row index.
+
         //Console.WriteLine("row count1 = " + g.table.Rows.Count);
         try
         {
@@ -850,6 +916,8 @@ public static class MainProgram
 
     private static void EC_row_merge(int symbolRow)
     {
+        // Unused right now.
+
         //g.table.Cell(g.row, 1).Merge(g.table.Cell(symbolRow, 1));
         //g.table.Cell(g.row, 2).Merge(g.table.Cell(symbolRow, 2));
         //g.table.Cell(g.row, 3).Merge(g.table.Cell(g.row - 1, 3));
@@ -861,6 +929,8 @@ public static class MainProgram
 
     private static void EC_row_merge2()
     {
+        // After the EC table is populated, merge all empty cells with the cell above to remove blanks.
+
         try
         {
             foreach (Row row in g.table.Rows)
@@ -884,7 +954,8 @@ public static class MainProgram
                     Console.WriteLine(c.RowIndex.ToString() + ", " + c.ColumnIndex.ToString() + ", " + c.Range.Text);
                     int i = 1;
 
-                    while (g.table.Cell(c.RowIndex + i, c.ColumnIndex).Range.Text.Length < 3)
+                    while (g.table.Cell(c.RowIndex + i, c.ColumnIndex).Range.Text.Length < 3
+                        && i <= g.table.Rows.Count)
                     {
                         i++;
                     }
@@ -894,28 +965,12 @@ public static class MainProgram
             }
             catch { }
         }
-
-        //foreach (Cell c in g.table.Range.Cells)
-        //{
-        //    try
-        //    {
-        //        if (c.Range.Text.Length < 3)
-        //        {
-        //            Console.WriteLine("blank: " + c.RowIndex.ToString() + ", " + c.ColumnIndex.ToString());
-        //            c.Merge(g.table.Cell(c.RowIndex - 1, c.ColumnIndex));
-        //        }
-        //        else
-        //        {
-        //            Console.WriteLine("not blank: " + c.RowIndex.ToString() + ", " +
-        //                c.ColumnIndex.ToString() + ", " + c.Range.Text.Length + ", " + c.Range.Text);
-        //        }
-        //    }
-        //    catch { }
-        //}
     }
 
-    private static void EC_IH_IL(string symbol, bool[] VDD_EC, g.pin_IOs VDD_IOs)
+    private static void EC_IH_IL(string symbol, bool[] VDD_EC, g.pin_IO_settings VDD_IOs)
     {
+        // Query the Access Database and Write VIH/VIL settings to the EC table.
+
         int symbolRow = EC_row_symbol(symbol);
         g.subSymbol = symbol.Substring(0, 3);
         g.row = symbolRow;
@@ -970,8 +1025,10 @@ public static class MainProgram
         EC_row_merge(symbolRow);
     }
 
-    private static void EC_OH_OL(string symbol, bool[] VDD_EC, g.pin_IOs VDD_IOs)
+    private static void EC_OH_OL(string symbol, bool[] VDD_EC, g.pin_IO_settings VDD_IOs)
     {
+        // Query the Access Database, and write VOH/VOL/IOH/IOL settings to the EC table.
+
         string highlow = null;
 
         int symbolRow = EC_row_symbol(symbol);
@@ -1013,9 +1070,9 @@ public static class MainProgram
         {
             switch (i)
             {
-                case 0: g.VDD_DB = "1_8"; g.extraInfo = "\nat VDD = 1.8v"; break;
-                case 1: g.VDD_DB = "3_3"; g.extraInfo = "\nat VDD = 3.3v"; break;
-                case 2: g.VDD_DB = "5_0"; g.extraInfo = "\nat VDD = 5.0v"; break;
+                case 0: g.VDD_DB = "1_8"; g.extraInfo = " at VDD = 1.8v"; break;
+                case 1: g.VDD_DB = "3_3"; g.extraInfo = " at VDD = 3.3v"; break;
+                case 2: g.VDD_DB = "5_0"; g.extraInfo = " at VDD = 5.0v"; break;
             }
 
             if (symbol.StartsWith("VOH"))
@@ -1023,9 +1080,9 @@ public static class MainProgram
                 highlow = "HIGH";
                 switch (g.VDD_DB)
                 {
-                    case "1_8": g.extraInfo += ", IOH = 100 µA"; break;
-                    case "3_3": g.extraInfo += ", IOH = 3 mA"; break;
-                    case "5_0": g.extraInfo += ", IOH = 5 mA"; break;
+                    case "1_8": g.extraInfo += ", IOH = 100µA"; break;
+                    case "3_3": g.extraInfo += ", IOH = 3mA"; break;
+                    case "5_0": g.extraInfo += ", IOH = 5mA"; break;
                 }
             }
             else if (symbol.StartsWith("VOL"))
@@ -1033,9 +1090,9 @@ public static class MainProgram
                 highlow = "LOW";
                 switch (g.VDD_DB)
                 {
-                    case "1_8": g.extraInfo += ", IOL = 100 µA"; break;
-                    case "3_3": g.extraInfo += ", IOL = 3 mA"; break;
-                    case "5_0": g.extraInfo += ", IOL = 5 mA"; break;
+                    case "1_8": g.extraInfo += ", IOL = 100µA"; break;
+                    case "3_3": g.extraInfo += ", IOL = 3mA"; break;
+                    case "5_0": g.extraInfo += ", IOL = 5mA"; break;
                 }
             }
             else if (symbol.StartsWith("IOH"))
@@ -1043,9 +1100,9 @@ public static class MainProgram
                 highlow = "HIGH";
                 switch (g.VDD_DB)
                 {
-                    case "1_8": g.extraInfo += ", VOH = VDD - 0.2 V"; break;
-                    case "3_3": g.extraInfo += ", VOH = 2.4 V"; break;
-                    case "5_0": g.extraInfo += ", VOH = 2.4 V"; break;
+                    case "1_8": g.extraInfo += ", VOH = VDD - 0.2v"; break;
+                    case "3_3": g.extraInfo += ", VOH = 2.4v"; break;
+                    case "5_0": g.extraInfo += ", VOH = 2.4v"; break;
                 }
             }
             else if (symbol.StartsWith("IOL"))
@@ -1053,9 +1110,9 @@ public static class MainProgram
                 highlow = "LOW";
                 switch (g.VDD_DB)
                 {
-                    case "1_8": g.extraInfo += ", VOL = 0.15 V"; break;
-                    case "3_3": g.extraInfo += ", VOL = 0.4 V"; break;
-                    case "5_0": g.extraInfo += ", VOL = 0.4 V"; break;
+                    case "1_8": g.extraInfo += ", VOL = 0.15v"; break;
+                    case "3_3": g.extraInfo += ", VOL = 0.4v"; break;
+                    case "5_0": g.extraInfo += ", VOL = 0.4v"; break;
                 }
             }
 
@@ -1106,6 +1163,8 @@ public static class MainProgram
 
     private static void EC_subscripts(Table table, string symbol, string subscript)
     {
+        // Make sure that all the symbols in the EC table have the proper subscripts.
+
         if (subscript.EndsWith("2"))
         {
             return;
@@ -1136,6 +1195,9 @@ public static class MainProgram
 
     private static void saveFileAndOpen()
     {
+        // Updates all the fields in the Word document, saves the file to the proper location
+        // with the proper filename, closes and quits word, then opens the new DS file.
+
         try
         {
             updateFields();
@@ -1158,6 +1220,8 @@ public static class MainProgram
 
     private static void InlineShapeReplace(string title)
     {
+        // Replaces the top marking, package size, and Tape and Reel pictures at the end of the DS.
+
         foreach (InlineShape shape in g.doc.InlineShapes)
         {
             if (shape.Title.Equals(title))
@@ -1185,6 +1249,8 @@ public static class MainProgram
     //### Maybe make a more succint version that queries min/typ/max all at once?
     private static string accessQuery(string returnField, string param1, string param2 = "-1", string param3 = "-1")
     {
+        // Returns a single value from the Access Database based on the string parameters.
+
         string returnValue = null;
         //g.connection.Open();
         OleDbCommand command = new OleDbCommand();
@@ -1215,6 +1281,8 @@ public static class MainProgram
 
     private static void queryAndWrite(string note, string param2 = "-1")
     {
+        // Queries the Access Database for min/typ/max, then writes the returned values to the EC table.
+
         //g.connection.Open();
         OleDbCommand command = new OleDbCommand();
         command.Connection = g.connection;
@@ -1247,6 +1315,10 @@ public static class MainProgram
 
     public static void theProgram(BackgroundWorker worker, DoWorkEventArgs e)
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  Load the GP and DS files that were selected in the gui. Populate the Date, I_Q, and DS_rev.
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
         var form = Form.ActiveForm as SilegoForm.SilegoForm;
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(2, "Loading files...");
@@ -1266,7 +1338,6 @@ public static class MainProgram
         try
         {
             g.app = new Microsoft.Office.Interop.Word.Application();
-            //g.doc = g.app.Documents.Add(g.DataSheet_File, oMissing, oMissing, true);
             g.doc = g.app.Documents.Add(g.DataSheet_File);
         }
         catch (Exception ex)
@@ -1681,7 +1752,6 @@ public static class MainProgram
                     // Look for xml elements called "item" with caption "PIN ?" and check if they have textLabel Element
                     foreach (XElement pin in g.ELEMENT.Descendants("item")
                         .Where(pin => pin.Attribute("caption").ToString().StartsWith("caption=\"PIN " + i.ToString())))
-                    //.Where(pin => (string)pin.Attribute("caption") == ("PIN " + (i).ToString())))
                     {
                         if (pin.Element("graphics").Attribute("hidden").Value.Equals("0") &&
                             TryGetElementValue(pin, "textLabel") == null)
@@ -2359,7 +2429,7 @@ public static class MainProgram
                         g.table.Cell(g.row, 2).Range.Text = "LOW-Level Input Current";
                         g.table.Cell(g.row, 7).Range.Text = "µA";
 
-                        EC_row_populate(g.table, g.row, "Logic Input PINs; VIN = 0V",
+                        EC_row_populate(g.table, g.row, "Logic Input PINs; VIN = 0v",
                             "-1.0",
                             "--",
                             "1.0");
@@ -2481,13 +2551,6 @@ public static class MainProgram
                                 g.GreenPAK.cnt[i].time.typ,
                                 "--");
                             EC_row_split();
-                            //EC_row_populate(table, row,
-                            //    "At temperature " + g.GreenPAK.temp.min + "\u00B0C" + " to " + g.GreenPAK.temp.max + "\u00B0C",
-                            //    "--",
-                            //    g.GreenPAK.cnt[i].time.typ,
-                            //    "--");
-                            //EC_row_split(table, row);
-                            //row++;
 
                             EC_row_merge(symbolRow);
                         }
@@ -2594,6 +2657,7 @@ public static class MainProgram
                 {
                     g.row = EC_row_symbol("tst_delay");
                     g.table.Cell(g.row, 2).Range.Text = "State Machine Output Delay";
+                    g.table.Cell(g.row, 7).Range.Text = "ns";
                     for (int i = 0; i < 3; i++)
                     {
                         string VDD_DB = null;
@@ -2608,11 +2672,12 @@ public static class MainProgram
                         accessQuery(VDD_DB, "tst_out_delay", null, "min"),
                         accessQuery(VDD_DB, "tst_out_delay", null, "typ"),
                         accessQuery(VDD_DB, "tst_out_delay", null, "max"));
+                        EC_row_split();
                     }
-                    g.table.Cell(g.row, 7).Range.Text = "ns";
 
                     g.row = EC_row_symbol("tst_out");
                     g.table.Cell(g.row, 2).Range.Text = "State Machine Output Transition Time";
+                    g.table.Cell(g.row, 7).Range.Text = "ns";
                     for (int i = 0; i < 3; i++)
                     {
                         string VDD_DB = null;
@@ -2627,11 +2692,12 @@ public static class MainProgram
                         accessQuery(VDD_DB, "tst_out", null, "min"),
                         accessQuery(VDD_DB, "tst_out", null, "typ"),
                         accessQuery(VDD_DB, "tst_out", null, "max"));
+                        EC_row_split();
                     }
-                    g.table.Cell(g.row, 7).Range.Text = "ns";
 
                     g.row = EC_row_symbol("tst_pulse");
                     g.table.Cell(g.row, 2).Range.Text = "State Machine Input Pulse Acceptance Time";
+                    g.table.Cell(g.row, 7).Range.Text = "ns";
                     for (int i = 0; i < 3; i++)
                     {
                         string VDD_DB = null;
@@ -2646,11 +2712,12 @@ public static class MainProgram
                         accessQuery(VDD_DB, "tst_pulse", null, "min"),
                         accessQuery(VDD_DB, "tst_pulse", null, "typ"),
                         accessQuery(VDD_DB, "tst_pulse", null, "max"));
+                        EC_row_split();
                     }
-                    g.table.Cell(g.row, 7).Range.Text = "ns";
 
                     g.row = EC_row_symbol("tst_comp");
-                    g.table.Cell(g.row, 2).Range.Text = "State Machine Input Compete Time";
+                    g.table.Cell(g.row, 2).Range.Text = "State Machine Input Complete Time";
+                    g.table.Cell(g.row, 7).Range.Text = "ns";
                     for (int i = 0; i < 3; i++)
                     {
                         string VDD_DB = null;
@@ -2665,8 +2732,8 @@ public static class MainProgram
                         accessQuery(VDD_DB, "tst_comp", null, "min"),
                         accessQuery(VDD_DB, "tst_comp", null, "typ"),
                         accessQuery(VDD_DB, "tst_comp", null, "max"));
+                        EC_row_split();
                     }
-                    g.table.Cell(g.row, 7).Range.Text = "ns";
                 }
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2704,28 +2771,40 @@ public static class MainProgram
 
                 if (g.new_part_update || g.pin_settings_update || g.temp_vdd_update)
                 {
+                    if (worker.CancellationPending) { e.Cancel = true; return; }
                     form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOH Subscripts");
                     EC_subscripts(g.table, "V", "OH");
+                    if (worker.CancellationPending) { e.Cancel = true; return; }
                     form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOH2 Subscripts");
                     EC_subscripts(g.table, "V", "OH2");
+                    if (worker.CancellationPending) { e.Cancel = true; return; }
                     form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOL Subscripts");
                     EC_subscripts(g.table, "V", "OL");
+                    if (worker.CancellationPending) { e.Cancel = true; return; }
                     form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOL2 Subscripts");
                     EC_subscripts(g.table, "V", "OL2");
+                    if (worker.CancellationPending) { e.Cancel = true; return; }
                     form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOH Subscripts");
                     EC_subscripts(g.table, "I", "OH");
+                    if (worker.CancellationPending) { e.Cancel = true; return; }
                     form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOH2 Subscripts");
                     EC_subscripts(g.table, "I", "OH2");
+                    if (worker.CancellationPending) { e.Cancel = true; return; }
                     form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOL Subscripts");
                     EC_subscripts(g.table, "I", "OL");
+                    if (worker.CancellationPending) { e.Cancel = true; return; }
                     form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOL2 Subscripts");
                     EC_subscripts(g.table, "I", "OL2");
+                    if (worker.CancellationPending) { e.Cancel = true; return; }
                     form.backgroundWorker.ReportProgress(2, "Populating EC Table: VDD Subscripts");
                     EC_subscripts(g.table, "V", "DD");
+                    if (worker.CancellationPending) { e.Cancel = true; return; }
                     form.backgroundWorker.ReportProgress(2, "Populating EC Table: VDD2 Subscripts");
                     EC_subscripts(g.table, "V", "DD2");
+                    if (worker.CancellationPending) { e.Cancel = true; return; }
                     form.backgroundWorker.ReportProgress(2, "Populating EC Table: PONTHR Subscripts");
                     EC_subscripts(g.table, "PON", "THR");
+                    if (worker.CancellationPending) { e.Cancel = true; return; }
                     form.backgroundWorker.ReportProgress(2, "Populating EC Table: POFFTHR Subscripts");
                     EC_subscripts(g.table, "POFF", "THR");
                 }
@@ -2868,7 +2947,7 @@ public static class MainProgram
         form.backgroundWorker.ReportProgress(100, "Saving and Opening DataSheet File");
 
         saveFileAndOpen();
-        // BackgroundWorker stops, GUI closes, return to main
+        // BackgroundWorker stops, return control to gui
         return;
     }
 
