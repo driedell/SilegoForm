@@ -1407,7 +1407,7 @@
                 new PIN() { PT = "GPI",     IM = 0379, RV = 0381,                                  VS = 1  },    // 01
                 new PIN() { PT = "GPIO",    IO = 0383, RV = 0386, UD = 0388, DR = 0389,            VS = 1  },    // 02
                 new PIN() { PT = "GPIO",    IO = 0390, RV = 0393, UD = 0395, DR = 0396,            VS = 1  },    // 03
-                new PIN() { PT = "GPIO_OE", IM = 0397, OM = 0399, RV = 0401, UD = 0403, OE = 0015, VS = 1  },    // 04
+                new PIN() { PT = "PWR_SW_ON",                                                              },    // 04
                 new PIN() { PT = "VIN",                                                                    },    // 05
                 new PIN() { PT = "NA",                                                                     },    // 06
                 new PIN() { PT = "VOUT",                                                                   },    // 07
@@ -1459,7 +1459,7 @@
                 new PIN() { PT = "GPI",     IM = 0379, RV = 0381,                                  VS = 1  },    // 01
                 new PIN() { PT = "GPIO",    IO = 0383, RV = 0386, UD = 0388, DR = 0389,            VS = 1  },    // 02
                 new PIN() { PT = "GPIO",    IO = 0390, RV = 0393, UD = 0395, DR = 0396,            VS = 1  },    // 03
-                new PIN() { PT = "GPIO_OE", IM = 0397, OM = 0399, RV = 0401, UD = 0403, OE = 0015, VS = 1  },    // 04
+                new PIN() { PT = "PWR_SW_ON",                                                              },    // 04
                 new PIN() { PT = "VIN",                                                                    },    // 05
                 new PIN() { PT = "NA",                                                                     },    // 06
                 new PIN() { PT = "VOUT",                                                                   },    // 07

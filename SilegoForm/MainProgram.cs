@@ -13,7 +13,7 @@ using System.Xml.Linq;
 public static class MainProgram
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //  Class for global variables
+    //  Global variables
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     public static class g
     {
@@ -927,22 +927,24 @@ public static class MainProgram
         //g.table.Cell(g.row, 7).Merge(g.table.Cell(symbolRow, 7));
     }
 
-    private static void EC_row_merge2()
+    private static void EC_cleanup()
     {
         // After the EC table is populated, merge all empty cells with the cell above to remove blanks.
 
-        try
+
+        for (int i = 1; i < g.table.Rows.Count; i++)
         {
-            foreach (Row row in g.table.Rows)
+            
+            try
             {
-                if (row.Cells[5].Range.Text.Length < 3)
+                if (g.table.Cell(i, 5).Range.Text.Length < 3)
                 {
-                    Console.WriteLine("blank line: " + row.Index.ToString());
-                    row.Delete();
+                    Console.WriteLine("blank line: " + i.ToString());
+                    g.table.Rows[i].Delete();
                 }
             }
+            catch { }
         }
-        catch { }
 
         foreach (Cell c in g.table.Range.Cells)
         {
@@ -962,6 +964,17 @@ public static class MainProgram
                     Console.WriteLine((i - 1).ToString());
                     c.Merge(g.table.Cell(c.RowIndex + i - 1, c.ColumnIndex));
                 }
+            }
+            catch { }
+        }
+
+        Console.WriteLine("setting row height");
+        for (int i = 0; i < g.table.Rows.Count; i++)
+        {
+            try
+            {
+                Console.WriteLine(i.ToString());
+                g.table.Cell(i, 5).SetHeight((float)0.1, WdRowHeightRule.wdRowHeightAtLeast);
             }
             catch { }
         }
@@ -1739,6 +1752,27 @@ public static class MainProgram
                     g.GreenPAK.pin[i].type = "LDO Output";
                     g.GreenPAK.pin[i].description = "Low Drop Out Regulator Output";
                 }
+                else if (g.GreenPAK.pin[i].PT.Equals("PWR_SW_ON"))
+                {
+                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "FET On";
+                    g.GreenPAK.pin[i].description = "P-FET Power Switch On";
+                }
+                else if (g.GreenPAK.pin[i].PT.Equals("VIN"))
+                {
+                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "P-FET Input";
+                    g.GreenPAK.pin[i].description = "P-FET Power Switch VIN";
+                }
+                else if (g.GreenPAK.pin[i].PT.Equals("VOUT"))
+                {
+                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "P-FET Output";
+                    g.GreenPAK.pin[i].description = "P-FET Power Switch VOUT";
+                }
                 else if (g.GreenPAK.pin[i].PT.Equals("NA"))
                 {
                     g.GreenPAK.pin[i].name = "NC";
@@ -2447,19 +2481,18 @@ public static class MainProgram
 
                         g.table.Cell(g.row, 2).Range.Text = "Schmitt Trigger Hysteresis Voltage";
                         g.table.Cell(g.row, 7).Range.Text = "V";
-
                         for (int i = 0; i < 3; i++)
                         {
                             string VDD_DB = null;
                             string VDD_typ = null;
                             switch (i)
                             {
-                                case 0: VDD_DB = "1_8"; VDD_typ = "1.8v"; break;
-                                case 1: VDD_DB = "3_3"; VDD_typ = "3.3v"; break;
-                                case 2: VDD_DB = "5_0"; VDD_typ = "5.0v"; break;
+                                case 0: VDD_DB = "1_8"; VDD_typ = " at VDD = 1.8v"; break;
+                                case 1: VDD_DB = "3_3"; VDD_typ = " at VDD = 3.3v"; break;
+                                case 2: VDD_DB = "5_0"; VDD_typ = " at VDD = 5.0v"; break;
                             }
 
-                            EC_row_populate(g.table, g.row, "Logic Input with Schmitt Trigger at VDD = " + VDD_typ,
+                            EC_row_populate(g.table, g.row, "Logic Input with Schmitt Trigger" + VDD_typ,
                                 accessQuery(VDD_DB, "VHYS", null, "min"),
                                 accessQuery(VDD_DB, "VHYS", null, "typ"),
                                 accessQuery(VDD_DB, "VHYS", null, "max"));
@@ -2745,7 +2778,7 @@ public static class MainProgram
                 if (g.new_part_update &&
                    (g.GreenPAK.base_die.Equals("SLG46116") || g.GreenPAK.base_die.Equals("SLG46117")))
                 {
-                    Document TABLES = g.app.Documents.Add(@"C:\Users\driedell\Desktop\TABLES.docx", oMissing, oMissing, true);
+                    Document TABLES = g.app.Documents.Add(@"P:\Apps_Tools\New_DS_Template\Resources\TABLES.docx");
 
                     foreach (Table newTable in TABLES.Tables)
                     {
@@ -2753,14 +2786,28 @@ public static class MainProgram
                         {
                             newTable.Range.Copy();
                             g.table.Rows.Add();
+                            g.row = g.table.Rows.Count;
                             g.table.Rows[g.table.Rows.Count].Range.PasteAppendTable();
                             //EC_row_merge(g.table.Rows.Count - 1, g.table.Rows.Count);
-                            EC_row_merge(g.table.Rows.Count - 1);
+                            //EC_row_merge(g.table.Rows.Count - 1);
 
                             break;
                         }
                     }
                     TABLES.Close();
+
+                    for (int i = g.row; i < g.table.Rows.Count; i++)
+                    {
+                        g.table.Rows[i].Cells.VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
+                    }
+
+                    //for (int i = 1; i < g.table.Columns.Count; i++)
+                    //{
+                    //    if (i == 1 || i > 3)
+                    //    {
+                    //        g.table.Columns[i].Cells.
+                    //    }
+                    //}
                 }
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2813,7 +2860,7 @@ public static class MainProgram
 
                 form.backgroundWorker.ReportProgress(2, "Populating EC Table: Formatting for prettiness");
                 g.table.Rows.SetHeight(1, WdRowHeightRule.wdRowHeightAuto);
-                EC_row_merge2();
+                EC_cleanup();
                 break;
             }
         }
