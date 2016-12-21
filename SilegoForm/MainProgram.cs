@@ -137,7 +137,7 @@ public static class MainProgram
             g.doc.Close(WdSaveOptions.wdDoNotSaveChanges);
             g.app.Quit(WdSaveOptions.wdDoNotSaveChanges);
         }
-        catch { }
+        catch { Console.WriteLine("Error occured in closeDontSave()"); }
     }
 
     private static void pin_cell_update(Table table, int i)
@@ -357,6 +357,15 @@ public static class MainProgram
         }
 
         Console.WriteLine("Pin" + i.ToString() + ": " + g.GreenPAK.pin[i].type + ", " + g.GreenPAK.pin[i].description);
+    }
+
+    private static void pin_config_name(int i)
+    {
+        foreach (XElement pin in g.ELEMENT.Descendants("item")
+            .Where(pin => pin.Attribute("caption").ToString().StartsWith("caption=\"PIN " + i.ToString())))
+        {
+            g.GreenPAK.pin[i].name = pin.Element("textLabel").Value;
+        }
     }
 
     private static void pin_config_resistor(int i)
@@ -863,7 +872,7 @@ public static class MainProgram
                     return i;
                 }
             }
-            catch { }
+            catch { Console.WriteLine("Error occured in EC_row_symbol()"); }
         }
         int new_row;
         if (symbol.Equals("VDD2"))
@@ -904,7 +913,7 @@ public static class MainProgram
         {
             g.table.Rows[g.row].Range.Cells.Split(2, 1);
         }
-        catch { }
+        catch { Console.WriteLine("Error occured in EC_row_split()"); }
         //Console.WriteLine("row count2 = " + g.table.Rows.Count);
 
         //for (int i = 1; i <= g.table.Columns.Count; i++)
@@ -927,14 +936,12 @@ public static class MainProgram
         //g.table.Cell(g.row, 7).Merge(g.table.Cell(symbolRow, 7));
     }
 
-    private static void EC_cleanup()
+    private static void EC_cleanup1()
     {
         // After the EC table is populated, merge all empty cells with the cell above to remove blanks.
 
-
         for (int i = 1; i < g.table.Rows.Count; i++)
         {
-            
             try
             {
                 if (g.table.Cell(i, 5).Range.Text.Length < 3)
@@ -943,9 +950,12 @@ public static class MainProgram
                     g.table.Rows[i].Delete();
                 }
             }
-            catch { }
+            catch { Console.WriteLine("Error occured in EC_cleanup1()"); }
         }
+    }
 
+    private static void EC_cleanup2()
+    {
         foreach (Cell c in g.table.Range.Cells)
         {
             try
@@ -965,9 +975,12 @@ public static class MainProgram
                     c.Merge(g.table.Cell(c.RowIndex + i - 1, c.ColumnIndex));
                 }
             }
-            catch { }
+            catch { Console.WriteLine("Error occured in EC_cleanup2()"); }
         }
+    }
 
+    private static void EC_cleanup3()
+    {
         Console.WriteLine("setting row height");
         for (int i = 0; i < g.table.Rows.Count; i++)
         {
@@ -976,7 +989,7 @@ public static class MainProgram
                 Console.WriteLine(i.ToString());
                 g.table.Cell(i, 5).SetHeight((float)0.1, WdRowHeightRule.wdRowHeightAtLeast);
             }
-            catch { }
+            catch { Console.WriteLine("Error occured in EC_cleanup3()"); }
         }
     }
 
@@ -1226,6 +1239,7 @@ public static class MainProgram
         }
         catch
         {
+            Console.WriteLine("Error occured in saveFileAndOpen()");
             MessageBox.Show("Error: Could not save DataSheet file!\nPlease close the DataSheet file then click \"OK\".");
             saveFileAndOpen();
         }
@@ -1252,6 +1266,7 @@ public static class MainProgram
                 }
                 catch
                 {
+                    Console.WriteLine("Error occured in InlineShapeReplace()");
                     MessageBox.Show("Could not find " + g.templatePath + @"Resources\" + g.GreenPAK.package + "_" + title + ".png");
                 }
                 return;
@@ -1285,6 +1300,7 @@ public static class MainProgram
         }
         catch (Exception ex)
         {
+            Console.WriteLine("Error occured in accessQuery()");
             MessageBox.Show("Error " + ex);
         }
 
@@ -1320,6 +1336,7 @@ public static class MainProgram
         }
         catch (Exception ex)
         {
+            Console.WriteLine("Error occured in queryAndWrite()");
             MessageBox.Show("Error " + ex);
         }
 
@@ -1344,6 +1361,7 @@ public static class MainProgram
         }
         catch
         {
+            Console.WriteLine("Error occured in theProgram: could not load GreenPAK file");
             form.backgroundWorker.ReportProgress(0, "Error: Could not load GreenPAK file!");
             e.Cancel = true;
             return;
@@ -1355,6 +1373,7 @@ public static class MainProgram
         }
         catch (Exception ex)
         {
+            Console.WriteLine("Error occured in theProgram: could not load Datasheet file");
             MessageBox.Show(ex.ToString());
             form.backgroundWorker.ReportProgress(0, "Error: Could not load DataSheet file!");
             e.Cancel = true;
@@ -1488,6 +1507,7 @@ public static class MainProgram
             }
             catch
             {
+                Console.WriteLine("Error occured in theProgram: missing VDD Specs");
                 e.Cancel = true;
                 form.backgroundWorker.ReportProgress(2, "Error: Missing VDD Specs");
                 return;
@@ -1511,6 +1531,7 @@ public static class MainProgram
                 }
                 catch
                 {
+                    Console.WriteLine("Error occured in theProgram: Missing VDD2 Specs");
                     e.Cancel = true;
                     form.backgroundWorker.ReportProgress(2, "Error: Missing VDD2 Specs");
                     return;
@@ -1534,6 +1555,7 @@ public static class MainProgram
             }
             catch
             {
+                Console.WriteLine("Error occured in theProgram: Missing TEMP Specs");
                 e.Cancel = true;
                 form.backgroundWorker.ReportProgress(2, "Error: Missing TEMP Specs");
                 return;
@@ -1714,110 +1736,125 @@ public static class MainProgram
         {
             for (int i = 1; i < g.GreenPAK.pin.Length; i++)
             {
-                if (g.GreenPAK.pin[i].PT.Equals("VDD"))
+                switch (g.GreenPAK.pin[i].PT)
                 {
-                    g.GreenPAK.pin[i].name = "VDD";
-                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                    g.GreenPAK.pin[i].resistor = "--";
-                    g.GreenPAK.pin[i].type = "PWR";
-                    g.GreenPAK.pin[i].description = "Supply Voltage";
-                }
-                else if (g.GreenPAK.pin[i].PT.Equals("GND"))
-                {
-                    g.GreenPAK.pin[i].name = "GND";
-                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                    g.GreenPAK.pin[i].resistor = "--";
-                    g.GreenPAK.pin[i].type = "GND";
-                    g.GreenPAK.pin[i].description = "Ground";
-                }
-                else if (g.GreenPAK.pin[i].PT.Equals("VDD2"))
-                {
-                    g.GreenPAK.pin[i].name = "VDD2";
-                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                    g.GreenPAK.pin[i].resistor = "--";
-                    g.GreenPAK.pin[i].type = "PWR";
-                    g.GreenPAK.pin[i].description = "Supply Voltage";
-                }
-                else if (g.GreenPAK.pin[i].PT.Equals("LDO_IN"))
-                {
-                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                    g.GreenPAK.pin[i].resistor = "--";
-                    g.GreenPAK.pin[i].type = "LDO Input";
-                    g.GreenPAK.pin[i].description = "Low Drop Out Regulator Input";
-                }
-                else if (g.GreenPAK.pin[i].PT.Equals("LDO_OUT"))
-                {
-                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                    g.GreenPAK.pin[i].resistor = "--";
-                    g.GreenPAK.pin[i].type = "LDO Output";
-                    g.GreenPAK.pin[i].description = "Low Drop Out Regulator Output";
-                }
-                else if (g.GreenPAK.pin[i].PT.Equals("PWR_SW_ON"))
-                {
-                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                    g.GreenPAK.pin[i].resistor = "--";
-                    g.GreenPAK.pin[i].type = "FET On";
-                    g.GreenPAK.pin[i].description = "P-FET Power Switch On";
-                }
-                else if (g.GreenPAK.pin[i].PT.Equals("VIN"))
-                {
-                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                    g.GreenPAK.pin[i].resistor = "--";
-                    g.GreenPAK.pin[i].type = "P-FET Input";
-                    g.GreenPAK.pin[i].description = "P-FET Power Switch VIN";
-                }
-                else if (g.GreenPAK.pin[i].PT.Equals("VOUT"))
-                {
-                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                    g.GreenPAK.pin[i].resistor = "--";
-                    g.GreenPAK.pin[i].type = "P-FET Output";
-                    g.GreenPAK.pin[i].description = "P-FET Power Switch VOUT";
-                }
-                else if (g.GreenPAK.pin[i].PT.Equals("NA"))
-                {
-                    g.GreenPAK.pin[i].name = "NC";
-                    g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                    g.GreenPAK.pin[i].resistor = "--";
-                    g.GreenPAK.pin[i].type = "--";
-                    g.GreenPAK.pin[i].description = "Keep Floating or Connect to GND";
-                }
-                else
-                {
-                    // Look for xml elements called "item" with caption "PIN ?" and check if they have textLabel Element
-                    foreach (XElement pin in g.ELEMENT.Descendants("item")
-                        .Where(pin => pin.Attribute("caption").ToString().StartsWith("caption=\"PIN " + i.ToString())))
-                    {
-                        if (pin.Element("graphics").Attribute("hidden").Value.Equals("0") &&
-                            TryGetElementValue(pin, "textLabel") == null)
-                        {
-                            form.backgroundWorker.ReportProgress(0, "Error: Pin" + i.ToString() + " is used but is not labeled!");
-                            e.Cancel = true;
-                            return;
-                        }
-                        if (pin.Element("graphics").Attribute("hidden").Value.Equals("1") &&
-                            TryGetElementValue(pin, "textLabel") != null)
-                        {
-                            form.backgroundWorker.ReportProgress(0, "Error: Pin" + i.ToString() + " is labeled but is not used!");
-                            e.Cancel = true;
-                            return;
-                        }
+                    case "VDD":
+                        g.GreenPAK.pin[i].name = "VDD";
+                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                        g.GreenPAK.pin[i].resistor = "--";
+                        g.GreenPAK.pin[i].type = "PWR";
+                        g.GreenPAK.pin[i].description = "Supply Voltage";
+                        break;
 
-                        if (pin.Element("textLabel") != null)
+                    case "GND":
+                        g.GreenPAK.pin[i].name = "GND";
+                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                        g.GreenPAK.pin[i].resistor = "--";
+                        g.GreenPAK.pin[i].type = "GND";
+                        g.GreenPAK.pin[i].description = "Ground";
+                        break;
+
+                    case "VDD2":
+                        g.GreenPAK.pin[i].name = "VDD2";
+                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                        g.GreenPAK.pin[i].resistor = "--";
+                        g.GreenPAK.pin[i].type = "PWR";
+                        g.GreenPAK.pin[i].description = "Supply Voltage";
+                        break;
+
+                    case "AGND":
+                        g.GreenPAK.pin[i].name = "AGND";
+                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                        g.GreenPAK.pin[i].resistor = "--";
+                        g.GreenPAK.pin[i].type = "AGND";
+                        g.GreenPAK.pin[i].description = "Analog Ground";
+                        break;
+
+                    case "LDO_IN":
+                        pin_config_name(i);
+                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                        g.GreenPAK.pin[i].resistor = "--";
+                        g.GreenPAK.pin[i].type = "LDO Input";
+                        g.GreenPAK.pin[i].description = "LDO Regulator Input";
+                        break;
+
+                    case "LDO_OUT":
+                        pin_config_name(i);
+                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                        g.GreenPAK.pin[i].resistor = "--";
+                        g.GreenPAK.pin[i].type = "LDO Output";
+                        g.GreenPAK.pin[i].description = "LDO Regulator Output";
+                        break;
+
+                    case "PWR_SW_ON":
+                        pin_config_name(i);
+                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                        g.GreenPAK.pin[i].resistor = "--";
+                        g.GreenPAK.pin[i].type = "FET On";
+                        g.GreenPAK.pin[i].description = "P-FET Power Switch On";
+                        break;
+
+                    case "VIN":
+                        pin_config_name(i);
+                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                        g.GreenPAK.pin[i].resistor = "--";
+                        g.GreenPAK.pin[i].type = "P-FET Input";
+                        g.GreenPAK.pin[i].description = "P-FET Power Switch VIN";
+                        break;
+
+                    case "VOUT":
+                        pin_config_name(i);
+                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                        g.GreenPAK.pin[i].resistor = "--";
+                        g.GreenPAK.pin[i].type = "P-FET Output";
+                        g.GreenPAK.pin[i].description = "P-FET Power Switch VOUT";
+                        break;
+
+                    case "NA":
+                        g.GreenPAK.pin[i].name = "NC";
+                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                        g.GreenPAK.pin[i].resistor = "--";
+                        g.GreenPAK.pin[i].type = "--";
+                        g.GreenPAK.pin[i].description = "Keep Floating or Connect to GND";
+                        break;
+
+                    default:
+                        // Look for xml elements called "item" with caption "PIN _" and check if they have textLabel Element
+                        foreach (XElement pin in g.ELEMENT.Descendants("item")
+                            .Where(pin => pin.Attribute("caption").ToString().StartsWith("caption=\"PIN " + i.ToString())))
                         {
-                            pin_config(i);
-                            g.GreenPAK.pin[i].name = pin.Element("textLabel").Value;
-                            g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                        }
-                        else
-                        {
-                            g.doc.Variables["pin" + i.ToString() + "_label"].Value = "NC";
-                            g.GreenPAK.pin[i].name = "NC";
-                            g.GreenPAK.pin[i].type = "--";
-                            g.GreenPAK.pin[i].description = "Keep Floating or Connect to GND";
-                            g.GreenPAK.pin[i].resistor = "--";
+                            if (pin.Element("graphics").Attribute("hidden").Value.Equals("0") &&
+                                TryGetElementValue(pin, "textLabel") == null)
+                            {
+                                form.backgroundWorker.ReportProgress(0, "Error: Pin" + i.ToString() + " is used but is not labeled!");
+                                e.Cancel = true;
+                                return;
+                            }
+                            if (pin.Element("graphics").Attribute("hidden").Value.Equals("1") &&
+                                TryGetElementValue(pin, "textLabel") != null)
+                            {
+                                form.backgroundWorker.ReportProgress(0, "Error: Pin" + i.ToString() + " is labeled but is not used!");
+                                e.Cancel = true;
+                                return;
+                            }
+
+                            if (pin.Element("textLabel") != null)
+                            {
+                                pin_config(i);
+                                g.GreenPAK.pin[i].name = pin.Element("textLabel").Value;
+                                g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
+                            }
+                            else
+                            {
+                                g.doc.Variables["pin" + i.ToString() + "_label"].Value = "NC";
+                                g.GreenPAK.pin[i].name = "NC";
+                                g.GreenPAK.pin[i].type = "--";
+                                g.GreenPAK.pin[i].description = "Keep Floating or Connect to GND";
+                                g.GreenPAK.pin[i].resistor = "--";
+                            }
+                            break;
                         }
                         break;
-                    }
                 }
             }
         }
@@ -1842,7 +1879,10 @@ public static class MainProgram
             if (g.VDD.ODP2x > 0) { output_summary += "\n\r" + (g.VDD.ODP2x + g.VDD2.ODP2x).ToString() + " Output \u2014 Open Drain PMOS 2x"; }
 
             try { g.doc.Variables["output_summary"].Value = output_summary.Substring(3); }
-            catch { }
+            catch
+            {
+                Console.WriteLine("Error occured in theProgram: could not create output_summary");
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2059,14 +2099,17 @@ public static class MainProgram
             foreach (Table table in g.doc.Tables)
             {
                 try
-                {
+                {                                                          // Is this try/catch necessary?
                     if (table.Title == "pin" + i.ToString() + "_label")
                     {
                         pin_cell_update(table, i);
                         i++;
                     }
                 }
-                catch { }
+                catch
+                {
+                    Console.WriteLine("Error occured in theProgram: could not update pin label " + i.ToString());
+                }
             }
         }
 
@@ -2110,6 +2153,15 @@ public static class MainProgram
                     case "01": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 2; break;
                     case "10": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 4; break;
                     case "11": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 8; break;
+                }
+
+                switch (g.nvmData[g.GreenPAK.LF_osc_pre_div + 1].ToString() +
+                        g.nvmData[g.GreenPAK.LF_osc_pre_div + 0].ToString())
+                {
+                    case "00": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 1; break;
+                    case "01": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 2; break;
+                    case "10": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 4; break;
+                    case "11": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 16; break;
                 }
             }
 
@@ -2374,6 +2426,7 @@ public static class MainProgram
             }
             catch (Exception exception)
             {
+                Console.WriteLine("Error occured in theProgram: could not connect to AccessDB");
                 MessageBox.Show(exception.ToString());
                 form.backgroundWorker.ReportProgress(0, "Error: Connection Unsuccessful. Try closing the Database!");
                 e.Cancel = true;
@@ -2858,9 +2911,12 @@ public static class MainProgram
 
                 g.connection.Close();
 
-                form.backgroundWorker.ReportProgress(2, "Populating EC Table: Formatting for prettiness");
-                g.table.Rows.SetHeight(1, WdRowHeightRule.wdRowHeightAuto);
-                EC_cleanup();
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: Formatting for prettiness 1");
+                EC_cleanup1();
+                form.backgroundWorker.ReportProgress(0, "Populating EC Table: Formatting for prettiness 2");
+                EC_cleanup2();
+                form.backgroundWorker.ReportProgress(0, "Populating EC Table: Formatting for prettiness 3");
+                EC_cleanup3();
                 break;
             }
         }
@@ -2888,6 +2944,7 @@ public static class MainProgram
             InlineShapeReplace("size");
             InlineShapeReplace("TR_specs");
             InlineShapeReplace("TR");
+            InlineShapeReplace("LP");
         }
 
         if (g.TM_part_code_update)

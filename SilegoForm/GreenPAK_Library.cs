@@ -952,6 +952,73 @@
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  SLG46580
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        internal static void createSLG46580()
+        {
+            PAKs.SLG46580 = new PAK();
+            PAKs.SLG46580.base_die = "SLG46580";
+            PAKs.SLG46580.package = "STQFN-22L";
+            PAKs.SLG46580.package_size = "2mm x 3mm";
+            PAKs.SLG46580.PAK_family = 5;
+            PAKs.SLG46580.package_weight = "0.xxxx g";
+            PAKs.SLG46580.pattern_id_address = 1840;
+            PAKs.SLG46580.dual_supply_PAK = false;
+            PAKs.SLG46580.i2c_PAK = true;
+            PAKs.SLG46580.i2c_slave_address = 1864;
+            PAKs.SLG46580.pin = new PIN[]
+            {
+                new PIN() { PT = "NA",                                                                                },    // 00
+                new PIN() { PT = "GPIO_OE", RV = 1026, UD = 1025, IM = 1028, OM = 1030, OE = 0000,            VS = 1  },    // 01
+                new PIN() { PT = "GPIO",    RV = 1035, UD = 1034, IO = 1037, DR = 1033,                       VS = 1  },    // 02
+                new PIN() { PT = "GPIO",    RV = 1043, UD = 1042, IO = 1045, DR = 1041,                       VS = 1  },    // 03
+                new PIN() { PT = "GPIO",    RV = 1051, UD = 1050, IO = 1053, DR = 1049,                       VS = 1  },    // 04
+                new PIN() { PT = "GPIO_OE", RV = 1058, UD = 1057, IM = 1060, OM = 1062, OE = 0000,            VS = 1  },    // 05
+                new PIN() { PT = "GPI",     RV = 1068, IM = 1070,                                             VS = 1  },    // 06
+                new PIN() { PT = "VDD",                                                                       VS = 0  },    // 07
+                new PIN() { PT = "I2C",     RV = 0000, UD = 0000, IO = 1077, DR = 0000,                       VS = 1  },    // 08
+                new PIN() { PT = "I2C",     RV = 0000, UD = 0000, IO = 1085, DR = 1081,                       VS = 1  },    // 09
+                new PIN() { PT = "GPIO_OE", RV = 1090, UD = 1089, IM = 1092, OM = 1094, OE = 0000,            VS = 1  },    // 10
+                new PIN() { PT = "LDO_OUT",                                                                           },    // 11
+                new PIN() { PT = "LDO_IN",                                                                            },    // 12
+                new PIN() { PT = "LDO_OUT",                                                                           },    // 13
+                new PIN() { PT = "LDO_OUT",                                                                           },    // 14
+                new PIN() { PT = "LDO_IN",                                                                            },    // 15
+                new PIN() { PT = "LDO_OUT",                                                                           },    // 16
+                new PIN() { PT = "AGND",                                                                              },    // 17
+                new PIN() { PT = "GPIO",    RV = 1099, UD = 1098, IO = 1101, DR = 1097,                       VS = 1  },    // 18
+                new PIN() { PT = "GPIO_OE", RV = 1106, UD = 1105, IM = 1108, OM = 1110, OE = 0000,            VS = 1  },    // 19
+                new PIN() { PT = "GND",                                                                               },    // 20
+            };
+            PAKs.SLG46580.cnt = new CNT[]
+            {
+                new CNT() { CK = 1242, DA = 1536, LN = 8, MD = 1246, SL = 1143 },    // 0
+                new CNT() { CK = 1250, DA = 1544, LN = 8, MD = 1254, SL = 1142 },    // 1
+                new CNT() { CK = 1258, DA = 1552, LN = 8, MD = 1262, SL = 1141 },    // 2
+                new CNT() { CK = 1266, DA = 1560, LN = 8, MD = 1270, SL = 1140 },    // 3
+                new CNT() { CK = 1274, DA = 1568, LN = 8, MD = 1278, SL = 1139 },    // 4
+            };
+            PAKs.SLG46580.acmp = new ACMP[]
+            {
+                new ACMP() { TH = 1624, GN = 1629, LB = 1631, HY = 1118 },    // 0
+                new ACMP() { TH = 1632, GN = 1637, LB = 1639, HY = 1114 },    // 1
+                new ACMP() { TH = 1640, GN = 1645, LB = 1647, HY = 1125 },    // 2
+                new ACMP() { TH = 1648, GN = 1653, LB = 1655, HY = 1121 },    // 3
+            };
+            PAKs.SLG46580.matrix_GND = "000000";
+            PAKs.SLG46580.matrix_VDD = "111111";
+            PAKs.SLG46580.matrix_POR = "011111";
+            PAKs.SLG46580.VDD_bypass_enable = 1475;
+            PAKs.SLG46580.ESD_cdm = 1300;
+            PAKs.SLG46580.RC_osc_freq = 25000;
+            PAKs.SLG46580.RC_osc_freq_alt = 2000000;
+            PAKs.SLG46580.RC_osc_src = 1294;
+            PAKs.SLG46580.RC_osc_pre_div = 1339;
+            PAKs.SLG46580.LF_osc_freq = 2000;
+            PAKs.SLG46580.LF_osc_pre_div = 1288;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  SLG46140
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         internal static void createSLG46140()
@@ -1719,6 +1786,7 @@
         public static PAK SLG46538;
         public static PAK SLG46537M;
         public static PAK SLG46538M;
+        public static PAK SLG46580;
 
         // GreenPAK4
 
