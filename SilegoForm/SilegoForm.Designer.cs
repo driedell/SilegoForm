@@ -49,7 +49,7 @@ namespace SilegoForm
             this.error_label = new System.Windows.Forms.Label();
             this.pin_labels_checkbox = new System.Windows.Forms.CheckBox();
             this.pin_settings_checkbox = new System.Windows.Forms.CheckBox();
-            this.metadata_checkbox = new System.Windows.Forms.CheckBox();
+            this.project_info_checkbox = new System.Windows.Forms.CheckBox();
             this.temp_vdd_checkbox = new System.Windows.Forms.CheckBox();
             this.CNTs_DLYs_checkbox = new System.Windows.Forms.CheckBox();
             this.ACMPs_checkbox = new System.Windows.Forms.CheckBox();
@@ -68,6 +68,7 @@ namespace SilegoForm
             this.lock_status_checkbox = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
+            this.select_DS_save_location = new System.Windows.Forms.FolderBrowserDialog();
             ((System.ComponentModel.ISupportInitialize)(this.SilegoLogo)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -103,7 +104,7 @@ namespace SilegoForm
             this.DS_file_textbox.ReadOnly = true;
             this.DS_file_textbox.Size = new System.Drawing.Size(275, 40);
             this.DS_file_textbox.TabIndex = 26;
-            this.DS_file_textbox.Text = "Drop DS File";
+            this.DS_file_textbox.Text = "P:\\Apps_Tools\\New_DS_Template\\New_DS_Template.docx";
             this.DS_file_textbox.TextChanged += new System.EventHandler(this.DS_file_textbox_TextChanged);
             // 
             // GP_file_textbox
@@ -276,16 +277,16 @@ namespace SilegoForm
             this.pin_settings_checkbox.UseVisualStyleBackColor = true;
             this.pin_settings_checkbox.CheckedChanged += new System.EventHandler(this.pin_settings_CheckedChanged);
             // 
-            // metadata_checkbox
+            // project_info_checkbox
             // 
-            this.metadata_checkbox.AutoSize = true;
-            this.metadata_checkbox.Location = new System.Drawing.Point(3, 30);
-            this.metadata_checkbox.Name = "metadata_checkbox";
-            this.metadata_checkbox.Size = new System.Drawing.Size(71, 17);
-            this.metadata_checkbox.TabIndex = 37;
-            this.metadata_checkbox.Text = "Metadata";
-            this.metadata_checkbox.UseVisualStyleBackColor = true;
-            this.metadata_checkbox.CheckedChanged += new System.EventHandler(this.metadata_CheckedChanged);
+            this.project_info_checkbox.AutoSize = true;
+            this.project_info_checkbox.Location = new System.Drawing.Point(3, 30);
+            this.project_info_checkbox.Name = "project_info_checkbox";
+            this.project_info_checkbox.Size = new System.Drawing.Size(80, 17);
+            this.project_info_checkbox.TabIndex = 37;
+            this.project_info_checkbox.Text = "Project Info";
+            this.project_info_checkbox.UseVisualStyleBackColor = true;
+            this.project_info_checkbox.CheckedChanged += new System.EventHandler(this.project_info_CheckedChanged);
             // 
             // temp_vdd_checkbox
             // 
@@ -327,7 +328,7 @@ namespace SilegoForm
             this.version_label.Name = "version_label";
             this.version_label.Size = new System.Drawing.Size(43, 13);
             this.version_label.TabIndex = 43;
-            this.version_label.Text = "v0.0.11";
+            this.version_label.Text = "v0.0.12";
             this.version_label.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // TM_Part_Code_textbox
@@ -390,9 +391,10 @@ namespace SilegoForm
             // new_part_checkbox
             // 
             this.new_part_checkbox.AutoSize = true;
+            this.new_part_checkbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.new_part_checkbox.Location = new System.Drawing.Point(3, 3);
             this.new_part_checkbox.Name = "new_part_checkbox";
-            this.new_part_checkbox.Size = new System.Drawing.Size(70, 17);
+            this.new_part_checkbox.Size = new System.Drawing.Size(78, 17);
             this.new_part_checkbox.TabIndex = 42;
             this.new_part_checkbox.Text = "New Part";
             this.new_part_checkbox.UseVisualStyleBackColor = true;
@@ -440,6 +442,7 @@ namespace SilegoForm
             this.DS_rev_change_textbox.Name = "DS_rev_change_textbox";
             this.DS_rev_change_textbox.Size = new System.Drawing.Size(272, 40);
             this.DS_rev_change_textbox.TabIndex = 52;
+            this.DS_rev_change_textbox.Text = "New Design for SLG";
             this.DS_rev_change_textbox.TextChanged += new System.EventHandler(this.DS_rev_change_textbox_TextChanged);
             // 
             // ds_rev_change_label
@@ -474,7 +477,7 @@ namespace SilegoForm
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.Controls.Add(this.new_part_checkbox, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.lock_status_checkbox, 1, 3);
-            this.tableLayoutPanel1.Controls.Add(this.metadata_checkbox, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.project_info_checkbox, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.pin_labels_checkbox, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.pin_settings_checkbox, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.temp_vdd_checkbox, 1, 0);
@@ -569,7 +572,7 @@ namespace SilegoForm
         private Label error_label;
         private CheckBox pin_labels_checkbox;
         private CheckBox pin_settings_checkbox;
-        private CheckBox metadata_checkbox;
+        private CheckBox project_info_checkbox;
         private CheckBox temp_vdd_checkbox;
         private CheckBox CNTs_DLYs_checkbox;
         private CheckBox ACMPs_checkbox;
@@ -588,5 +591,6 @@ namespace SilegoForm
         private CheckBox lock_status_checkbox;
         private TableLayoutPanel tableLayoutPanel1;
         private Label label1;
+        private FolderBrowserDialog select_DS_save_location;
     }
 }

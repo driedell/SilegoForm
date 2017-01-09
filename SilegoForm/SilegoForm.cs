@@ -68,7 +68,7 @@ namespace SilegoForm
                 cancel_button.Enabled = false;
 
                 new_part_checkbox.Enabled = true;
-                metadata_checkbox.Enabled = true;
+                project_info_checkbox.Enabled = true;
                 pin_labels_checkbox.Enabled = true;
                 temp_vdd_checkbox.Enabled = true;
                 CNTs_DLYs_checkbox.Enabled = true;
@@ -103,7 +103,7 @@ namespace SilegoForm
                 cancel_button.Enabled = false;
 
                 new_part_checkbox.Enabled = true;
-                metadata_checkbox.Enabled = true;
+                project_info_checkbox.Enabled = true;
                 pin_labels_checkbox.Enabled = true;
                 temp_vdd_checkbox.Enabled = true;
                 CNTs_DLYs_checkbox.Enabled = true;
@@ -132,6 +132,12 @@ namespace SilegoForm
             else MainProgram.g.CNTs_DLYs_update = false;
         }
 
+        private void DS_file_textbox_TextChanged(object sender, EventArgs e)
+        {
+            Console.WriteLine(MainProgram.g.DataSheet_File);
+            MainProgram.g.DataSheet_File = DS_file_textbox.Text;
+        }
+
         private void DS_rev_change_textbox_TextChanged(object sender, EventArgs e)
         {
             MainProgram.g.DS_rev_change = DS_rev_change_textbox.Text;
@@ -157,6 +163,12 @@ namespace SilegoForm
         private void DS_rev_combobox_SelectedIndexChanged(object sender, EventArgs e)
         {
             MainProgram.g.DS_rev = DS_rev_combobox.Text;
+        }
+
+        private void GP_file_textbox_TextChanged(object sender, EventArgs e)
+        {
+            Console.WriteLine(MainProgram.g.GreenPAK_File);
+            MainProgram.g.GreenPAK_File = GP_file_textbox.Text;
         }
 
         private void help_CheckedChanged(object sender, EventArgs e)
@@ -202,18 +214,12 @@ namespace SilegoForm
             else MainProgram.g.lock_status_update = false;
         }
 
-        private void metadata_CheckedChanged(object sender, EventArgs e)
-        {
-            if (metadata_checkbox.Checked) MainProgram.g.metadata_update = true;
-            else MainProgram.g.metadata_update = false;
-        }
-
         private void new_part_CheckedChanged(object sender, EventArgs e)
         {
             if (new_part_checkbox.Checked)
             {
                 MainProgram.g.new_part_update = true;
-                metadata_checkbox.Checked = true;
+                project_info_checkbox.Checked = true;
                 pin_labels_checkbox.Checked = true;
                 temp_vdd_checkbox.Checked = true;
                 CNTs_DLYs_checkbox.Checked = true;
@@ -222,11 +228,17 @@ namespace SilegoForm
                 DS_rev_checkbox.Checked = true;
                 I_Q_checkbox.Checked = true;
                 lock_status_checkbox.Checked = true;
+                DS_rev_change_textbox.Text = "New Design for SLG";
+
+                status_label.Visible = true;
+                status_label.Text = "New Part. Loaded New_DS_Template.docx";
+                DS_file_textbox.Text = @"P:\Apps_Tools\New_DS_Template\New_DS_Template.docx";
+                DS_button.Visible = false;
             }
             else
             {
                 MainProgram.g.new_part_update = false;
-                metadata_checkbox.Checked = false;
+                project_info_checkbox.Checked = false;
                 pin_labels_checkbox.Checked = false;
                 temp_vdd_checkbox.Checked = false;
                 CNTs_DLYs_checkbox.Checked = false;
@@ -235,6 +247,12 @@ namespace SilegoForm
                 DS_rev_checkbox.Checked = false;
                 I_Q_checkbox.Checked = false;
                 lock_status_checkbox.Checked = false;
+                DS_rev_change_textbox.Text = "";
+
+                status_label.Visible = false;
+                status_label.Text = "";
+                DS_file_textbox.Text = "Drop DS file";
+                DS_button.Visible = true;
             }
         }
 
@@ -250,13 +268,19 @@ namespace SilegoForm
             else MainProgram.g.pin_settings_update = false;
         }
 
+        private void project_info_CheckedChanged(object sender, EventArgs e)
+        {
+            if (project_info_checkbox.Checked) MainProgram.g.project_info_update = true;
+            else MainProgram.g.project_info_update = false;
+        }
         private void Select_DS_Click(object sender, EventArgs e)
         {
             if (select_DS_file.ShowDialog() == DialogResult.OK && (
                 select_DS_file.FileName.EndsWith(".docx") ||
                 select_DS_file.FileName.EndsWith(".doc")))
             {
-                DS_file_textbox.Text = select_DS_file.FileName.Substring(select_DS_file.FileName.LastIndexOf("\\"));
+                //DS_file_textbox.Text = select_DS_file.FileName.Substring(select_DS_file.FileName.LastIndexOf("\\"));
+                DS_file_textbox.Text = select_DS_file.FileName;
                 MainProgram.g.DataSheet_File = select_DS_file.FileName;
                 error_label.Visible = false;
             }
@@ -276,7 +300,8 @@ namespace SilegoForm
                 select_GP_file.FileName.EndsWith(".gp4") ||
                 select_GP_file.FileName.EndsWith(".gp3")))
             {
-                GP_file_textbox.Text = select_GP_file.FileName.Substring(select_GP_file.FileName.LastIndexOf("\\"));
+                //GP_file_textbox.Text = select_GP_file.FileName.Substring(select_GP_file.FileName.LastIndexOf("\\"));
+                GP_file_textbox.Text = select_GP_file.FileName;
                 MainProgram.g.GreenPAK_File = select_GP_file.FileName;
                 error_label.Visible = false;
             }
@@ -296,19 +321,21 @@ namespace SilegoForm
                 if (files[i].EndsWith(".docx") || files[i].EndsWith(".doc"))
                 {
                     error_label.Visible = false;
-                    MainProgram.g.DataSheet_File = files[i];
-                    DS_file_textbox.Text = files[i].Substring(files[i].LastIndexOf("\\"));
+                    //MainProgram.g.DataSheet_File = files[i];
+                    //DS_file_textbox.Text = files[i].Substring(files[i].LastIndexOf("\\"));
+                    DS_file_textbox.Text = files[i];
                 }
                 else if (files[i].EndsWith(".gp6") || files[i].EndsWith(".gp5") || files[i].EndsWith(".gp4") || files[i].EndsWith(".gp3"))
                 {
                     error_label.Visible = false;
-                    MainProgram.g.GreenPAK_File = files[i];
-                    GP_file_textbox.Text = files[i].Substring(files[i].LastIndexOf("\\"));
+                    //MainProgram.g.GreenPAK_File = files[i];
+                    //GP_file_textbox.Text = files[i].Substring(files[i].LastIndexOf("\\"));
+                    GP_file_textbox.Text = files[i];
                 }
                 else
                 {
                     error_label.Visible = true;
-                    error_label.Text = "Wrong fileType!";
+                    error_label.Text = "Wrong file type!";
                 }
             }
         }
@@ -342,7 +369,7 @@ namespace SilegoForm
             error_label.Text = "";
 
             new_part_checkbox.Enabled = false;
-            metadata_checkbox.Enabled = false;
+            project_info_checkbox.Enabled = false;
             pin_labels_checkbox.Enabled = false;
             temp_vdd_checkbox.Enabled = false;
             CNTs_DLYs_checkbox.Enabled = false;
@@ -405,16 +432,6 @@ namespace SilegoForm
         private void TM_Revision_textbox_TextChanged(object sender, EventArgs e)
         {
             MainProgram.g.TM_revision = TM_Revision_textbox.Text;
-        }
-
-        private void GP_file_textbox_TextChanged(object sender, EventArgs e)
-        {
-            Console.WriteLine(MainProgram.g.GreenPAK_File);
-        }
-
-        private void DS_file_textbox_TextChanged(object sender, EventArgs e)
-        {
-            Console.WriteLine(MainProgram.g.DataSheet_File);
         }
     }
 }

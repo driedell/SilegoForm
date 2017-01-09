@@ -26,10 +26,11 @@ public static class MainProgram
         public static string GreenPAK_File = null;
         public static string DataSheet_File = null;
         public static string templatePath = @"P:\Apps_Tools\New_DS_Template\";
+        public static string path;
 
         public static bool pin_labels_update = false;
         public static bool pin_settings_update = false;
-        public static bool metadata_update = false;
+        public static bool project_info_update = false;
         public static bool temp_vdd_update = false;
         public static bool CNTs_DLYs_update = false;
         public static bool ACMPs_update = false;
@@ -70,6 +71,8 @@ public static class MainProgram
             public byte ODN4x;
             public byte ODP1x;
             public byte ODP2x;
+            public byte TRI1x;
+            public byte TRI2x;
             public bool LVDI;
             public bool wSchmitt;
             public bool woSchmitt;
@@ -91,6 +94,12 @@ public static class MainProgram
         public static string VDD_typ = null;            // VDD to print to table (1.8, 3.3, 5.0)
         public static string subSymbol = null;          // Removes "2" from Dual Supply symbols (VOH2 → VOH)
         public static string extraInfo = null;          // Holds additional info for the condition/note field
+
+        public struct symbols
+        {
+            public string sym;
+            public string sub;
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -137,7 +146,7 @@ public static class MainProgram
             g.doc.Close(WdSaveOptions.wdDoNotSaveChanges);
             g.app.Quit(WdSaveOptions.wdDoNotSaveChanges);
         }
-        catch { Console.WriteLine("Error occured in closeDontSave()"); }
+        catch { Console.WriteLine("An error occured in closeDontSave(), or closeDontSave() was unnecessary"); }
     }
 
     private static void pin_cell_update(Table table, int i)
@@ -326,6 +335,8 @@ public static class MainProgram
                 case "Open Drain NMOS 4x": g.VDD.ODN4x++; break;
                 case "Open Drain PMOS 1x": g.VDD.ODP1x++; break;
                 case "Open Drain PMOS 2x": g.VDD.ODP2x++; break;
+                case "3-State Output 1x": g.VDD.TRI1x++; break;
+                case "3-State Output 2x": g.VDD.TRI2x++; break;
                 case "Digital Input without Schmitt trigger": g.VDD.woSchmitt = true; break;
                 case "Low Voltage Digital Input": g.VDD.LVDI = true; break;
 
@@ -347,6 +358,8 @@ public static class MainProgram
                 case "Open Drain NMOS 4x": g.VDD2.ODN4x++; break;
                 case "Open Drain PMOS 1x": g.VDD2.ODP1x++; break;
                 case "Open Drain PMOS 2x": g.VDD2.ODP2x++; break;
+                case "3-State Output 1x": g.VDD2.TRI1x++; break;
+                case "3-State Output 2x": g.VDD2.TRI2x++; break;
                 case "Digital Input without Schmitt trigger": g.VDD2.woSchmitt = true; break;
                 case "Low Voltage Digital Input": g.VDD2.LVDI = true; break;
 
@@ -410,7 +423,18 @@ public static class MainProgram
             case "00": g.GreenPAK.pin[i].description += "Digital Input without Schmitt trigger"; break;
             case "01": g.GreenPAK.pin[i].description += "Digital Input with Schmitt trigger"; break;
             case "10": g.GreenPAK.pin[i].description += "Low Voltage Digital Input"; break;
-            case "11": g.GreenPAK.pin[i].description += "Analog Input/Output"; g.GreenPAK.pin[i].type = "Analog I/O"; break;
+            case "11":
+                if (g.GreenPAK.pin[i].type == "Digital I/O")
+                {
+                    g.GreenPAK.pin[i].type = "3-State";
+                    break;
+                }
+                else
+                {
+                    g.GreenPAK.pin[i].description += "Analog Input/Output";
+                    g.GreenPAK.pin[i].type = "Analog I/O";
+                    break;
+                }
         }
     }
 
@@ -418,7 +442,7 @@ public static class MainProgram
     {
         // Stores a pin's output settings for pins with OE's.
 
-        if (g.GreenPAK.pin[i].SD >= 0 &&
+        if (g.GreenPAK.pin[i].SD > 0 &&
             g.nvmData[g.GreenPAK.pin[i].SD].ToString().Equals("1"))
         {
             g.GreenPAK.pin[i].description += "Open Drain NMOS 4x";
@@ -428,8 +452,28 @@ public static class MainProgram
             switch (g.nvmData[g.GreenPAK.pin[i].OM + 1].ToString() +
                     g.nvmData[g.GreenPAK.pin[i].OM + 0].ToString())
             {
-                case "00": g.GreenPAK.pin[i].description += "Push Pull 1x"; break;
-                case "01": g.GreenPAK.pin[i].description += "Push Pull 2x"; break;
+                case "00":
+                    if (g.GreenPAK.pin[i].type == "3-State")
+                    {
+                        g.GreenPAK.pin[i].description = "3-State Output 1x";
+                        break;
+                    }
+                    else
+                    {
+                        g.GreenPAK.pin[i].description += "Push Pull 1x";
+                        break;
+                    }
+                case "01":
+                    if (g.GreenPAK.pin[i].type == "3-State")
+                    {
+                        g.GreenPAK.pin[i].description = "3-State Output 2x";
+                        break;
+                    }
+                    else
+                    {
+                        g.GreenPAK.pin[i].description += "Push Pull 2x";
+                        break;
+                    }
                 case "10": g.GreenPAK.pin[i].description += "Open Drain NMOS 1x"; break;
                 case "11": g.GreenPAK.pin[i].description += "Open Drain NMOS 2x"; break;
             }
@@ -454,7 +498,7 @@ public static class MainProgram
             case "111": g.GreenPAK.pin[i].type = "Digital Output"; g.GreenPAK.pin[i].description = ("Open Drain NMOS"); break;
         }
         if (g.GreenPAK.pin[i].type.Equals("Digital Output") &&
-            g.GreenPAK.pin[i].SD >= 0 &&
+            g.GreenPAK.pin[i].SD > 0 &&
             g.nvmData[g.GreenPAK.pin[i].SD].ToString().Equals("1"))
         {
             g.GreenPAK.pin[i].description = "Open Drain NMOS 4x";
@@ -1187,7 +1231,53 @@ public static class MainProgram
         EC_row_merge(symbolRow);
     }
 
-    private static void EC_subscripts(Table table, string symbol, string subscript)
+    private static g.symbols[] symbolArray;
+
+    private static void EC_subscripts2()
+    {
+        symbolArray = new g.symbols[]
+        {
+            new g.symbols() { sym = "V", sub = "DD" },
+            new g.symbols() { sym = "V", sub = "DD2" },
+            new g.symbols() { sym = "V", sub = "OH" },
+            new g.symbols() { sym = "V", sub = "OH2" },
+            new g.symbols() { sym = "V", sub = "OL" },
+            new g.symbols() { sym = "V", sub = "OL2" },
+            new g.symbols() { sym = "I", sub = "OH" },
+            new g.symbols() { sym = "I", sub = "OH2" },
+            new g.symbols() { sym = "I", sub = "OL" },
+            new g.symbols() { sym = "I", sub = "OL2" },
+            new g.symbols() { sym = "PON", sub = "THR" },
+            new g.symbols() { sym = "POFF", sub = "THR" },
+        };
+
+        foreach (Cell cell in g.table.Range.Cells)
+        {
+            for (int i = 0; i < symbolArray.Length; i++)
+            {
+                if (cell.Range.Text.Contains(symbolArray[i].sym + symbolArray[i].sub))
+                {
+                    Console.WriteLine(cell.Range.Text);
+                    Console.WriteLine("Found " + symbolArray[i].sym + symbolArray[i].sub + " in cell " + cell.RowIndex.ToString() + "," + cell.ColumnIndex.ToString());
+
+                    Range r = cell.Range;
+
+                    r.SetRange(r.Start + r.Text.IndexOf(symbolArray[i].sym),
+                               r.Start + r.Text.IndexOf(symbolArray[i].sym) + symbolArray[i].sym.Length);
+                    r.Select();
+                    r.Font.Subscript = 0;
+
+                    r = cell.Range;
+                    r.SetRange(r.Start + r.Text.IndexOf(symbolArray[i].sub),
+                               r.Start + r.Text.IndexOf(symbolArray[i].sub) + symbolArray[i].sub.Length);
+                    r.Select();
+                    r.Font.Subscript = 1;
+                }
+            }
+        }
+    }
+
+    private static void EC_subscripts(string symbol, string subscript)
     {
         // Make sure that all the symbols in the EC table have the proper subscripts.
 
@@ -1196,7 +1286,7 @@ public static class MainProgram
             return;
         }
 
-        foreach (Cell cell in table.Range.Cells)
+        foreach (Cell cell in g.table.Range.Cells)
         {
             if (cell.Range.Text.Contains(symbol + subscript))
             {
@@ -1227,13 +1317,14 @@ public static class MainProgram
         try
         {
             updateFields();
-            string path = g.DataSheet_File.Substring(0, g.DataSheet_File.LastIndexOf('\\') + 1);
-            g.doc.SaveAs2(path + g.part_number + "_DS_r" + g.DS_rev + "_" + DateTime.Now.ToString("MMddyyyy") + ".docx");
+            //string path = g.DataSheet_File.Substring(0, g.DataSheet_File.LastIndexOf('\\') + 1);
+            Console.WriteLine("\n\n" + g.path + g.part_number + "_DS_r" + g.DS_rev + "_" + DateTime.Now.ToString("MMddyyyy") + ".docx");
+            g.doc.SaveAs2(g.path + g.part_number + "_DS_r" + g.DS_rev + "_" + DateTime.Now.ToString("MMddyyyy") + ".docx");
 
             g.doc.Close();
             g.app.Quit();
 
-            Process.Start(path + g.part_number + "_DS_r" + g.DS_rev + "_" + DateTime.Now.ToString("MMddyyyy") + ".docx");
+            Process.Start(g.path + g.part_number + "_DS_r" + g.DS_rev + "_" + DateTime.Now.ToString("MMddyyyy") + ".docx");
 
             return;
         }
@@ -1346,6 +1437,19 @@ public static class MainProgram
     public static void theProgram(BackgroundWorker worker, DoWorkEventArgs e)
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  Reinitialize variables
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        g.VDD.PP1x = 0;
+        g.VDD.PP2x = 0;
+        g.VDD.PP4x = 0;
+        g.VDD.ODN1x = 0;
+        g.VDD.ODN2x = 0;
+        g.VDD.ODN4x = 0;
+        g.VDD.ODP1x = 0;
+        g.VDD.ODP2x = 0;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  Load the GP and DS files that were selected in the gui. Populate the Date, I_Q, and DS_rev.
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1369,7 +1473,14 @@ public static class MainProgram
         try
         {
             g.app = new Microsoft.Office.Interop.Word.Application();
-            g.doc = g.app.Documents.Add(g.DataSheet_File);
+            if (g.new_part_update)
+            {
+                g.doc = g.app.Documents.Add(@"P:\Apps_Tools\New_DS_Template\New_DS_Template.docx");
+            }
+            else
+            {
+                g.doc = g.app.Documents.Add(g.DataSheet_File);
+            }
         }
         catch (Exception ex)
         {
@@ -1379,6 +1490,14 @@ public static class MainProgram
             e.Cancel = true;
             return;
         }
+
+        g.path = g.GreenPAK_File.Substring(0, g.GreenPAK_File.LastIndexOf(@"\Program Files\"));
+
+        Console.WriteLine(g.path);
+
+        g.path += @"\Datasheet Files\";
+
+        Console.WriteLine(g.path);
 
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(2, "Getting Date / I_Q / DS_rev");
@@ -1568,12 +1687,12 @@ public static class MainProgram
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        //  Project Metadata
+        //  Project Info
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(2, "Gathering MetaData");
+        form.backgroundWorker.ReportProgress(2, "Gathering Project Info");
 
-        if (g.metadata_update)
+        if (g.project_info_update)
         {
             // Customer Info (Name, project name, part number, version number)
             foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
@@ -1869,14 +1988,16 @@ public static class MainProgram
         {
             string output_summary = ".";
 
-            if (g.VDD.PP1x > 0) { output_summary += "\n\r" + (g.VDD.PP1x + g.VDD2.PP1x).ToString() + " Output \u2014 Push Pull 1x"; }
-            if (g.VDD.PP2x > 0) { output_summary += "\n\r" + (g.VDD.PP2x + g.VDD2.PP2x).ToString() + " Output \u2014 Push Pull 2x"; }
-            if (g.VDD.PP4x > 0) { output_summary += "\n\r" + (g.VDD.PP4x + g.VDD2.PP4x).ToString() + " Output \u2014 Push Pull 4x"; }
-            if (g.VDD.ODN1x > 0) { output_summary += "\n\r" + (g.VDD.ODN1x + g.VDD2.ODN1x).ToString() + " Output \u2014 Open Drain NMOS 1x"; }
-            if (g.VDD.ODN2x > 0) { output_summary += "\n\r" + (g.VDD.ODN2x + g.VDD2.ODN2x).ToString() + " Output \u2014 Open Drain NMOS 2x"; }
-            if (g.VDD.ODN4x > 0) { output_summary += "\n\r" + (g.VDD.ODN4x + g.VDD2.ODN4x).ToString() + " Output \u2014 Open Drain NMOS 4x"; }
-            if (g.VDD.ODP1x > 0) { output_summary += "\n\r" + (g.VDD.ODP1x + g.VDD2.ODP1x).ToString() + " Output \u2014 Open Drain PMOS 1x"; }
-            if (g.VDD.ODP2x > 0) { output_summary += "\n\r" + (g.VDD.ODP2x + g.VDD2.ODP2x).ToString() + " Output \u2014 Open Drain PMOS 2x"; }
+            if (g.VDD.PP1x > 0 || g.VDD2.PP1x > 0) { output_summary += "\n\r" + (g.VDD.PP1x + g.VDD2.PP1x).ToString() + " Output \u2014 Push Pull 1x"; }
+            if (g.VDD.PP2x > 0 || g.VDD2.PP2x > 0) { output_summary += "\n\r" + (g.VDD.PP2x + g.VDD2.PP2x).ToString() + " Output \u2014 Push Pull 2x"; }
+            if (g.VDD.PP4x > 0 || g.VDD2.PP4x > 0) { output_summary += "\n\r" + (g.VDD.PP4x + g.VDD2.PP4x).ToString() + " Output \u2014 Push Pull 4x"; }
+            if (g.VDD.ODN1x > 0 || g.VDD2.ODN1x > 0) { output_summary += "\n\r" + (g.VDD.ODN1x + g.VDD2.ODN1x).ToString() + " Output \u2014 Open Drain NMOS 1x"; }
+            if (g.VDD.ODN2x > 0 || g.VDD2.ODN2x > 0) { output_summary += "\n\r" + (g.VDD.ODN2x + g.VDD2.ODN2x).ToString() + " Output \u2014 Open Drain NMOS 2x"; }
+            if (g.VDD.ODN4x > 0 || g.VDD2.ODN4x > 0) { output_summary += "\n\r" + (g.VDD.ODN4x + g.VDD2.ODN4x).ToString() + " Output \u2014 Open Drain NMOS 4x"; }
+            if (g.VDD.ODP1x > 0 || g.VDD2.ODP1x > 0) { output_summary += "\n\r" + (g.VDD.ODP1x + g.VDD2.ODP1x).ToString() + " Output \u2014 Open Drain PMOS 1x"; }
+            if (g.VDD.ODP2x > 0 || g.VDD2.ODP2x > 0) { output_summary += "\n\r" + (g.VDD.ODP2x + g.VDD2.ODP2x).ToString() + " Output \u2014 Open Drain PMOS 2x"; }
+            if (g.VDD.TRI1x > 0 || g.VDD2.TRI1x > 0) { output_summary += "\n\r" + (g.VDD.TRI1x + g.VDD2.TRI1x).ToString() + " Output \u2014 3-State Output 1x"; }
+            if (g.VDD.TRI2x > 0 || g.VDD2.TRI2x > 0) { output_summary += "\n\r" + (g.VDD.TRI2x + g.VDD2.TRI2x).ToString() + " Output \u2014 3-State Output 2x"; }
 
             try { g.doc.Variables["output_summary"].Value = output_summary.Substring(3); }
             catch
@@ -2867,46 +2988,47 @@ public static class MainProgram
                 //  Format EC table subscripts and exit EC table
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (worker.CancellationPending) { e.Cancel = true; return; }
-                //form.backgroundWorker.ReportProgress(2, "Populating EC Table: Fixing Subscripts");
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: Fixing Subscripts");
 
                 if (g.new_part_update || g.pin_settings_update || g.temp_vdd_update)
                 {
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOH Subscripts");
-                    EC_subscripts(g.table, "V", "OH");
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOH2 Subscripts");
-                    EC_subscripts(g.table, "V", "OH2");
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOL Subscripts");
-                    EC_subscripts(g.table, "V", "OL");
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOL2 Subscripts");
-                    EC_subscripts(g.table, "V", "OL2");
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOH Subscripts");
-                    EC_subscripts(g.table, "I", "OH");
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOH2 Subscripts");
-                    EC_subscripts(g.table, "I", "OH2");
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOL Subscripts");
-                    EC_subscripts(g.table, "I", "OL");
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOL2 Subscripts");
-                    EC_subscripts(g.table, "I", "OL2");
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: VDD Subscripts");
-                    EC_subscripts(g.table, "V", "DD");
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: VDD2 Subscripts");
-                    EC_subscripts(g.table, "V", "DD2");
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: PONTHR Subscripts");
-                    EC_subscripts(g.table, "PON", "THR");
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: POFFTHR Subscripts");
-                    EC_subscripts(g.table, "POFF", "THR");
+                    EC_subscripts2();
+                    //if (worker.CancellationPending) { e.Cancel = true; return; }
+                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOH Subscripts");
+                    //EC_subscripts("V", "OH");
+                    //if (worker.CancellationPending) { e.Cancel = true; return; }
+                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOH2 Subscripts");
+                    //EC_subscripts("V", "OH2");
+                    //if (worker.CancellationPending) { e.Cancel = true; return; }
+                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOL Subscripts");
+                    //EC_subscripts("V", "OL");
+                    //if (worker.CancellationPending) { e.Cancel = true; return; }
+                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOL2 Subscripts");
+                    //EC_subscripts("V", "OL2");
+                    //if (worker.CancellationPending) { e.Cancel = true; return; }
+                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOH Subscripts");
+                    //EC_subscripts("I", "OH");
+                    //if (worker.CancellationPending) { e.Cancel = true; return; }
+                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOH2 Subscripts");
+                    //EC_subscripts("I", "OH2");
+                    //if (worker.CancellationPending) { e.Cancel = true; return; }
+                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOL Subscripts");
+                    //EC_subscripts("I", "OL");
+                    //if (worker.CancellationPending) { e.Cancel = true; return; }
+                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOL2 Subscripts");
+                    //EC_subscripts("I", "OL2");
+                    //if (worker.CancellationPending) { e.Cancel = true; return; }
+                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: VDD Subscripts");
+                    //EC_subscripts("V", "DD");
+                    //if (worker.CancellationPending) { e.Cancel = true; return; }
+                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: VDD2 Subscripts");
+                    //EC_subscripts("V", "DD2");
+                    //if (worker.CancellationPending) { e.Cancel = true; return; }
+                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: PONTHR Subscripts");
+                    //EC_subscripts("PON", "THR");
+                    //if (worker.CancellationPending) { e.Cancel = true; return; }
+                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: POFFTHR Subscripts");
+                    //EC_subscripts("POFF", "THR");
                 }
 
                 g.connection.Close();
