@@ -480,19 +480,19 @@
   <data name="help_textbox.Text" xml:space="preserve">
     <value>Steps:
 
-1. Verify GreenPAK designer file includes Customer Name, Customer Project Name, and Customer Project Number in Project Info &gt; Information.
+1. Verify GreenPAK designer file includes Project Info (Customer Name, Customer Project Name, and Customer Project Number).
 
-2. If this is a new design or a new base die, click "New Part." Then copy P:\Apps_Tools\New_DS_Template\New_DS_Template.docx to your destination folder and use that copy in Step 4.
+2. Drag &amp; Drop your GreenPAK file into the window.
 
-3. If this is a rev of a part, select the new changes and fill in corresponding textboxes.
+3. If this is a new design click "New Part."
 
-4. Drag &amp; Drop your most recent GreenPAK file and most recent DataSheet file into the window.
+4. If this is a new DS revision, uncheck "New Part" and select the new changes. Also, Drag &amp; Drop your most recent DS file into the window.
 
 5. Press START.
 
 6. If you wish to cancel operation at any point, press CANCEL.
 
-This program was written by and is maintained by David Riedell.</value>
+This program was written by and is maintained by driedell@silego.com.</value>
   </data>
   <metadata name="select_DS_save_location.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>423, 17</value>

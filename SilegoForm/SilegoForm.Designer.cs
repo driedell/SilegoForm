@@ -324,7 +324,7 @@ namespace SilegoForm
             // version_label
             // 
             this.version_label.AutoSize = true;
-            this.version_label.Location = new System.Drawing.Point(294, 17);
+            this.version_label.Location = new System.Drawing.Point(284, 17);
             this.version_label.Name = "version_label";
             this.version_label.Size = new System.Drawing.Size(43, 13);
             this.version_label.TabIndex = 43;
@@ -414,11 +414,11 @@ namespace SilegoForm
             // 
             // help_textbox
             // 
-            this.help_textbox.Location = new System.Drawing.Point(379, 25);
+            this.help_textbox.Location = new System.Drawing.Point(379, 12);
             this.help_textbox.Multiline = true;
             this.help_textbox.Name = "help_textbox";
             this.help_textbox.ReadOnly = true;
-            this.help_textbox.Size = new System.Drawing.Size(293, 345);
+            this.help_textbox.Size = new System.Drawing.Size(293, 358);
             this.help_textbox.TabIndex = 50;
             this.help_textbox.Text = resources.GetString("help_textbox.Text");
             this.help_textbox.Visible = false;
