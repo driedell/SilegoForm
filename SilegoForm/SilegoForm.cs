@@ -273,6 +273,7 @@ namespace SilegoForm
             if (project_info_checkbox.Checked) MainProgram.g.project_info_update = true;
             else MainProgram.g.project_info_update = false;
         }
+
         private void Select_DS_Click(object sender, EventArgs e)
         {
             if (select_DS_file.ShowDialog() == DialogResult.OK && (
@@ -318,7 +319,15 @@ namespace SilegoForm
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             for (int i = 0; i < files.Length; i++)
             {
-                if (files[i].EndsWith(".docx") || files[i].EndsWith(".doc"))
+                if ((files[i].EndsWith(".docx") || files[i].EndsWith(".doc")) && new_part_checkbox.Checked)
+                {
+                    error_label.Visible = true;
+                    error_label.Text = "Warning: New Part is selected.";
+                    //MainProgram.g.DataSheet_File = files[i];
+                    //DS_file_textbox.Text = files[i].Substring(files[i].LastIndexOf("\\"));
+                    //DS_file_textbox.Text = files[i];
+                }
+                else if (files[i].EndsWith(".docx") || files[i].EndsWith(".doc"))
                 {
                     error_label.Visible = false;
                     //MainProgram.g.DataSheet_File = files[i];
