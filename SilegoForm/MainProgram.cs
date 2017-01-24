@@ -1470,6 +1470,7 @@ public static class MainProgram
             e.Cancel = true;
             return;
         }
+
         try
         {
             g.app = new Microsoft.Office.Interop.Word.Application();
@@ -1491,10 +1492,17 @@ public static class MainProgram
             return;
         }
 
-        g.path = g.GreenPAK_File.Substring(0, g.GreenPAK_File.LastIndexOf(@"\Program Files\"));
-
-        Console.WriteLine(g.path);
-
+        try
+        {
+            g.path = g.GreenPAK_File.Substring(0, g.GreenPAK_File.LastIndexOf("\\Program Files"));
+            Console.WriteLine(g.path);
+        }
+        catch
+        {
+            form.backgroundWorker.ReportProgress(0, "Error: Support Case directory structure is not there!");
+            e.Cancel = true;
+            return;
+        }
         g.path += @"\Datasheet Files\";
 
         Console.WriteLine(g.path);
