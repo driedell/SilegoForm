@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C50C8EFA-998E-46C8-B7D0-6E649A080384}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilegoForm", "SilegoForm\SilegoForm.csproj", "{09B7512C-9AD3-4E8C-BFA1-BFB9538B3B6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilegoForm_Project", "SilegoForm\SilegoForm_Project.csproj", "{09B7512C-9AD3-4E8C-BFA1-BFB9538B3B6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

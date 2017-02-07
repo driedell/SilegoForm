@@ -58,17 +58,17 @@ namespace SilegoForm
             this.TM_Part_Code_checkbox = new System.Windows.Forms.CheckBox();
             this.TM_Revision_checkbox = new System.Windows.Forms.CheckBox();
             this.TM_Revision_textbox = new System.Windows.Forms.TextBox();
-            this.DS_rev_checkbox = new System.Windows.Forms.CheckBox();
             this.new_part_checkbox = new System.Windows.Forms.CheckBox();
             this.help_checkbox = new System.Windows.Forms.CheckBox();
             this.help_textbox = new System.Windows.Forms.TextBox();
             this.cancel_button = new System.Windows.Forms.Button();
-            this.DS_rev_change_textbox = new System.Windows.Forms.TextBox();
-            this.ds_rev_change_label = new System.Windows.Forms.Label();
+            this.DRH_textbox = new System.Windows.Forms.TextBox();
             this.lock_status_checkbox = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.DS_rev_checkbox = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.select_DS_save_location = new System.Windows.Forms.FolderBrowserDialog();
+            this.DRH_checkbox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.SilegoLogo)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -163,7 +163,6 @@ namespace SilegoForm
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DS_rev_combobox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.DS_rev_combobox.Enabled = false;
             this.DS_rev_combobox.FormattingEnabled = true;
             this.DS_rev_combobox.Items.AddRange(new object[] {
             "010",
@@ -330,7 +329,6 @@ namespace SilegoForm
             this.version_label.TabIndex = 43;
             this.version_label.Text = "v0.0.13";
             this.version_label.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.version_label.Click += new System.EventHandler(this.version_label_Click);
             // 
             // TM_Part_Code_textbox
             // 
@@ -377,17 +375,6 @@ namespace SilegoForm
             this.TM_Revision_textbox.Size = new System.Drawing.Size(78, 20);
             this.TM_Revision_textbox.TabIndex = 46;
             this.TM_Revision_textbox.TextChanged += new System.EventHandler(this.TM_Revision_textbox_TextChanged);
-            // 
-            // DS_rev_checkbox
-            // 
-            this.DS_rev_checkbox.AutoSize = true;
-            this.DS_rev_checkbox.Location = new System.Drawing.Point(181, 3);
-            this.DS_rev_checkbox.Name = "DS_rev_checkbox";
-            this.DS_rev_checkbox.Size = new System.Drawing.Size(67, 17);
-            this.DS_rev_checkbox.TabIndex = 48;
-            this.DS_rev_checkbox.Text = "DS Rev:";
-            this.DS_rev_checkbox.UseVisualStyleBackColor = true;
-            this.DS_rev_checkbox.CheckedChanged += new System.EventHandler(this.DS_rev_CheckedChanged);
             // 
             // new_part_checkbox
             // 
@@ -436,26 +423,15 @@ namespace SilegoForm
             this.cancel_button.Visible = false;
             this.cancel_button.Click += new System.EventHandler(this.cancel_button_Click);
             // 
-            // DS_rev_change_textbox
+            // DRH_textbox
             // 
-            this.DS_rev_change_textbox.Location = new System.Drawing.Point(100, 173);
-            this.DS_rev_change_textbox.Multiline = true;
-            this.DS_rev_change_textbox.Name = "DS_rev_change_textbox";
-            this.DS_rev_change_textbox.Size = new System.Drawing.Size(272, 40);
-            this.DS_rev_change_textbox.TabIndex = 52;
-            this.DS_rev_change_textbox.Text = "New Design for SLG";
-            this.DS_rev_change_textbox.TextChanged += new System.EventHandler(this.DS_rev_change_textbox_TextChanged);
-            // 
-            // ds_rev_change_label
-            // 
-            this.ds_rev_change_label.AutoSize = true;
-            this.ds_rev_change_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ds_rev_change_label.Location = new System.Drawing.Point(9, 173);
-            this.ds_rev_change_label.Name = "ds_rev_change_label";
-            this.ds_rev_change_label.Size = new System.Drawing.Size(75, 26);
-            this.ds_rev_change_label.TabIndex = 53;
-            this.ds_rev_change_label.Text = "Datasheet\r\nRev Changes:";
-            this.ds_rev_change_label.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.DRH_textbox.Location = new System.Drawing.Point(100, 173);
+            this.DRH_textbox.Multiline = true;
+            this.DRH_textbox.Name = "DRH_textbox";
+            this.DRH_textbox.Size = new System.Drawing.Size(272, 40);
+            this.DRH_textbox.TabIndex = 52;
+            this.DRH_textbox.Text = "New Design for SLG";
+            this.DRH_textbox.TextChanged += new System.EventHandler(this.DRH_textbox_TextChanged);
             // 
             // lock_status_checkbox
             // 
@@ -503,6 +479,19 @@ namespace SilegoForm
             this.tableLayoutPanel1.Size = new System.Drawing.Size(363, 105);
             this.tableLayoutPanel1.TabIndex = 55;
             // 
+            // DS_rev_checkbox
+            // 
+            this.DS_rev_checkbox.AutoSize = true;
+            this.DS_rev_checkbox.Checked = true;
+            this.DS_rev_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.DS_rev_checkbox.Location = new System.Drawing.Point(181, 3);
+            this.DS_rev_checkbox.Name = "DS_rev_checkbox";
+            this.DS_rev_checkbox.Size = new System.Drawing.Size(67, 17);
+            this.DS_rev_checkbox.TabIndex = 48;
+            this.DS_rev_checkbox.Text = "DS Rev:";
+            this.DS_rev_checkbox.UseVisualStyleBackColor = true;
+            this.DS_rev_checkbox.CheckedChanged += new System.EventHandler(this.DS_rev_CheckedChanged);
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -513,16 +502,27 @@ namespace SilegoForm
             this.label1.TabIndex = 56;
             this.label1.Text = "Select Applicable Changes:";
             // 
+            // DRH_checkbox
+            // 
+            this.DRH_checkbox.AutoSize = true;
+            this.DRH_checkbox.Location = new System.Drawing.Point(12, 175);
+            this.DRH_checkbox.Name = "DRH_checkbox";
+            this.DRH_checkbox.Size = new System.Drawing.Size(64, 30);
+            this.DRH_checkbox.TabIndex = 57;
+            this.DRH_checkbox.Text = "DS Rev\r\nHistory:";
+            this.DRH_checkbox.UseVisualStyleBackColor = true;
+            this.DRH_checkbox.CheckedChanged += new System.EventHandler(this.DRH_checkbox_CheckedChanged);
+            // 
             // SilegoForm
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(684, 382);
+            this.Controls.Add(this.DRH_checkbox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Controls.Add(this.ds_rev_change_label);
-            this.Controls.Add(this.DS_rev_change_textbox);
+            this.Controls.Add(this.DRH_textbox);
             this.Controls.Add(this.start_button);
             this.Controls.Add(this.help_textbox);
             this.Controls.Add(this.help_checkbox);
@@ -582,16 +582,16 @@ namespace SilegoForm
         private CheckBox TM_Part_Code_checkbox;
         private CheckBox TM_Revision_checkbox;
         private TextBox TM_Revision_textbox;
-        private CheckBox DS_rev_checkbox;
         private CheckBox new_part_checkbox;
         private CheckBox help_checkbox;
         private TextBox help_textbox;
         public Button cancel_button;
-        private TextBox DS_rev_change_textbox;
-        private Label ds_rev_change_label;
+        private TextBox DRH_textbox;
         private CheckBox lock_status_checkbox;
         private TableLayoutPanel tableLayoutPanel1;
         private Label label1;
         private FolderBrowserDialog select_DS_save_location;
+        private CheckBox DRH_checkbox;
+        private CheckBox DS_rev_checkbox;
     }
 }

@@ -12,8 +12,6 @@ namespace SilegoForm
             MaximumSize = new System.Drawing.Size(400, 420);
             Location = new System.Drawing.Point(800, 0);
             new_part_checkbox.Checked = true;           //### Erase this later?
-
-            DS_rev_combobox.Text = "010";
         }
 
         public void progressIncrement(int value)
@@ -79,7 +77,7 @@ namespace SilegoForm
                 TM_Part_Code_checkbox.Enabled = true;
                 TM_Revision_checkbox.Enabled = true;
                 lock_status_checkbox.Enabled = true;
-                DS_rev_change_textbox.ReadOnly = false;
+                DRH_textbox.ReadOnly = false;
 
                 progressBar.Visible = false;
                 progressBar.Value = 0;
@@ -114,7 +112,7 @@ namespace SilegoForm
                 TM_Part_Code_checkbox.Enabled = true;
                 TM_Revision_checkbox.Enabled = true;
                 lock_status_checkbox.Enabled = true;
-                DS_rev_change_textbox.ReadOnly = false;
+                DRH_textbox.ReadOnly = false;
 
                 progressBar.Visible = false;
                 progressBar.Value = 100;
@@ -138,9 +136,9 @@ namespace SilegoForm
             MainProgram.g.DataSheet_File = DS_file_textbox.Text;
         }
 
-        private void DS_rev_change_textbox_TextChanged(object sender, EventArgs e)
+        private void DRH_textbox_TextChanged(object sender, EventArgs e)
         {
-            MainProgram.g.DS_rev_change = DS_rev_change_textbox.Text;
+            MainProgram.g.DRH_text = DRH_textbox.Text;
         }
 
         private void DS_rev_CheckedChanged(object sender, EventArgs e)
@@ -151,7 +149,8 @@ namespace SilegoForm
             }
             else
             {
-                DS_rev_combobox.Enabled = false;
+                //DS_rev_combobox.Enabled = false;
+                DS_rev_checkbox.Checked = true;
             }
         }
 
@@ -226,9 +225,9 @@ namespace SilegoForm
                 ACMPs_checkbox.Checked = true;
                 pin_settings_checkbox.Checked = true;
                 DS_rev_checkbox.Checked = true;
-                I_Q_checkbox.Checked = true;
                 lock_status_checkbox.Checked = true;
-                DS_rev_change_textbox.Text = "New Design for SLG";
+                DRH_checkbox.Checked = true;
+                DRH_textbox.Text = "New Design for SLG";
 
                 status_label.Visible = true;
                 status_label.Text = "New Part. Loaded New_DS_Template.docx";
@@ -245,9 +244,9 @@ namespace SilegoForm
                 ACMPs_checkbox.Checked = false;
                 pin_settings_checkbox.Checked = false;
                 DS_rev_checkbox.Checked = false;
-                I_Q_checkbox.Checked = false;
                 lock_status_checkbox.Checked = false;
-                DS_rev_change_textbox.Text = "";
+                DRH_checkbox.Checked = false;
+                DRH_textbox.Text = "";
 
                 status_label.Visible = false;
                 status_label.Text = "";
@@ -364,6 +363,13 @@ namespace SilegoForm
             //Console.WriteLine(MainProgram.g.GreenPAK_File);
             //Console.WriteLine(MainProgram.g.DataSheet_File);
 
+            if (DS_rev_combobox.Text == "")
+            {
+                error_label.Show();
+                error_label.Text = "Select DS Rev";
+                return;
+            }
+
             GP_button.Enabled = false;
             DS_button.Enabled = false;
             I_Q_textBox.ReadOnly = true;
@@ -389,7 +395,7 @@ namespace SilegoForm
             TM_Part_Code_checkbox.Enabled = false;
             TM_Revision_checkbox.Enabled = false;
             lock_status_checkbox.Enabled = false;
-            DS_rev_change_textbox.ReadOnly = true;
+            DRH_textbox.ReadOnly = true;
 
             progressBar.Visible = true;
             progressBar.Value = 0;
@@ -441,6 +447,25 @@ namespace SilegoForm
         private void TM_Revision_textbox_TextChanged(object sender, EventArgs e)
         {
             MainProgram.g.TM_revision = TM_Revision_textbox.Text;
+        }
+
+        private void DRH_checkbox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (DRH_checkbox.Checked)
+            {
+                MainProgram.g.DRH_update = true;
+                DRH_textbox.Enabled = true;
+                if (new_part_checkbox.Checked)
+                {
+                    DRH_textbox.Text = "New Design for SLG";
+                }
+            }
+            else
+            {
+                MainProgram.g.DRH_update = false;
+                DRH_textbox.Enabled = false;
+                DRH_textbox.Text = "";
+            }
         }
     }
 }

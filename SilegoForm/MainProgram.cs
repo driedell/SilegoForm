@@ -40,12 +40,13 @@ public static class MainProgram
         public static bool TM_part_code_update = false;
         public static bool TM_revision_update = false;
         public static bool ext_clk_update = false;
+        public static bool DRH_update = false;
 
         public static string I_Q = "1.0";
         public static string TM_part_code = "  ";
         public static string TM_revision = "  ";
         public static string DS_rev = "010";
-        public static string DS_rev_change = null;
+        public static string DRH_text = null;
         public static string Date = null;
         public static string part_number = "SLG~~~~~";
         public static int ext_clk_freq = 0;
@@ -324,49 +325,71 @@ public static class MainProgram
         }
         if (g.GreenPAK.pin[i].VS.Equals(1))
         {
-            switch (g.GreenPAK.pin[i].description)
-            {
-                case "Push Pull 1x": g.VDD.PP1x++; break;
-                case "Digital Input with Schmitt trigger": g.VHYS = true; g.VDD.wSchmitt = true; break;
-                case "Push Pull 2x": g.VDD.PP2x++; break;
-                case "Push Pull 4x": g.VDD.PP4x++; break;
-                case "Open Drain NMOS 1x": g.VDD.ODN1x++; break;
-                case "Open Drain NMOS 2x": g.VDD.ODN2x++; break;
-                case "Open Drain NMOS 4x": g.VDD.ODN4x++; break;
-                case "Open Drain PMOS 1x": g.VDD.ODP1x++; break;
-                case "Open Drain PMOS 2x": g.VDD.ODP2x++; break;
-                case "3-State Output 1x": g.VDD.TRI1x++; break;
-                case "3-State Output 2x": g.VDD.TRI2x++; break;
-                case "Digital Input without Schmitt trigger": g.VDD.woSchmitt = true; break;
-                case "Low Voltage Digital Input": g.VDD.LVDI = true; break;
+            if (g.GreenPAK.pin[i].description.Contains("Push Pull 1x")) g.VDD.PP1x++;
+            if (g.GreenPAK.pin[i].description.Contains("Push Pull 2x")) g.VDD.PP2x++;
+            if (g.GreenPAK.pin[i].description.Contains("Push Pull 4x")) g.VDD.PP4x++;
+            if (g.GreenPAK.pin[i].description.Contains("Drain NMOS 1x")) g.VDD.ODN1x++;
+            if (g.GreenPAK.pin[i].description.Contains("Drain NMOS 2x")) g.VDD.ODN2x++;
+            if (g.GreenPAK.pin[i].description.Contains("Drain NMOS 4x")) g.VDD.ODN4x++;
+            if (g.GreenPAK.pin[i].description.Contains("Drain PMOS 1x")) g.VDD.ODP1x++;
+            if (g.GreenPAK.pin[i].description.Contains("Drain PMOS 2x")) g.VDD.ODP2x++;
+            if (g.GreenPAK.pin[i].description.Contains("3-State Output 1x")) g.VDD.TRI1x++;
+            if (g.GreenPAK.pin[i].description.Contains("3-State Output 2x")) g.VDD.TRI2x++;
+            if (g.GreenPAK.pin[i].description.Contains("Digital Input with Schmitt trigger")) g.VHYS = true; g.VDD.wSchmitt = true;
+            if (g.GreenPAK.pin[i].description.Contains("Digital Input without Schmitt trigger")) g.VDD.woSchmitt = true;
+            if (g.GreenPAK.pin[i].description.Contains("Low Voltage Digital Input")) g.VDD.LVDI = true;
 
-                //### TriState?
-
-                default: break;
-            }
+            //switch (g.GreenPAK.pin[i].description)
+            //{
+            //    case "Push Pull 1x": g.VDD.PP1x++; break;
+            //    case "Digital Input with Schmitt trigger": g.VHYS = true; g.VDD.wSchmitt = true; break;
+            //    case "Push Pull 2x": g.VDD.PP2x++; break;
+            //    case "Push Pull 4x": g.VDD.PP4x++; break;
+            //    case "Open Drain NMOS 1x": g.VDD.ODN1x++; break;
+            //    case "Open Drain NMOS 2x": g.VDD.ODN2x++; break;
+            //    case "Open Drain NMOS 4x": g.VDD.ODN4x++; break;
+            //    case "Open Drain PMOS 1x": g.VDD.ODP1x++; break;
+            //    case "Open Drain PMOS 2x": g.VDD.ODP2x++; break;
+            //    case "3-State Output 1x": g.VDD.TRI1x++; break;
+            //    case "3-State Output 2x": g.VDD.TRI2x++; break;
+            //    case "Digital Input without Schmitt trigger": g.VDD.woSchmitt = true; break;
+            //    case "Low Voltage Digital Input": g.VDD.LVDI = true; break;
+            //    default: break;
+            //}
         }
         else if (g.GreenPAK.pin[i].VS.Equals(2))
         {
-            switch (g.GreenPAK.pin[i].description)
-            {
-                case "Push Pull 1x": g.VDD2.PP1x++; break;
-                case "Digital Input with Schmitt trigger": g.VHYS = true; g.VDD2.wSchmitt = true; break;
-                case "Push Pull 2x": g.VDD2.PP2x++; break;
-                case "Push Pull 4x": g.VDD2.PP4x++; break;
-                case "Open Drain NMOS 1x": g.VDD2.ODN1x++; break;
-                case "Open Drain NMOS 2x": g.VDD2.ODN2x++; break;
-                case "Open Drain NMOS 4x": g.VDD2.ODN4x++; break;
-                case "Open Drain PMOS 1x": g.VDD2.ODP1x++; break;
-                case "Open Drain PMOS 2x": g.VDD2.ODP2x++; break;
-                case "3-State Output 1x": g.VDD2.TRI1x++; break;
-                case "3-State Output 2x": g.VDD2.TRI2x++; break;
-                case "Digital Input without Schmitt trigger": g.VDD2.woSchmitt = true; break;
-                case "Low Voltage Digital Input": g.VDD2.LVDI = true; break;
+            if (g.GreenPAK.pin[i].description.Contains("Push Pull 1x")) g.VDD2.PP1x++;
+            if (g.GreenPAK.pin[i].description.Contains("Push Pull 2x")) g.VDD2.PP2x++;
+            if (g.GreenPAK.pin[i].description.Contains("Push Pull 4x")) g.VDD2.PP4x++;
+            if (g.GreenPAK.pin[i].description.Contains("Drain NMOS 1x")) g.VDD2.ODN1x++;
+            if (g.GreenPAK.pin[i].description.Contains("Drain NMOS 2x")) g.VDD2.ODN2x++;
+            if (g.GreenPAK.pin[i].description.Contains("Drain NMOS 4x")) g.VDD2.ODN4x++;
+            if (g.GreenPAK.pin[i].description.Contains("Drain PMOS 1x")) g.VDD2.ODP1x++;
+            if (g.GreenPAK.pin[i].description.Contains("Drain PMOS 2x")) g.VDD2.ODP2x++;
+            if (g.GreenPAK.pin[i].description.Contains("3-State Output 1x")) g.VDD2.TRI1x++;
+            if (g.GreenPAK.pin[i].description.Contains("3-State Output 2x")) g.VDD2.TRI2x++;
+            if (g.GreenPAK.pin[i].description.Contains("Digital Input with Schmitt trigger")) g.VHYS = true; g.VDD2.wSchmitt = true;
+            if (g.GreenPAK.pin[i].description.Contains("Digital Input without Schmitt trigger")) g.VDD2.woSchmitt = true;
+            if (g.GreenPAK.pin[i].description.Contains("Low Voltage Digital Input")) g.VDD2.LVDI = true;
 
-                //### TriState?
-
-                default: break;
-            }
+            //switch (g.GreenPAK.pin[i].description)
+            //{
+            //    case "Push Pull 1x": g.VDD2.PP1x++; break;
+            //    case "Digital Input with Schmitt trigger": g.VHYS = true; g.VDD2.wSchmitt = true; break;
+            //    case "Push Pull 2x": g.VDD2.PP2x++; break;
+            //    case "Push Pull 4x": g.VDD2.PP4x++; break;
+            //    case "Open Drain NMOS 1x": g.VDD2.ODN1x++; break;
+            //    case "Open Drain NMOS 2x": g.VDD2.ODN2x++; break;
+            //    case "Open Drain NMOS 4x": g.VDD2.ODN4x++; break;
+            //    case "Open Drain PMOS 1x": g.VDD2.ODP1x++; break;
+            //    case "Open Drain PMOS 2x": g.VDD2.ODP2x++; break;
+            //    case "3-State Output 1x": g.VDD2.TRI1x++; break;
+            //    case "3-State Output 2x": g.VDD2.TRI2x++; break;
+            //    case "Digital Input without Schmitt trigger": g.VDD2.woSchmitt = true; break;
+            //    case "Low Voltage Digital Input": g.VDD2.LVDI = true; break;
+            //    default: break;
+            //}
         }
 
         Console.WriteLine("Pin" + i.ToString() + ": " + g.GreenPAK.pin[i].type + ", " + g.GreenPAK.pin[i].description);
@@ -1476,7 +1499,22 @@ public static class MainProgram
             g.app = new Microsoft.Office.Interop.Word.Application();
             if (g.new_part_update)
             {
+                //using (ResXResourceSet resxSet = new ResXResourceSet(@"..\..\Resources\New_DS_Template.docx"))
+                //{
+                //    g.doc = (Document)resxSet;
+                //}
+
+                //g.doc = SilegoForm_namespace.Properties.Resources.New_DS_Template;
+
                 g.doc = g.app.Documents.Add(@"P:\Apps_Tools\New_DS_Template\New_DS_Template.docx");
+                try
+                {
+                    g.doc.Unprotect("david");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
             }
             else
             {
@@ -1996,16 +2034,16 @@ public static class MainProgram
         {
             string output_summary = ".";
 
-            if (g.VDD.PP1x > 0 || g.VDD2.PP1x > 0) { output_summary += "\n\r" + (g.VDD.PP1x + g.VDD2.PP1x).ToString() + " Output \u2014 Push Pull 1x"; }
-            if (g.VDD.PP2x > 0 || g.VDD2.PP2x > 0) { output_summary += "\n\r" + (g.VDD.PP2x + g.VDD2.PP2x).ToString() + " Output \u2014 Push Pull 2x"; }
-            if (g.VDD.PP4x > 0 || g.VDD2.PP4x > 0) { output_summary += "\n\r" + (g.VDD.PP4x + g.VDD2.PP4x).ToString() + " Output \u2014 Push Pull 4x"; }
-            if (g.VDD.ODN1x > 0 || g.VDD2.ODN1x > 0) { output_summary += "\n\r" + (g.VDD.ODN1x + g.VDD2.ODN1x).ToString() + " Output \u2014 Open Drain NMOS 1x"; }
-            if (g.VDD.ODN2x > 0 || g.VDD2.ODN2x > 0) { output_summary += "\n\r" + (g.VDD.ODN2x + g.VDD2.ODN2x).ToString() + " Output \u2014 Open Drain NMOS 2x"; }
-            if (g.VDD.ODN4x > 0 || g.VDD2.ODN4x > 0) { output_summary += "\n\r" + (g.VDD.ODN4x + g.VDD2.ODN4x).ToString() + " Output \u2014 Open Drain NMOS 4x"; }
-            if (g.VDD.ODP1x > 0 || g.VDD2.ODP1x > 0) { output_summary += "\n\r" + (g.VDD.ODP1x + g.VDD2.ODP1x).ToString() + " Output \u2014 Open Drain PMOS 1x"; }
-            if (g.VDD.ODP2x > 0 || g.VDD2.ODP2x > 0) { output_summary += "\n\r" + (g.VDD.ODP2x + g.VDD2.ODP2x).ToString() + " Output \u2014 Open Drain PMOS 2x"; }
-            if (g.VDD.TRI1x > 0 || g.VDD2.TRI1x > 0) { output_summary += "\n\r" + (g.VDD.TRI1x + g.VDD2.TRI1x).ToString() + " Output \u2014 3-State Output 1x"; }
-            if (g.VDD.TRI2x > 0 || g.VDD2.TRI2x > 0) { output_summary += "\n\r" + (g.VDD.TRI2x + g.VDD2.TRI2x).ToString() + " Output \u2014 3-State Output 2x"; }
+            if (g.VDD.PP1x > 0 || g.VDD2.PP1x > 0) { output_summary += "\n\r" + (g.VDD.PP1x + g.VDD2.PP1x).ToString() + " Output(s) \u2014 Push Pull 1x"; }
+            if (g.VDD.PP2x > 0 || g.VDD2.PP2x > 0) { output_summary += "\n\r" + (g.VDD.PP2x + g.VDD2.PP2x).ToString() + " Output(s) \u2014 Push Pull 2x"; }
+            if (g.VDD.PP4x > 0 || g.VDD2.PP4x > 0) { output_summary += "\n\r" + (g.VDD.PP4x + g.VDD2.PP4x).ToString() + " Output(s) \u2014 Push Pull 4x"; }
+            if (g.VDD.ODN1x > 0 || g.VDD2.ODN1x > 0) { output_summary += "\n\r" + (g.VDD.ODN1x + g.VDD2.ODN1x).ToString() + " Output(s) \u2014 Open Drain NMOS 1x"; }
+            if (g.VDD.ODN2x > 0 || g.VDD2.ODN2x > 0) { output_summary += "\n\r" + (g.VDD.ODN2x + g.VDD2.ODN2x).ToString() + " Output(s) \u2014 Open Drain NMOS 2x"; }
+            if (g.VDD.ODN4x > 0 || g.VDD2.ODN4x > 0) { output_summary += "\n\r" + (g.VDD.ODN4x + g.VDD2.ODN4x).ToString() + " Output(s) \u2014 Open Drain NMOS 4x"; }
+            if (g.VDD.ODP1x > 0 || g.VDD2.ODP1x > 0) { output_summary += "\n\r" + (g.VDD.ODP1x + g.VDD2.ODP1x).ToString() + " Output(s) \u2014 Open Drain PMOS 1x"; }
+            if (g.VDD.ODP2x > 0 || g.VDD2.ODP2x > 0) { output_summary += "\n\r" + (g.VDD.ODP2x + g.VDD2.ODP2x).ToString() + " Output(s) \u2014 Open Drain PMOS 2x"; }
+            if (g.VDD.TRI1x > 0 || g.VDD2.TRI1x > 0) { output_summary += "\n\r" + (g.VDD.TRI1x + g.VDD2.TRI1x).ToString() + " Output(s) \u2014 3-State Output 1x"; }
+            if (g.VDD.TRI2x > 0 || g.VDD2.TRI2x > 0) { output_summary += "\n\r" + (g.VDD.TRI2x + g.VDD2.TRI2x).ToString() + " Output(s) \u2014 3-State Output 2x"; }
 
             try { g.doc.Variables["output_summary"].Value = output_summary.Substring(3); }
             catch
@@ -3092,18 +3130,21 @@ public static class MainProgram
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(2, "Populating Datasheet Revision History table");
 
-        foreach (Table table in g.doc.Tables)
+        if (g.DRH_update)
         {
-            if (table.Title == "DRH")
+            foreach (Table table in g.doc.Tables)
             {
-                table.Rows.Add();
-                int DRH_row = table.Rows.Count - 1;
+                if (table.Title == "DRH")
+                {
+                    table.Rows.Add();
+                    int DRH_row = table.Rows.Count - 1;
 
-                table.Cell(DRH_row, 1).Range.Text = DateTime.Now.ToString("MM/dd/yyyy");
-                table.Cell(DRH_row, 2).Range.Text = g.DS_rev.Insert(1, ".");
-                table.Cell(DRH_row, 3).Range.Text = g.DS_rev_change;
+                    table.Cell(DRH_row, 1).Range.Text = DateTime.Now.ToString("MM/dd/yyyy");
+                    table.Cell(DRH_row, 2).Range.Text = g.DS_rev.Insert(1, ".");
+                    table.Cell(DRH_row, 3).Range.Text = g.DRH_text;
 
-                break;
+                    break;
+                }
             }
         }
 
