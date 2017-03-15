@@ -26,9 +26,10 @@ public static class MainProgram
 
         public static string GreenPAK_File = null;
         public static string DataSheet_File = null;
+
         //public static string templatePath = @"P:\Apps_Tools\New_DS_Template\";
         public static string templatePath = Directory.GetCurrentDirectory();
-        
+
         public static string path;
 
         public static bool pin_labels_update = false;
@@ -1095,6 +1096,8 @@ public static class MainProgram
 
         for (int i = 0; i < 3; i++)
         {
+            if (VDD_EC[i] == false) continue;
+
             switch (i)
             {
                 case 0: g.VDD_DB = "1_8"; g.extraInfo = " at VDD = 1.8v"; break;
@@ -1164,6 +1167,8 @@ public static class MainProgram
 
         for (int i = 0; i < 3; i++)
         {
+            if (VDD_EC[i] == false) continue;
+
             switch (i)
             {
                 case 0: g.VDD_DB = "1_8"; g.extraInfo = " at VDD = 1.8v"; break;
@@ -1512,8 +1517,6 @@ public static class MainProgram
                 //g.doc = g.app.Documents.Add(@"P:\Apps_Tools\New_DS_Template\New_DS_Template.docx");
                 g.doc = g.app.Documents.Add(g.templatePath + @"\New_DS_Template.docx");
 
-
-                
                 try
                 {
                     g.doc.Unprotect("david");
@@ -2558,6 +2561,8 @@ public static class MainProgram
         {
             g.VDD_EC[2] = false;
         }
+        Console.WriteLine(g.VDD_EC[0].ToString() + " " + g.VDD_EC[1].ToString() + " " + g.VDD_EC[2].ToString());
+        Console.ReadLine();
 
         double VDD2_min = Convert.ToDouble(g.GreenPAK.vdd2.min);
         double VDD2_max = Convert.ToDouble(g.GreenPAK.vdd2.max);
