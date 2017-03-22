@@ -9,10 +9,51 @@ namespace SilegoForm
         public SilegoForm()
         {
             InitializeComponent();
-            MaximumSize = new System.Drawing.Size(400, 420);
+            //MaximumSize = new System.Drawing.Size(400, 420);
             Location = new System.Drawing.Point(800, 0);
             new_part_checkbox.Checked = true;           //### Erase this later?
+
+
+            initialize_pin_boxes();                     //### move this later
+            for (int i = 1; i < 10; i++)
+            {
+                configure_pin_boxes(i);
+            }
+
+            //myPinBox custom = new myPinBox();
+            //custom.Location = new System.Drawing.Point(100, 400);
+            //Controls.Add(custom);
         }
+
+        public myPinBox[] Pin_boxes = new myPinBox[33];
+
+        public void initialize_pin_boxes()
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                Pin_boxes[i] = new myPinBox();
+            }
+        }
+
+        public void configure_pin_boxes(int i)
+        {
+            Pin_boxes[i].AutoSize = true;
+            Pin_boxes[i].AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            Pin_boxes[i].Pin_box.Text = "Pin" + i.ToString();
+            //PinTableLayoutPanel.RowCount++;
+            //PinTableLayoutPanel.RowStyles.Add(new RowStyle());
+            //PinTableLayoutPanel.RowStyles.
+            PinTableLayoutPanel.Controls.Add(Pin_boxes[i], 0, i - 1);
+            //PinTableLayoutPanel.PerformLayout();
+
+        }
+
+        public void addnewControl(Control theControl, int row)
+        {
+            PinTableLayoutPanel.Controls.Add(theControl, 0, row);
+        }
+
+
 
         public void progressIncrement(int value)
         {
@@ -72,7 +113,7 @@ namespace SilegoForm
                 CNTs_DLYs_checkbox.Enabled = true;
                 ACMPs_checkbox.Enabled = true;
                 pin_settings_checkbox.Enabled = true;
-                DS_rev_checkbox.Enabled = true;
+                //DS_rev_checkbox.Enabled = true;
                 I_Q_checkbox.Enabled = true;
                 TM_Part_Code_checkbox.Enabled = true;
                 TM_Revision_checkbox.Enabled = true;
@@ -107,7 +148,7 @@ namespace SilegoForm
                 CNTs_DLYs_checkbox.Enabled = true;
                 ACMPs_checkbox.Enabled = true;
                 pin_settings_checkbox.Enabled = true;
-                DS_rev_checkbox.Enabled = true;
+                //DS_rev_checkbox.Enabled = true;
                 I_Q_checkbox.Enabled = true;
                 TM_Part_Code_checkbox.Enabled = true;
                 TM_Revision_checkbox.Enabled = true;
@@ -143,15 +184,15 @@ namespace SilegoForm
 
         private void DS_rev_CheckedChanged(object sender, EventArgs e)
         {
-            if (DS_rev_checkbox.Checked)
-            {
-                DS_rev_combobox.Enabled = true;
-            }
-            else
-            {
-                //DS_rev_combobox.Enabled = false;
-                DS_rev_checkbox.Checked = true;
-            }
+            //if (DS_rev_checkbox.Checked)
+            //{
+            //    DS_rev_combobox.Enabled = true;
+            //}
+            //else
+            //{
+            //    //DS_rev_combobox.Enabled = false;
+            //    DS_rev_checkbox.Checked = true;
+            //}
         }
 
         private void DS_rev_combobox_MouseHover(object sender, EventArgs e)
@@ -174,16 +215,16 @@ namespace SilegoForm
         {
             if (help_checkbox.Checked)
             {
-                Size = new System.Drawing.Size(700, 500);
-                MaximumSize = new System.Drawing.Size(700, 420);
-                MinimumSize = new System.Drawing.Size(700, 420);
+                //Size = new System.Drawing.Size(700, 500);
+                //MaximumSize = new System.Drawing.Size(700, 420);
+                //MinimumSize = new System.Drawing.Size(700, 420);
                 help_textbox.Visible = true;
             }
             else if (!help_checkbox.Checked)
             {
-                Size = new System.Drawing.Size(400, 500);
-                MaximumSize = new System.Drawing.Size(400, 420);
-                MinimumSize = new System.Drawing.Size(400, 420);
+                //Size = new System.Drawing.Size(400, 500);
+                //MaximumSize = new System.Drawing.Size(400, 420);
+                //MinimumSize = new System.Drawing.Size(400, 420);
                 help_textbox.Visible = false;
             }
         }
@@ -224,7 +265,7 @@ namespace SilegoForm
                 CNTs_DLYs_checkbox.Checked = true;
                 ACMPs_checkbox.Checked = true;
                 pin_settings_checkbox.Checked = true;
-                DS_rev_checkbox.Checked = true;
+                //DS_rev_checkbox.Checked = true;
                 lock_status_checkbox.Checked = true;
                 DRH_checkbox.Checked = true;
                 DRH_textbox.Text = "New Design for SLG";
@@ -244,7 +285,7 @@ namespace SilegoForm
                 CNTs_DLYs_checkbox.Checked = false;
                 ACMPs_checkbox.Checked = false;
                 pin_settings_checkbox.Checked = false;
-                DS_rev_checkbox.Checked = false;
+                //DS_rev_checkbox.Checked = false;
                 lock_status_checkbox.Checked = false;
                 DRH_checkbox.Checked = false;
                 DRH_textbox.Text = "";
@@ -391,7 +432,7 @@ namespace SilegoForm
             CNTs_DLYs_checkbox.Enabled = false;
             ACMPs_checkbox.Enabled = false;
             pin_settings_checkbox.Enabled = false;
-            DS_rev_checkbox.Enabled = false;
+            //DS_rev_checkbox.Enabled = false;
             I_Q_checkbox.Enabled = false;
             TM_Part_Code_checkbox.Enabled = false;
             TM_Revision_checkbox.Enabled = false;
@@ -466,6 +507,14 @@ namespace SilegoForm
                 MainProgram.g.DRH_update = false;
                 DRH_textbox.Enabled = false;
                 DRH_textbox.Text = "";
+            }
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (tabControl1.SelectedTab == Pins_tab)
+            {
+                Pin_boxes[1].Pin_label_textbox.Focus();
             }
         }
     }

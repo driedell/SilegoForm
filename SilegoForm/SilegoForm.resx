@@ -492,10 +492,25 @@
 
 6. If you wish to cancel operation at any point, press CANCEL. It may take a few seconds to cancel.
 
-This program was written by and is maintained by driedell@silego.com.</value>
+This program was written by and is maintained by driedell@silego.com.
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+a</value>
   </data>
   <metadata name="select_DS_save_location.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>423, 17</value>
+  </metadata>
+  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>37</value>
   </metadata>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

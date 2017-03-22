@@ -1,5 +1,5 @@
-C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\obj\Debug\SilegoForm_Project.csproj.ResolveComReference.cache
 C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\bin\Debug\SilegoForm_AssemblyName.exe.config
+C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\obj\Debug\SilegoForm_Project.csproj.ResolveComReference.cache
 C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\bin\Debug\Base_Die_DB.accdb
 C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\bin\Debug\SilegoForm_AssemblyName.exe
 C:\Users\driedell\Source\Repos\SilegoForm\SilegoForm\bin\Debug\SilegoForm_AssemblyName.pdb
