@@ -40,12 +40,7 @@ namespace SilegoForm
             Pin_boxes[i].AutoSize = true;
             Pin_boxes[i].AutoSizeMode = AutoSizeMode.GrowAndShrink;
             Pin_boxes[i].Pin_box.Text = "Pin" + i.ToString();
-            //PinTableLayoutPanel.RowCount++;
-            //PinTableLayoutPanel.RowStyles.Add(new RowStyle());
-            //PinTableLayoutPanel.RowStyles.
             PinTableLayoutPanel.Controls.Add(Pin_boxes[i], 0, i - 1);
-            //PinTableLayoutPanel.PerformLayout();
-
         }
 
         public void addnewControl(Control theControl, int row)
@@ -215,16 +210,16 @@ namespace SilegoForm
         {
             if (help_checkbox.Checked)
             {
-                //Size = new System.Drawing.Size(700, 500);
-                //MaximumSize = new System.Drawing.Size(700, 420);
-                //MinimumSize = new System.Drawing.Size(700, 420);
+                Size = new System.Drawing.Size(800, 750);
+                MaximumSize = new System.Drawing.Size(800, 750);
+                MinimumSize = new System.Drawing.Size(800, 750);
                 help_textbox.Visible = true;
             }
             else if (!help_checkbox.Checked)
             {
-                //Size = new System.Drawing.Size(400, 500);
-                //MaximumSize = new System.Drawing.Size(400, 420);
-                //MinimumSize = new System.Drawing.Size(400, 420);
+                Size = new System.Drawing.Size(540, 750);
+                MaximumSize = new System.Drawing.Size(540, 750);
+                MinimumSize = new System.Drawing.Size(540, 750);
                 help_textbox.Visible = false;
             }
         }
@@ -274,7 +269,7 @@ namespace SilegoForm
                 status_label.Text = "New Part. Loaded New_DS_Template.docx";
                 //DS_file_textbox.Text = @"P:\Apps_Tools\New_DS_Template\New_DS_Template.docx";
                 DS_file_textbox.Text = MainProgram.g.templatePath + @"\New_DS_Template.docx";
-                DS_button.Visible = false;
+                DS_button.Enabled = false;
             }
             else
             {
@@ -293,7 +288,7 @@ namespace SilegoForm
                 status_label.Visible = false;
                 status_label.Text = "";
                 DS_file_textbox.Text = "Drop DS file";
-                DS_button.Visible = true;
+                DS_button.Enabled = true;
             }
         }
 
@@ -512,7 +507,7 @@ namespace SilegoForm
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (tabControl1.SelectedTab == Pins_tab)
+            if (misc_tab.SelectedTab == Pins_tab)
             {
                 Pin_boxes[1].Pin_label_textbox.Focus();
             }

@@ -62,7 +62,7 @@ namespace SilegoForm
             this.lock_status_checkbox = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.select_DS_save_location = new System.Windows.Forms.FolderBrowserDialog();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.misc_tab = new System.Windows.Forms.TabControl();
             this.Project_Info_tab = new System.Windows.Forms.TabPage();
             this.Files_box = new System.Windows.Forms.GroupBox();
             this.DS_Rev_box = new System.Windows.Forms.GroupBox();
@@ -101,14 +101,15 @@ namespace SilegoForm
             this.part_number_textbox = new System.Windows.Forms.TextBox();
             this.customer_name_label = new System.Windows.Forms.Label();
             this.project_name_label = new System.Windows.Forms.Label();
-            this.project_name_textbox = new System.Windows.Forms.TextBox();
             this.Pins_tab = new System.Windows.Forms.TabPage();
             this.PinTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.Counters_tab = new System.Windows.Forms.TabPage();
             this.ACMPs_tab = new System.Windows.Forms.TabPage();
+            this.project_name_textbox = new System.Windows.Forms.TextBox();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             ((System.ComponentModel.ISupportInitialize)(this.SilegoLogo)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
-            this.tabControl1.SuspendLayout();
+            this.misc_tab.SuspendLayout();
             this.Project_Info_tab.SuspendLayout();
             this.Files_box.SuspendLayout();
             this.DS_Rev_box.SuspendLayout();
@@ -120,6 +121,7 @@ namespace SilegoForm
             this.Part_Info_box.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.Pins_tab.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // SilegoLogo
@@ -386,8 +388,7 @@ namespace SilegoForm
             this.help_textbox.Multiline = true;
             this.help_textbox.Name = "help_textbox";
             this.help_textbox.ReadOnly = true;
-            this.help_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.help_textbox.Size = new System.Drawing.Size(293, 358);
+            this.help_textbox.Size = new System.Drawing.Size(250, 622);
             this.help_textbox.TabIndex = 50;
             this.help_textbox.Text = resources.GetString("help_textbox.Text");
             this.help_textbox.Visible = false;
@@ -434,7 +435,7 @@ namespace SilegoForm
             this.tableLayoutPanel1.Controls.Add(this.CNTs_DLYs_checkbox, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.TM_Part_Code_checkbox, 2, 2);
             this.tableLayoutPanel1.Controls.Add(this.ACMPs_checkbox, 1, 2);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(518, 523);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(6, 6);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 4;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -445,19 +446,19 @@ namespace SilegoForm
             this.tableLayoutPanel1.Size = new System.Drawing.Size(363, 105);
             this.tableLayoutPanel1.TabIndex = 55;
             // 
-            // tabControl1
+            // misc_tab
             // 
-            this.tabControl1.Controls.Add(this.Project_Info_tab);
-            this.tabControl1.Controls.Add(this.Pins_tab);
-            this.tabControl1.Controls.Add(this.Counters_tab);
-            this.tabControl1.Controls.Add(this.ACMPs_tab);
-            this.tabControl1.Location = new System.Drawing.Point(12, 48);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(500, 580);
-            this.tabControl1.TabIndex = 0;
-            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
-
+            this.misc_tab.Controls.Add(this.Project_Info_tab);
+            this.misc_tab.Controls.Add(this.Pins_tab);
+            this.misc_tab.Controls.Add(this.Counters_tab);
+            this.misc_tab.Controls.Add(this.ACMPs_tab);
+            this.misc_tab.Controls.Add(this.tabPage1);
+            this.misc_tab.Location = new System.Drawing.Point(12, 48);
+            this.misc_tab.Name = "misc_tab";
+            this.misc_tab.SelectedIndex = 0;
+            this.misc_tab.Size = new System.Drawing.Size(500, 580);
+            this.misc_tab.TabIndex = 0;
+            this.misc_tab.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
             // Project_Info_tab
             // 
@@ -844,7 +845,7 @@ namespace SilegoForm
             this.Part_Info_box.Controls.Add(this.tableLayoutPanel2);
             this.Part_Info_box.Location = new System.Drawing.Point(3, 176);
             this.Part_Info_box.Name = "Part_Info_box";
-            this.Part_Info_box.Size = new System.Drawing.Size(266, 110);
+            this.Part_Info_box.Size = new System.Drawing.Size(266, 136);
             this.Part_Info_box.TabIndex = 81;
             this.Part_Info_box.TabStop = false;
             this.Part_Info_box.Text = "Part Info";
@@ -865,10 +866,10 @@ namespace SilegoForm
             this.tableLayoutPanel2.Location = new System.Drawing.Point(6, 19);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 3;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(254, 72);
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(254, 98);
             this.tableLayoutPanel2.TabIndex = 77;
             // 
             // part_number_label
@@ -911,13 +912,6 @@ namespace SilegoForm
             this.project_name_label.Size = new System.Drawing.Size(81, 13);
             this.project_name_label.TabIndex = 5;
             this.project_name_label.Text = "Project Name: *";
-            // 
-            // project_name_textbox
-            // 
-            this.project_name_textbox.Location = new System.Drawing.Point(101, 55);
-            this.project_name_textbox.Name = "project_name_textbox";
-            this.project_name_textbox.Size = new System.Drawing.Size(150, 20);
-            this.project_name_textbox.TabIndex = 4;
             // 
             // Pins_tab
             // 
@@ -995,15 +989,33 @@ namespace SilegoForm
             this.ACMPs_tab.Text = "ACMPs";
             this.ACMPs_tab.UseVisualStyleBackColor = true;
             // 
+            // project_name_textbox
+            // 
+            this.project_name_textbox.Location = new System.Drawing.Point(101, 55);
+            this.project_name_textbox.Multiline = true;
+            this.project_name_textbox.Name = "project_name_textbox";
+            this.project_name_textbox.Size = new System.Drawing.Size(150, 40);
+            this.project_name_textbox.TabIndex = 4;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.tableLayoutPanel1);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(492, 554);
+            this.tabPage1.TabIndex = 4;
+            this.tabPage1.Text = "tabPage1";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
             // SilegoForm
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(984, 712);
+            this.ClientSize = new System.Drawing.Size(524, 712);
             this.Controls.Add(this.new_part_checkbox);
-            this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.Controls.Add(this.misc_tab);
             this.Controls.Add(this.start_button);
             this.Controls.Add(this.help_textbox);
             this.Controls.Add(this.help_checkbox);
@@ -1026,7 +1038,7 @@ namespace SilegoForm
             ((System.ComponentModel.ISupportInitialize)(this.SilegoLogo)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
-            this.tabControl1.ResumeLayout(false);
+            this.misc_tab.ResumeLayout(false);
             this.Project_Info_tab.ResumeLayout(false);
             this.Project_Info_tab.PerformLayout();
             this.Files_box.ResumeLayout(false);
@@ -1049,6 +1061,8 @@ namespace SilegoForm
             this.tableLayoutPanel2.PerformLayout();
             this.Pins_tab.ResumeLayout(false);
             this.Pins_tab.PerformLayout();
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1086,7 +1100,7 @@ namespace SilegoForm
         private CheckBox lock_status_checkbox;
         private TableLayoutPanel tableLayoutPanel1;
         private FolderBrowserDialog select_DS_save_location;
-        private TabControl tabControl1;
+        private TabControl misc_tab;
         private TabPage Project_Info_tab;
         private TabPage Pins_tab;
         private TabPage Counters_tab;
@@ -1101,7 +1115,6 @@ namespace SilegoForm
         private TextBox DRH_textbox;
         private ComboBox DS_rev_combobox;
         private Label project_name_label;
-        private TextBox project_name_textbox;
         private Label customer_name_label;
         private TextBox customer_name_textbox;
         private Label part_number_label;
@@ -1130,6 +1143,8 @@ namespace SilegoForm
         private TextBox I_Q_condition_textbox;
         private TableLayoutPanel PinTableLayoutPanel;
         private GroupBox Files_box;
+        private TextBox project_name_textbox;
+        private TabPage tabPage1;
     }
 
     public partial class myPinBox : UserControl
