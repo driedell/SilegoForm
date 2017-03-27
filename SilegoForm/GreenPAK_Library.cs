@@ -4,10 +4,13 @@
     {
         public string base_die;
         public string package;
+        public string package_VM = "V";
         public byte PAK_family;
         public string package_size;
         public string package_weight;
         public int pattern_id_address;
+        public string pattern_id;
+        public string nvm_lock;
 
         public bool dual_supply_PAK = false;
         public string dual_supply_vdd_pins;
@@ -68,7 +71,7 @@
             public int OE;          // Output enable
             public byte VS;         // VDD source for Dual Supply
 
-            public string name;
+            public string label;
             public string type;
             public string resistor;
             public string description;
@@ -561,13 +564,13 @@
                 new PIN() { PT = "I2C",     RV = 0000, UD = 0000, IO = 0000, DR = 0000,                       VS = 1  },    // 08   //###
                 new PIN() { PT = "I2C",     RV = 0000, UD = 0000, IO = 0000, DR = 0000,                       VS = 1  },    // 09   //###
                 new PIN() { PT = "GPIO_OE", RV = 1090, UD = 1089, IM = 1092, OM = 1094, OE = 0384,            VS = 1  },    // 10
-                new PIN() { PT = "LDO_OUT", name = "LDO_VOUT0"                                                        },    // 11
-                new PIN() { PT = "LDO_IN",  name = "LDO_VIN0"                                                         },    // 12
-                new PIN() { PT = "LDO_OUT", name = "LDO_VOUT1"                                                        },    // 13
-                new PIN() { PT = "LDO_OUT", name = "LDO_VOUT2"                                                        },    // 14
-                new PIN() { PT = "LDO_IN",  name = "LDO_VIN1"                                                         },    // 15
-                new PIN() { PT = "LDO_OUT", name = "LDO_VOUT3"                                                        },    // 16
-                new PIN() { PT = "LDO_GND", name = "LDO_GND"                                                          },    // 17
+                new PIN() { PT = "LDO_OUT", label = "LDO_VOUT0"                                                        },    // 11
+                new PIN() { PT = "LDO_IN",  label = "LDO_VIN0"                                                         },    // 12
+                new PIN() { PT = "LDO_OUT", label = "LDO_VOUT1"                                                        },    // 13
+                new PIN() { PT = "LDO_OUT", label = "LDO_VOUT2"                                                        },    // 14
+                new PIN() { PT = "LDO_IN",  label = "LDO_VIN1"                                                         },    // 15
+                new PIN() { PT = "LDO_OUT", label = "LDO_VOUT3"                                                        },    // 16
+                new PIN() { PT = "LDO_GND", label = "LDO_GND"                                                          },    // 17
                 new PIN() { PT = "GPIO",    RV = 1099, UD = 1098, IO = 1101, DR = 1097,                       VS = 1  },    // 18
                 new PIN() { PT = "GPIO_OE", RV = 1106, UD = 1105, IM = 1108, OM = 1110, OE = 0408,            VS = 1  },    // 19
                 new PIN() { PT = "GND",                                                                               },    // 20
@@ -607,6 +610,7 @@
             PAKs.SLG46533M = new PAK();
             PAKs.SLG46533M.base_die = "SLG46533M";
             PAKs.SLG46533M.package = "MSTQFN-22L";
+            PAKs.SLG46533M.package_VM = "M";
             PAKs.SLG46533M.package_size = "2mm x 3mm";
             PAKs.SLG46533M.PAK_family = 5;
             PAKs.SLG46533M.package_weight = "0.0058 g";
@@ -816,6 +820,7 @@
             PAKs.SLG46537M = new PAK();
             PAKs.SLG46537M.base_die = "SLG46537M";
             PAKs.SLG46537M.package = "MSTQFN-22L";
+            PAKs.SLG46537M.package_VM = "M";
             PAKs.SLG46537M.package_size = "2mm x 2.2mm";
             PAKs.SLG46537M.PAK_family = 5;
             PAKs.SLG46537M.package_weight = "0.0058 g";
@@ -886,6 +891,7 @@
             PAKs.SLG46538M = new PAK();
             PAKs.SLG46538M.base_die = "SLG46538M";
             PAKs.SLG46538M.package = "MSTQFN-22L";
+            PAKs.SLG46538M.package_VM = "M";
             PAKs.SLG46538M.package_size = "2mm x 2.2mm";
             PAKs.SLG46538M.PAK_family = 5;
             PAKs.SLG46538M.package_weight = "0.0058 g";
@@ -1700,7 +1706,7 @@
                 new CNT() { CK = 0690, DA = 0693, LN = 08, MD = 0689, SL = 0706 },    // 3
                 new CNT() { CK = 0754, DA = 0757, LN = 08, MD = 0753, SL = 0000 },    // 4
                 new CNT() { CK = 0768, DA = 0771, LN = 08, MD = 0767, SL = 0000 },    // 5
-                new CNT() { CK = 0782, DA = 0785, LN = 08, MD = 0781, SL = 0000 },    // 6            
+                new CNT() { CK = 0782, DA = 0785, LN = 08, MD = 0781, SL = 0000 },    // 6
             };
             PAKs.SLG46169.acmp = new ACMP[]
             {
@@ -1798,7 +1804,7 @@
 
         public static PAK SLG46721;
         public static PAK SLG46722;
-        public static PAK SLG46110;   
+        public static PAK SLG46110;
         public static PAK SLG46120;
         public static PAK SLG46116;
         public static PAK SLG46117;

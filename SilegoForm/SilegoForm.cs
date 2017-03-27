@@ -6,6 +6,8 @@ namespace SilegoForm
 {
     public partial class SilegoForm : Form
     {
+        public myPinBox[] Pin_boxes = new myPinBox[33];
+
         public SilegoForm()
         {
             InitializeComponent();
@@ -13,46 +15,7 @@ namespace SilegoForm
             Location = new System.Drawing.Point(800, 0);
             new_part_checkbox.Checked = true;           //### Erase this later?
 
-
-            initialize_pin_boxes();                     //### move this later
-            for (int i = 1; i < 10; i++)
-            {
-                configure_pin_boxes(i);
-            }
-
-            //myPinBox custom = new myPinBox();
-            //custom.Location = new System.Drawing.Point(100, 400);
-            //Controls.Add(custom);
-        }
-
-        public myPinBox[] Pin_boxes = new myPinBox[33];
-
-        public void initialize_pin_boxes()
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                Pin_boxes[i] = new myPinBox();
-            }
-        }
-
-        public void configure_pin_boxes(int i)
-        {
-            Pin_boxes[i].AutoSize = true;
-            Pin_boxes[i].AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            Pin_boxes[i].Pin_box.Text = "Pin" + i.ToString();
-            PinTableLayoutPanel.Controls.Add(Pin_boxes[i], 0, i - 1);
-        }
-
-        public void addnewControl(Control theControl, int row)
-        {
-            PinTableLayoutPanel.Controls.Add(theControl, 0, row);
-        }
-
-
-
-        public void progressIncrement(int value)
-        {
-            progressBar.Increment(value);
+            initialize_pin_boxes();                     //### move this later?
         }
 
         private void ACMPs_CheckedChanged(object sender, EventArgs e)
@@ -102,9 +65,7 @@ namespace SilegoForm
                 cancel_button.Enabled = false;
 
                 new_part_checkbox.Enabled = true;
-                project_info_checkbox.Enabled = true;
                 pin_labels_checkbox.Enabled = true;
-                temp_vdd_checkbox.Enabled = true;
                 CNTs_DLYs_checkbox.Enabled = true;
                 ACMPs_checkbox.Enabled = true;
                 pin_settings_checkbox.Enabled = true;
@@ -112,7 +73,6 @@ namespace SilegoForm
                 I_Q_checkbox.Enabled = true;
                 TM_Part_Code_checkbox.Enabled = true;
                 TM_Revision_checkbox.Enabled = true;
-                lock_status_checkbox.Enabled = true;
                 DRH_textbox.ReadOnly = false;
 
                 progressBar.Visible = false;
@@ -137,9 +97,7 @@ namespace SilegoForm
                 cancel_button.Enabled = false;
 
                 new_part_checkbox.Enabled = true;
-                project_info_checkbox.Enabled = true;
                 pin_labels_checkbox.Enabled = true;
-                temp_vdd_checkbox.Enabled = true;
                 CNTs_DLYs_checkbox.Enabled = true;
                 ACMPs_checkbox.Enabled = true;
                 pin_settings_checkbox.Enabled = true;
@@ -147,12 +105,16 @@ namespace SilegoForm
                 I_Q_checkbox.Enabled = true;
                 TM_Part_Code_checkbox.Enabled = true;
                 TM_Revision_checkbox.Enabled = true;
-                lock_status_checkbox.Enabled = true;
                 DRH_textbox.ReadOnly = false;
 
                 progressBar.Visible = false;
                 progressBar.Value = 100;
             }
+        }
+
+        public void progressIncrement(int value)
+        {
+            progressBar.Increment(value);
         }
 
         private void cancel_button_Click(object sender, EventArgs e)
@@ -166,15 +128,20 @@ namespace SilegoForm
             else MainProgram.g.CNTs_DLYs_update = false;
         }
 
-        private void DS_file_textbox_TextChanged(object sender, EventArgs e)
+        private void customer_name_textbox_TextChanged(object sender, EventArgs e)
         {
-            Console.WriteLine(MainProgram.g.DataSheet_File);
-            MainProgram.g.DataSheet_File = DS_file_textbox.Text;
+            MainProgram.g.customer_name = customer_name_textbox.Text;
         }
 
         private void DRH_textbox_TextChanged(object sender, EventArgs e)
         {
             MainProgram.g.DRH_text = DRH_textbox.Text;
+        }
+
+        private void DS_file_textbox_TextChanged(object sender, EventArgs e)
+        {
+            Console.WriteLine(MainProgram.g.DataSheet_File);
+            MainProgram.g.DataSheet_File = DS_file_textbox.Text;
         }
 
         private void DS_rev_CheckedChanged(object sender, EventArgs e)
@@ -204,6 +171,64 @@ namespace SilegoForm
         {
             Console.WriteLine(MainProgram.g.GreenPAK_File);
             MainProgram.g.GreenPAK_File = GP_file_textbox.Text;
+            string[] returnedArray = MainProgram.load_GP();
+
+            base_die_textbox.Text = returnedArray[0];
+            part_number_textbox.Text = returnedArray[1];
+            customer_name_textbox.Text = returnedArray[2];
+            project_name_textbox.Text = returnedArray[3];
+            vdd_min_textbox.Text = returnedArray[4];
+            vdd_typ_textbox.Text = returnedArray[5];
+            vdd_max_textbox.Text = returnedArray[6];
+            vdd2_min_textbox.Text = returnedArray[7];
+            vdd2_typ_textbox.Text = returnedArray[8];
+            vdd2_max_textbox.Text = returnedArray[9];
+            temp_min_textbox.Text = returnedArray[10];
+            temp_typ_textbox.Text = returnedArray[11];
+            temp_max_textbox.Text = returnedArray[12];
+            lock_status_textbox.Text = returnedArray[13];
+            pattern_id_textbox.Text = returnedArray[14];
+
+            for (int i = 1; i < 33; i++)
+            {
+                PinTableLayoutPanel.Controls.Remove(Pin_boxes[i]);
+            }
+
+            for (int i = 1; i < MainProgram.g.GreenPAK.pin.Length; i++)
+            {
+                configure_pin_boxes(i);
+            }
+
+            if (new_part_checkbox.Checked)
+            {
+                DRH_textbox.Text = "New design for " + base_die_textbox.Text + ".";
+            }
+            else
+            {
+                DRH_textbox.Text = "";
+            }
+        }
+
+        public void initialize_pin_boxes()
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                Pin_boxes[i] = new myPinBox();
+            }
+        }
+
+        public void configure_pin_boxes(int i)
+        {
+            Pin_boxes[i].AutoSize = true;
+            Pin_boxes[i].AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            Pin_boxes[i].Pin_box.Text = "Pin " + i.ToString().PadLeft(2, '0');
+
+            Pin_boxes[i].Pin_label_textbox.Text = MainProgram.g.GreenPAK.pin[i].label;
+            Pin_boxes[i].Pin_type_textbox.Text = MainProgram.g.GreenPAK.pin[i].type;
+            Pin_boxes[i].Pin_resistor_textbox.Text = MainProgram.g.GreenPAK.pin[i].resistor;
+            Pin_boxes[i].Pin_description_textbox.Text = MainProgram.g.GreenPAK.pin[i].description;
+
+            PinTableLayoutPanel.Controls.Add(Pin_boxes[i], 0, i - 1);
         }
 
         private void help_CheckedChanged(object sender, EventArgs e)
@@ -224,18 +249,39 @@ namespace SilegoForm
             }
         }
 
-        private void I_Q_CheckedChanged(object sender, EventArgs e)
+        private void I_Q_checkbox_CheckedChanged(object sender, EventArgs e)
         {
             if (I_Q_checkbox.Checked)
             {
                 MainProgram.g.I_Q_update = true;
-                I_Q_textBox.Enabled = true;
+                I_Q_textBox.ReadOnly = false;
+                I_Q_textBox.Focus();
             }
             else
             {
                 MainProgram.g.I_Q_update = false;
-                I_Q_textBox.Enabled = false;
+                I_Q_textBox.ReadOnly = true;
             }
+        }
+
+        private void I_Q_condition_checkbox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (I_Q_condition_checkbox.Checked)
+            {
+                MainProgram.g.I_Q_condition_update = true;
+                I_Q_condition_textbox.ReadOnly = false;
+                I_Q_condition_textbox.Focus();
+            }
+            else
+            {
+                MainProgram.g.I_Q_update = false;
+                I_Q_condition_textbox.ReadOnly = true;
+            }
+        }
+
+        private void I_Q_condition_textbox_TextChanged(object sender, EventArgs e)
+        {
+            MainProgram.g.I_Q_condition = I_Q_condition_textbox.Text;
         }
 
         private void I_Q_TextBox_TextChanged(object sender, EventArgs e)
@@ -243,27 +289,18 @@ namespace SilegoForm
             MainProgram.g.I_Q = I_Q_textBox.Text;
         }
 
-        private void lock_checkbox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (lock_status_checkbox.Checked) MainProgram.g.lock_status_update = true;
-            else MainProgram.g.lock_status_update = false;
-        }
-
-        private void new_part_CheckedChanged(object sender, EventArgs e)
+        private void new_part_checkbox_CheckedChanged(object sender, EventArgs e)
         {
             if (new_part_checkbox.Checked)
             {
+                Console.WriteLine("new part checked");
+
                 MainProgram.g.new_part_update = true;
-                project_info_checkbox.Checked = true;
                 pin_labels_checkbox.Checked = true;
-                temp_vdd_checkbox.Checked = true;
+                pin_settings_checkbox.Checked = true;
                 CNTs_DLYs_checkbox.Checked = true;
                 ACMPs_checkbox.Checked = true;
-                pin_settings_checkbox.Checked = true;
-                //DS_rev_checkbox.Checked = true;
-                lock_status_checkbox.Checked = true;
-                DRH_checkbox.Checked = true;
-                DRH_textbox.Text = "New Design for SLG";
+                //DRH_textbox.Text = "New Design for " + MainProgram.g.GreenPAK.base_die + ".";
 
                 status_label.Visible = true;
                 status_label.Text = "New Part. Loaded New_DS_Template.docx";
@@ -273,23 +310,25 @@ namespace SilegoForm
             }
             else
             {
+                Console.WriteLine("new part not checked");
+
                 MainProgram.g.new_part_update = false;
-                project_info_checkbox.Checked = false;
                 pin_labels_checkbox.Checked = false;
-                temp_vdd_checkbox.Checked = false;
+                pin_settings_checkbox.Checked = false;
                 CNTs_DLYs_checkbox.Checked = false;
                 ACMPs_checkbox.Checked = false;
-                pin_settings_checkbox.Checked = false;
-                //DS_rev_checkbox.Checked = false;
-                lock_status_checkbox.Checked = false;
-                DRH_checkbox.Checked = false;
-                DRH_textbox.Text = "";
+                //DRH_textbox.Text = "";
 
                 status_label.Visible = false;
                 status_label.Text = "";
                 DS_file_textbox.Text = "Drop DS file";
                 DS_button.Enabled = true;
             }
+        }
+
+        private void part_number_textbox_TextChanged(object sender, EventArgs e)
+        {
+            MainProgram.g.part_number = part_number_textbox.Text;
         }
 
         private void pin_labels_CheckedChanged(object sender, EventArgs e)
@@ -304,10 +343,9 @@ namespace SilegoForm
             else MainProgram.g.pin_settings_update = false;
         }
 
-        private void project_info_CheckedChanged(object sender, EventArgs e)
+        private void project_name_textbox_TextChanged(object sender, EventArgs e)
         {
-            if (project_info_checkbox.Checked) MainProgram.g.project_info_update = true;
-            else MainProgram.g.project_info_update = false;
+            MainProgram.g.project_name = project_name_textbox.Text;
         }
 
         private void Select_DS_Click(object sender, EventArgs e)
@@ -421,9 +459,7 @@ namespace SilegoForm
             error_label.Text = "";
 
             new_part_checkbox.Enabled = false;
-            project_info_checkbox.Enabled = false;
             pin_labels_checkbox.Enabled = false;
-            temp_vdd_checkbox.Enabled = false;
             CNTs_DLYs_checkbox.Enabled = false;
             ACMPs_checkbox.Enabled = false;
             pin_settings_checkbox.Enabled = false;
@@ -431,7 +467,6 @@ namespace SilegoForm
             I_Q_checkbox.Enabled = false;
             TM_Part_Code_checkbox.Enabled = false;
             TM_Revision_checkbox.Enabled = false;
-            lock_status_checkbox.Enabled = false;
             DRH_textbox.ReadOnly = true;
 
             progressBar.Visible = true;
@@ -440,24 +475,15 @@ namespace SilegoForm
             backgroundWorker.RunWorkerAsync();
         }
 
-        private void temp_vdd_CheckedChanged(object sender, EventArgs e)
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (temp_vdd_checkbox.Checked) MainProgram.g.temp_vdd_update = true;
-            else MainProgram.g.temp_vdd_update = false;
-        }
-
-        private void TM_Part_Code_CheckedChanged(object sender, EventArgs e)
-        {
-            if (TM_Part_Code_checkbox.Checked)
+            if (misc_tab.SelectedTab == Pins_tab)
             {
-                MainProgram.g.TM_part_code_update = true;
-                TM_Part_Code_textbox.Enabled = true;
+                Pin_boxes[1].Pin_label_textbox.Focus();
             }
-            else
+            if (misc_tab.SelectedTab == Project_Info_tab)
             {
-                MainProgram.g.TM_part_code_update = false;
-                TM_Part_Code_textbox.Enabled = false;
-                TM_Part_Code_textbox.Text = "";
+                part_number_textbox.Focus();
             }
         }
 
@@ -466,50 +492,40 @@ namespace SilegoForm
             MainProgram.g.TM_part_code = TM_Part_Code_textbox.Text;
         }
 
-        private void TM_Revision_CheckedChanged(object sender, EventArgs e)
-        {
-            if (TM_Revision_checkbox.Checked)
-            {
-                MainProgram.g.TM_revision_update = true;
-                TM_Revision_textbox.Enabled = true;
-            }
-            else
-            {
-                MainProgram.g.TM_revision_update = false;
-                TM_Revision_textbox.Enabled = false;
-                TM_Revision_textbox.Text = "";
-            }
-        }
-
         private void TM_Revision_textbox_TextChanged(object sender, EventArgs e)
         {
             MainProgram.g.TM_revision = TM_Revision_textbox.Text;
         }
 
-        private void DRH_checkbox_CheckedChanged(object sender, EventArgs e)
+        private void TM_Part_Code_checkbox_CheckedChanged(object sender, EventArgs e)
         {
-            if (DRH_checkbox.Checked)
+            if (TM_Part_Code_checkbox.Checked)
             {
-                MainProgram.g.DRH_update = true;
-                DRH_textbox.Enabled = true;
-                if (new_part_checkbox.Checked)
-                {
-                    DRH_textbox.Text = "New Design for SLG";
-                }
+                MainProgram.g.TM_part_code_update = true;
+                TM_Part_Code_textbox.ReadOnly = false;
+                TM_Part_Code_textbox.Focus();
             }
             else
             {
-                MainProgram.g.DRH_update = false;
-                DRH_textbox.Enabled = false;
-                DRH_textbox.Text = "";
+                MainProgram.g.TM_part_code_update = false;
+                TM_Part_Code_textbox.ReadOnly = true;
+                TM_Part_Code_textbox.Text = "";
             }
         }
 
-        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        private void TM_Revision_checkbox_CheckedChanged(object sender, EventArgs e)
         {
-            if (misc_tab.SelectedTab == Pins_tab)
+            if (TM_Revision_checkbox.Checked)
             {
-                Pin_boxes[1].Pin_label_textbox.Focus();
+                MainProgram.g.TM_revision_update = true;
+                TM_Revision_textbox.ReadOnly = false;
+                TM_Revision_textbox.Focus();
+            }
+            else
+            {
+                MainProgram.g.TM_revision_update = false;
+                TM_Revision_textbox.ReadOnly = true;
+                TM_Revision_textbox.Text = "";
             }
         }
     }

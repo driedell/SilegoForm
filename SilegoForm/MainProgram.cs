@@ -34,25 +34,28 @@ public static class MainProgram
 
         public static bool pin_labels_update = false;
         public static bool pin_settings_update = false;
-        public static bool project_info_update = false;
-        public static bool temp_vdd_update = false;
+
+        //public static bool temp_vdd_update = false;
         public static bool CNTs_DLYs_update = false;
+
         public static bool ACMPs_update = false;
         public static bool I_Q_update = false;
+        public static bool I_Q_condition_update = false;
         public static bool new_part_update = false;
-        public static bool lock_status_update = false;
         public static bool TM_part_code_update = false;
         public static bool TM_revision_update = false;
         public static bool ext_clk_update = false;
-        public static bool DRH_update = false;
 
         public static string I_Q = "1.0";
-        public static string TM_part_code = "  ";
-        public static string TM_revision = "  ";
+        public static string I_Q_condition = " ";
+        public static string TM_part_code = " ";
+        public static string TM_revision = " ";
         public static string DS_rev = "010";
         public static string DRH_text = null;
         public static string Date = null;
         public static string part_number = "SLG~~~~~";
+        public static string project_name = "";
+        public static string customer_name = "";
         public static int ext_clk_freq = 0;
 
         public static PAK GreenPAK;
@@ -158,14 +161,14 @@ public static class MainProgram
     {
         // Updates the pin labels in the first page pinout diagram
 
-        if (g.GreenPAK.pin[i].name.Length <= 16)
+        if (g.GreenPAK.pin[i].label.Length <= 16)
         {
-            table.Cell(1, 1).Range.Text = g.GreenPAK.pin[i].name;
+            table.Cell(1, 1).Range.Text = g.GreenPAK.pin[i].label;
         }
         else
         {
-            table.Cell(1, 1).Range.Text = g.GreenPAK.pin[i].name.Substring(0, 16) + " " +
-                                          g.GreenPAK.pin[i].name.Substring(16);
+            table.Cell(1, 1).Range.Text = g.GreenPAK.pin[i].label.Substring(0, 16) + " " +
+                                          g.GreenPAK.pin[i].label.Substring(16);
         }
     }
 
@@ -404,7 +407,7 @@ public static class MainProgram
         foreach (XElement pin in g.ELEMENT.Descendants("item")
             .Where(pin => pin.Attribute("caption").ToString().StartsWith("caption=\"PIN " + i.ToString())))
         {
-            g.GreenPAK.pin[i].name = pin.Element("textLabel").Value;
+            g.GreenPAK.pin[i].label = pin.Element("textLabel").Value;
         }
     }
 
@@ -1465,13 +1468,7 @@ public static class MainProgram
         //g.connection.Close();
     }
 
-
-    public static void load_GP()
-    {
-
-    }
-
-    public static void theProgram(BackgroundWorker worker, DoWorkEventArgs e)
+    public static string[] load_GP()
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  Reinitialize variables
@@ -1487,14 +1484,9 @@ public static class MainProgram
         g.VDD.ODP2x = 0;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        //  Load the GP and DS files that were selected in the gui. Populate the Date, I_Q, and DS_rev.
+        //  Load GP file
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        var form = Form.ActiveForm as SilegoForm.SilegoForm;
-        if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(2, "Loading files...");
-
-        object oMissing = System.Reflection.Missing.Value;
+        string[] returnarray = new string[100];
 
         try
         {
@@ -1502,84 +1494,13 @@ public static class MainProgram
         }
         catch
         {
-            Console.WriteLine("Error occured in theProgram: could not load GreenPAK file");
-            form.backgroundWorker.ReportProgress(0, "Error: Could not load GreenPAK file!");
-            e.Cancel = true;
-            return;
+            Console.WriteLine("Error occured: could not load GreenPAK file");
+            return returnarray;
         }
-
-        try
-        {
-            g.app = new Microsoft.Office.Interop.Word.Application();
-            if (g.new_part_update)
-            {
-                //using (ResXResourceSet resxSet = new ResXResourceSet(@"..\..\Resources\New_DS_Template.docx"))
-                //{
-                //    g.doc = (Document)resxSet;
-                //}
-
-                //g.doc = SilegoForm_namespace.Properties.Resources.New_DS_Template;
-
-                //g.doc = g.app.Documents.Add(@"P:\Apps_Tools\New_DS_Template\New_DS_Template.docx");
-                g.doc = g.app.Documents.Add(g.templatePath + @"\New_DS_Template.docx");
-
-                try
-                {
-                    g.doc.Unprotect("david");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
-            }
-            else
-            {
-                g.doc = g.app.Documents.Add(g.DataSheet_File);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error occured in theProgram: could not load Datasheet file");
-            MessageBox.Show(ex.ToString());
-            form.backgroundWorker.ReportProgress(0, "Error: Could not load DataSheet file!");
-            e.Cancel = true;
-            return;
-        }
-
-        try
-        {
-            g.path = g.GreenPAK_File.Substring(0, g.GreenPAK_File.LastIndexOf("\\Program Files"));
-            Console.WriteLine(g.path);
-        }
-        catch
-        {
-            form.backgroundWorker.ReportProgress(0, "Error: Support Case directory structure is not there!");
-            e.Cancel = true;
-            return;
-        }
-        g.path += @"\Datasheet Files\";
-
-        Console.WriteLine(g.path);
-
-        if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(2, "Getting Date / I_Q / DS_rev");
-
-        g.doc.Variables["Date"].Value = DateTime.Now.ToString("MM/dd/yyyy");
-        g.doc.Variables["Date_long"].Value = DateTime.Now.ToString("MMMM dd, yyyy");
-
-        if (g.I_Q_update)
-        {
-            g.doc.Variables["I_Q"].Value = g.I_Q;
-        }
-
-        g.doc.Variables["DS_rev"].Value = g.DS_rev;
-        g.doc.Variables["DS_rev_alt"].Value = g.DS_rev.Insert(1, ".");
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  Determine what chip this is for and assign to g.GreenPAK
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(2, "Creating PAKs");
 
         // GreenPAK5
         foreach (XElement chip in g.ELEMENT.Descendants("chip")
@@ -1634,28 +1555,9 @@ public static class MainProgram
             }
         }
 
-        g.doc.Variables["GreenPAK_Base_Die"].Value = g.GreenPAK.base_die;
-        if (g.GreenPAK.package.Contains("_"))
-        {
-            g.doc.Variables["GreenPAK_Package"].Value = g.GreenPAK.package.Substring(0, g.GreenPAK.package.IndexOf("_"));
-        }
-        else
-        {
-            g.doc.Variables["GreenPAK_Package"].Value = g.GreenPAK.package;
-        }
-        g.doc.Variables["GreenPAK_Package_alt"].Value = g.GreenPAK.package.Substring(0, g.GreenPAK.package.IndexOf("-"));
-        g.doc.Variables["GreenPAK_Package_size"].Value = g.GreenPAK.package_size;
-        g.doc.Variables["GreenPAK_Family"].Value = g.GreenPAK.PAK_family.ToString();
-        g.doc.Variables["GreenPAK_Pin_Count"].Value = (g.GreenPAK.pin.Length - 1).ToString();
-
-        Console.WriteLine(g.GreenPAK.base_die);
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  Grab NVM, store in g.nvmData
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(2, "Loading NVM");
-
         foreach (XElement xEle in g.ELEMENT.Descendants("nvmData"))
         {
             string nvmData1 = (string)xEle;
@@ -1672,27 +1574,81 @@ public static class MainProgram
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  Project Info
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // Customer Info (Name, project name, part number, version number)
+        foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
+             .Where(xEle => (string)xEle.Attribute("id") == "2"))
+        {
+            if (xEle.Attribute("text").Value.Length > 0)
+            {
+                g.customer_name = xEle.Attribute("text").Value;
+            }
+        }
+        foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
+             .Where(xEle => (string)xEle.Attribute("id") == "3"))
+        {
+            if (xEle.Attribute("text").Value.Length > 0)
+            {
+                g.project_name = xEle.Attribute("text").Value;
+            }
+        }
+        foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
+             .Where(xEle => (string)xEle.Attribute("id") == "4"))
+        {
+            if (xEle.Attribute("text").Value.Length > 0)
+            {
+                g.part_number = xEle.Attribute("text").Value;
+            }
+        }
+        foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
+            .Where(xEle => (string)xEle.Attribute("id") == "5"))
+        {
+        }
+
+        //g.part_number = g.DataSheet_File.Substring(g.DataSheet_File.LastIndexOf("\\") + 1);
+        //g.part_number = g.part_number.Substring(0, g.part_number.IndexOf("_"));
+        //Console.WriteLine("Part Number: " + g.part_number);
+        //g.doc.Variables["Customer_Part_Number"].Value = g.part_number;
+
+        // Pattern ID
+        string pattern = Reverse(g.nvmData.Substring(g.GreenPAK.pattern_id_address, 8));
+        g.GreenPAK.pattern_id = Convert.ToInt32(pattern, 2).ToString().PadLeft(3, '0');
+
+        // Locked/Unlocked
+        if (g.GreenPAK.PAK_family.Equals(5))
+        {
+            switch (g.nvmData[g.GreenPAK.lock_read].ToString() +
+                    g.nvmData[g.GreenPAK.lock_write_0].ToString() +
+                    g.nvmData[g.GreenPAK.lock_write_1].ToString())
+            {
+                case "000": g.GreenPAK.nvm_lock = "U"; break;
+                case "001": g.GreenPAK.nvm_lock = "L"; break;
+                case "010": g.GreenPAK.nvm_lock = "L"; break;
+                case "011": g.GreenPAK.nvm_lock = "L"; break;   // Superfluous
+                case "100": g.GreenPAK.nvm_lock = "L"; break;
+                case "101": g.GreenPAK.nvm_lock = "L"; break;
+                case "110": g.GreenPAK.nvm_lock = "L"; break;
+                case "111": g.GreenPAK.nvm_lock = "L"; break;   // Superfluous
+            }
+        }
+        else if (g.GreenPAK.PAK_family.Equals(4) ||
+                    g.GreenPAK.PAK_family.Equals(3))
+        {
+            switch (g.nvmData[g.GreenPAK.lock_status].ToString())
+            {
+                case "0": g.GreenPAK.nvm_lock = "U"; break;
+                case "1": g.GreenPAK.nvm_lock = "L"; break;
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  VDD / Temp Specs
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(2, "Grabbing VDD / Temp specs");
-
         // VDD specs
         foreach (XElement xEle in g.ELEMENT.Descendants("vddSpecs"))
         {
-            try
-            {
-                g.doc.Variables["vddMin"].Value = xEle.Attribute("vddMin").Value;
-                g.doc.Variables["vddTyp"].Value = xEle.Attribute("vddTyp").Value;
-                g.doc.Variables["vddMax"].Value = xEle.Attribute("vddMax").Value;
-            }
-            catch
-            {
-                Console.WriteLine("Error occured in theProgram: missing VDD Specs");
-                e.Cancel = true;
-                form.backgroundWorker.ReportProgress(2, "Error: Missing VDD Specs");
-                return;
-            }
             g.GreenPAK.vdd = new PAK.mTM();
             g.GreenPAK.vdd.min = xEle.Attribute("vddMin").Value;
             g.GreenPAK.vdd.typ = xEle.Attribute("vddTyp").Value;
@@ -1704,44 +1660,22 @@ public static class MainProgram
         {
             foreach (XElement xEle in g.ELEMENT.Descendants("vdd2Specs"))
             {
-                try
-                {
-                    g.doc.Variables["vdd2Min"].Value = xEle.Attribute("vdd2Min").Value;
-                    g.doc.Variables["vdd2Typ"].Value = xEle.Attribute("vdd2Typ").Value;
-                    g.doc.Variables["vdd2Max"].Value = xEle.Attribute("vdd2Max").Value;
-                }
-                catch
-                {
-                    Console.WriteLine("Error occured in theProgram: Missing VDD2 Specs");
-                    e.Cancel = true;
-                    form.backgroundWorker.ReportProgress(2, "Error: Missing VDD2 Specs");
-                    return;
-                }
-
                 g.GreenPAK.vdd2 = new PAK.mTM();
                 g.GreenPAK.vdd2.min = xEle.Attribute("vdd2Min").Value;
                 g.GreenPAK.vdd2.typ = xEle.Attribute("vdd2Typ").Value;
                 g.GreenPAK.vdd2.max = xEle.Attribute("vdd2Max").Value;
             }
         }
+        else
+        {
+            g.GreenPAK.vdd2.min = "--";
+            g.GreenPAK.vdd2.typ = "--";
+            g.GreenPAK.vdd2.max = "--";
+        }
 
         // Temp specs
         foreach (XElement xEle in g.ELEMENT.Descendants("tempSpecs"))
         {
-            try
-            {
-                g.doc.Variables["tempMin"].Value = xEle.Attribute("tempMin").Value;
-                g.doc.Variables["tempTyp"].Value = xEle.Attribute("tempTyp").Value;
-                g.doc.Variables["tempMax"].Value = xEle.Attribute("tempMax").Value;
-            }
-            catch
-            {
-                Console.WriteLine("Error occured in theProgram: Missing TEMP Specs");
-                e.Cancel = true;
-                form.backgroundWorker.ReportProgress(2, "Error: Missing TEMP Specs");
-                return;
-            }
-
             g.GreenPAK.temp = new PAK.mTM();
             g.GreenPAK.temp.min = xEle.Attribute("tempMin").Value;
             g.GreenPAK.temp.typ = xEle.Attribute("tempTyp").Value;
@@ -1749,162 +1683,283 @@ public static class MainProgram
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        //  Project Info
+        //  Pin Labels and Settings
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        for (int i = 1; i < g.GreenPAK.pin.Length; i++)
+        {
+            switch (g.GreenPAK.pin[i].PT)
+            {
+                case "VDD":
+                    g.GreenPAK.pin[i].label = "VDD";
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "PWR";
+                    g.GreenPAK.pin[i].description = "Supply Voltage";
+                    break;
+
+                case "GND":
+                    g.GreenPAK.pin[i].label = "GND";
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "GND";
+                    g.GreenPAK.pin[i].description = "Ground";
+                    break;
+
+                case "VDD2":
+                    g.GreenPAK.pin[i].label = "VDD2";
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "PWR";
+                    g.GreenPAK.pin[i].description = "Supply Voltage";
+                    break;
+
+                case "AGND":
+                    g.GreenPAK.pin[i].label = "AGND";
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "AGND";
+                    g.GreenPAK.pin[i].description = "Analog Ground";
+                    break;
+
+                case "LDO_IN":
+                    pin_config_name(i);
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "LDO Input";
+                    g.GreenPAK.pin[i].description = "LDO Regulator Input";
+                    break;
+
+                case "LDO_OUT":
+                    pin_config_name(i);
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "LDO Output";
+                    g.GreenPAK.pin[i].description = "LDO Regulator Output";
+                    break;
+
+                case "PWR_SW_ON":
+                    pin_config_name(i);
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "FET On";
+                    g.GreenPAK.pin[i].description = "P-FET Power Switch On";
+                    break;
+
+                case "VIN":
+                    pin_config_name(i);
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "P-FET Input";
+                    g.GreenPAK.pin[i].description = "P-FET Power Switch VIN";
+                    break;
+
+                case "VOUT":
+                    pin_config_name(i);
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "P-FET Output";
+                    g.GreenPAK.pin[i].description = "P-FET Power Switch VOUT";
+                    break;
+
+                case "NA":
+                    g.GreenPAK.pin[i].label = "NC";
+                    g.GreenPAK.pin[i].resistor = "--";
+                    g.GreenPAK.pin[i].type = "--";
+                    g.GreenPAK.pin[i].description = "Keep Floating or Connect to GND";
+                    break;
+
+                default:
+                    // Look for xml elements called "item" with caption "PIN _" and check if they have textLabel Element
+                    foreach (XElement pin in g.ELEMENT.Descendants("item")
+                        .Where(pin => pin.Attribute("caption").ToString().StartsWith("caption=\"PIN " + i.ToString())))
+                    {
+                        if (pin.Element("graphics").Attribute("hidden").Value.Equals("0") &&
+                            TryGetElementValue(pin, "textLabel") == null)
+                        {
+                            g.GreenPAK.pin[i].label = "UNLABELED";
+                        }
+
+                        if (pin.Element("textLabel") != null)
+                        {
+                            pin_config(i);
+                            g.GreenPAK.pin[i].label = pin.Element("textLabel").Value;
+                        }
+                        else
+                        {
+                            g.GreenPAK.pin[i].label = "NC";
+                            g.GreenPAK.pin[i].type = "--";
+                            g.GreenPAK.pin[i].description = "Keep Floating or Connect to GND";
+                            g.GreenPAK.pin[i].resistor = "--";
+                        }
+                        break;
+                    }
+                    break;
+            }
+        }
+
+        returnarray[0] = g.GreenPAK.base_die;
+        returnarray[1] = g.part_number;
+        returnarray[2] = g.customer_name;
+        returnarray[3] = g.project_name;
+        returnarray[4] = g.GreenPAK.vdd.min;
+        returnarray[5] = g.GreenPAK.vdd.typ;
+        returnarray[6] = g.GreenPAK.vdd.max;
+        returnarray[7] = g.GreenPAK.vdd2.min;
+        returnarray[8] = g.GreenPAK.vdd2.typ;
+        returnarray[9] = g.GreenPAK.vdd2.max;
+        returnarray[10] = g.GreenPAK.temp.min;
+        returnarray[11] = g.GreenPAK.temp.typ;
+        returnarray[12] = g.GreenPAK.temp.max;
+        returnarray[13] = g.GreenPAK.nvm_lock;
+        returnarray[14] = g.GreenPAK.pattern_id;
+
+        for (int i = 0; i < returnarray.Length; i++)
+        {
+            Console.WriteLine(returnarray[i]);
+        }
+        return returnarray;
+    }
+
+    public static string testFunction()
+    {
+        SilegoForm.SilegoForm SilegoForm1 = new SilegoForm.SilegoForm();
+        SilegoForm1.customer_name_textbox.Text = "abc";
+
+        return "def";
+    }
+
+    public static void theProgram(BackgroundWorker worker, DoWorkEventArgs e)
+    {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  Load the DS files that was selected in the GUI.
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        var form = Form.ActiveForm as SilegoForm.SilegoForm;
+        if (worker.CancellationPending) { e.Cancel = true; return; }
+        form.backgroundWorker.ReportProgress(2, "Loading files...");
+
+        object oMissing = System.Reflection.Missing.Value;
+
+        try
+        {
+            g.app = new Microsoft.Office.Interop.Word.Application();
+            if (g.new_part_update)
+            {
+                g.doc = g.app.Documents.Add(g.templatePath + @"\New_DS_Template.docx");
+
+                //try
+                //{
+                //    g.doc.Unprotect("david");
+                //}
+                //catch (Exception ex)
+                //{
+                //    MessageBox.Show(ex.ToString());
+                //}
+            }
+            else
+            {
+                g.doc = g.app.Documents.Add(g.DataSheet_File);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error occured in theProgram: could not load Datasheet file");
+            MessageBox.Show(ex.ToString());
+            form.backgroundWorker.ReportProgress(0, "Error: Could not load DataSheet file!");
+            e.Cancel = true;
+            return;
+        }
+
+        try
+        {
+            g.path = g.GreenPAK_File.Substring(0, g.GreenPAK_File.LastIndexOf("\\Program Files"));
+            Console.WriteLine(g.path);
+        }
+        catch
+        {
+            form.backgroundWorker.ReportProgress(0, "Error: Support Case directory structure does not exist!");
+            e.Cancel = true;
+            return;
+        }
+        g.path += @"\Datasheet Files\";
+
+        Console.WriteLine(g.path);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  Update known docvariables
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(2, "Gathering Project Info");
+        form.backgroundWorker.ReportProgress(2, "Updating Docvariables");
 
-        if (g.project_info_update)
+        g.doc.Variables["Date"].Value = DateTime.Now.ToString("MM/dd/yyyy");
+        g.doc.Variables["Date_long"].Value = DateTime.Now.ToString("MMMM dd, yyyy");
+
+        if (g.I_Q_update)
         {
-            // Customer Info (Name, project name, part number, version number)
-            foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
-                 .Where(xEle => (string)xEle.Attribute("id") == "2"))
-            {
-                if (xEle.Attribute("text").Value.Length > 0)
-                {
-                    g.doc.Variables["Customer_Name"].Value = xEle.Attribute("text").Value;
-                }
-                else
-                {
-                    e.Cancel = true;
-                    form.backgroundWorker.ReportProgress(0, "Error: Missing Customer Name");
-                    return;
-                }
-            }
-            foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
-                 .Where(xEle => (string)xEle.Attribute("id") == "3"))
-            {
-                if (xEle.Attribute("text").Value.Length > 0)
-                {
-                    g.doc.Variables["Customer_Project_Name"].Value = xEle.Attribute("text").Value;
-                }
-                else
-                {
-                    e.Cancel = true;
-                    form.backgroundWorker.ReportProgress(0, "Error: Missing Customer Project Name");
-                    return;
-                }
-            }
-            foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
-                 .Where(xEle => (string)xEle.Attribute("id") == "4"))
-            {
-                if (xEle.Attribute("text").Value.Length > 0)
-                {
-                    g.doc.Variables["Customer_Part_Number"].Value = xEle.Attribute("text").Value;
-                    g.part_number = xEle.Attribute("text").Value;
-                }
-                else
-                {
-                    e.Cancel = true;
-                    form.backgroundWorker.ReportProgress(0, "Error: Missing Customer Part Number");
-                    return;
-                }
-            }
-            foreach (XElement xEle in g.ELEMENT.Descendants("textLineDataField")
-                .Where(xEle => (string)xEle.Attribute("id") == "5"))
-            {
-                g.doc.Variables["Customer_Version_Number"].Value = xEle.Attribute("text").Value;
-            }
+            g.doc.Variables["I_Q"].Value = g.I_Q;
+            g.doc.Variables["I_Q_condition"].Value = g.I_Q_condition;
+        }
+
+        g.doc.Variables["DS_rev"].Value = g.DS_rev;
+        g.doc.Variables["DS_rev_alt"].Value = g.DS_rev.Insert(1, ".");
+
+        g.doc.Variables["GreenPAK_Base_Die"].Value = g.GreenPAK.base_die;
+        if (g.GreenPAK.package.Contains("_"))
+        {
+            g.doc.Variables["GreenPAK_Package"].Value = g.GreenPAK.package.Substring(0, g.GreenPAK.package.IndexOf("_"));
         }
         else
         {
-            g.part_number = g.DataSheet_File.Substring(g.DataSheet_File.LastIndexOf("\\") + 1);
-            g.part_number = g.part_number.Substring(0, g.part_number.IndexOf("_"));
-            Console.WriteLine("Part Number: " + g.part_number);
-            g.doc.Variables["Customer_Part_Number"].Value = g.part_number;
+            g.doc.Variables["GreenPAK_Package"].Value = g.GreenPAK.package;
         }
+        g.doc.Variables["GreenPAK_Package_alt"].Value = g.GreenPAK.package.Substring(0, g.GreenPAK.package.IndexOf("-"));
+        g.doc.Variables["GreenPAK_Package_size"].Value = g.GreenPAK.package_size;
+        g.doc.Variables["GreenPAK_Family"].Value = g.GreenPAK.PAK_family.ToString();
+        g.doc.Variables["GreenPAK_Pin_Count"].Value = (g.GreenPAK.pin.Length - 1).ToString();
 
-        // Pattern ID
-        string pattern = Reverse(g.nvmData.Substring(g.GreenPAK.pattern_id_address, 8));
-        g.doc.Variables["Pattern_ID"].Value = Convert.ToInt32(pattern, 2).ToString().PadLeft(3, '0');
+        Console.WriteLine(g.GreenPAK.base_die);
 
-        // Locked/Unlocked
-        if (g.new_part_update)
+        g.doc.Variables["Customer_Part_Number"].Value = g.part_number;
+        g.doc.Variables["Customer_Project_Name"].Value = g.project_name;
+        g.doc.Variables["GreenPAK_Package_VM"].Value = g.GreenPAK.package_VM;
+        g.doc.Variables["Pattern_ID"].Value = g.GreenPAK.pattern_id;
+        g.doc.Variables["NVM_lock"].Value = g.GreenPAK.nvm_lock;
+        g.doc.Variables["TM_part_code"].Value = g.TM_part_code;
+        g.doc.Variables["TM_revision"].Value = g.TM_revision;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  VDD / Temp Specs
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        try
         {
-            foreach (Table table in g.doc.Tables)
-            {
-                if (table.Title == "lock_table")
-                {
-                    if (g.GreenPAK.PAK_family.Equals(5))
-                    {
-                        while (table.Rows.Count < 6)
-                        {
-                            table.Rows.Add();
-                        }
-
-                        table.Cell(1, 2).Range.Text = "Unlocked";
-                        table.Cell(2, 2).Range.Text = "Locked for read, bits <0:1535> ";
-                        table.Cell(3, 2).Range.Text = "Locked for write, bits <0:1535>";
-                        table.Cell(4, 2).Range.Text = "Locked for write, bits <0:2047>";
-                        table.Cell(5, 2).Range.Text = "Locked for read and write, bits <0:1535>";
-                        table.Cell(6, 2).Range.Text = "Locked for read, bits <0:1535>, locked for write, bits <0:2047>";
-
-                        break;
-                    }
-                    else if (g.GreenPAK.PAK_family.Equals(4) ||
-                             g.GreenPAK.PAK_family.Equals(3))
-                    {
-                        foreach (Paragraph p in g.doc.Paragraphs)
-                        {
-                            if (p.Range.Text.StartsWith("Lock coverage "))
-                            {
-                                Console.WriteLine("Found lock coverage");
-                                p.Range.Select();
-                                g.app.Selection.Delete();
-                                p.Range.Select();
-                                g.app.Selection.Delete();
-                                break;
-                            }
-                        }
-
-                        table.Delete();
-                        break;
-                    }
-                }
-            }
+            g.doc.Variables["vddMin"].Value = g.GreenPAK.vdd.min;
+            g.doc.Variables["vddTyp"].Value = g.GreenPAK.vdd.typ;
+            g.doc.Variables["vddMax"].Value = g.GreenPAK.vdd.max;
         }
-
-        if (g.lock_status_update)
+        catch
         {
-            string nvm_lock = null;
-
-            if (g.GreenPAK.PAK_family.Equals(5))
-            {
-                foreach (Table table in g.doc.Tables)
-                {
-                    if (table.Title == "lock_table")
-                    {
-                        for (int i = 0; i < table.Rows.Count; i++)
-                        {
-                            table.Cell(i, 1).Range.Text = "";
-                        }
-
-                        switch (g.nvmData[g.GreenPAK.lock_read].ToString() +
-                                g.nvmData[g.GreenPAK.lock_write_0].ToString() +
-                                g.nvmData[g.GreenPAK.lock_write_1].ToString())
-                        {
-                            case "000": nvm_lock = "U"; table.Cell(1, 1).Range.Text = "√"; break;
-                            case "001": nvm_lock = "L"; table.Cell(4, 1).Range.Text = "√"; break;
-                            case "010": nvm_lock = "L"; table.Cell(3, 1).Range.Text = "√"; break;
-                            case "011": nvm_lock = "L"; table.Cell(4, 1).Range.Text = "√"; break;   // Superfluous
-                            case "100": nvm_lock = "L"; table.Cell(2, 1).Range.Text = "√"; break;
-                            case "101": nvm_lock = "L"; table.Cell(6, 1).Range.Text = "√"; break;
-                            case "110": nvm_lock = "L"; table.Cell(5, 1).Range.Text = "√"; break;
-                            case "111": nvm_lock = "L"; table.Cell(6, 1).Range.Text = "√"; break;   // Superfluous
-                        }
-                    }
-                }
-            }
-            else if (g.GreenPAK.PAK_family.Equals(4) ||
-                     g.GreenPAK.PAK_family.Equals(3))
-            {
-                switch (g.nvmData[g.GreenPAK.lock_status].ToString())
-                {
-                    case "0": nvm_lock = "U"; break;
-                    case "1": nvm_lock = "L"; break;
-                }
-            }
-            g.doc.Variables["NVM_lock"].Value = nvm_lock;
+            Console.WriteLine("Error occured in theProgram: missing VDD Specs");
+            e.Cancel = true;
+            form.backgroundWorker.ReportProgress(2, "Error: Missing VDD Specs");
+            return;
+        }
+        try
+        {
+            g.doc.Variables["vdd2Min"].Value = g.GreenPAK.vdd2.min;
+            g.doc.Variables["vdd2Typ"].Value = g.GreenPAK.vdd2.typ;
+            g.doc.Variables["vdd2Max"].Value = g.GreenPAK.vdd2.max;
+        }
+        catch
+        {
+            Console.WriteLine("Error occured in theProgram: missing VDD2 Specs");
+            e.Cancel = true;
+            form.backgroundWorker.ReportProgress(2, "Error: Missing VDD2 Specs");
+            return;
+        }
+        try
+        {
+            g.doc.Variables["tempMin"].Value = g.GreenPAK.temp.min;
+            g.doc.Variables["tempTyp"].Value = g.GreenPAK.temp.typ;
+            g.doc.Variables["tempMax"].Value = g.GreenPAK.temp.max;
+        }
+        catch
+        {
+            Console.WriteLine("Error occured in theProgram: missing TEMP Specs");
+            e.Cancel = true;
+            form.backgroundWorker.ReportProgress(2, "Error: Missing TEMP Specs");
+            return;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1913,131 +1968,9 @@ public static class MainProgram
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(2, "Creating Pins");
 
-        if (g.pin_labels_update || g.pin_settings_update)
+        for (int i = 1; i < g.GreenPAK.pin.Length; i++)
         {
-            for (int i = 1; i < g.GreenPAK.pin.Length; i++)
-            {
-                switch (g.GreenPAK.pin[i].PT)
-                {
-                    case "VDD":
-                        g.GreenPAK.pin[i].name = "VDD";
-                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                        g.GreenPAK.pin[i].resistor = "--";
-                        g.GreenPAK.pin[i].type = "PWR";
-                        g.GreenPAK.pin[i].description = "Supply Voltage";
-                        break;
-
-                    case "GND":
-                        g.GreenPAK.pin[i].name = "GND";
-                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                        g.GreenPAK.pin[i].resistor = "--";
-                        g.GreenPAK.pin[i].type = "GND";
-                        g.GreenPAK.pin[i].description = "Ground";
-                        break;
-
-                    case "VDD2":
-                        g.GreenPAK.pin[i].name = "VDD2";
-                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                        g.GreenPAK.pin[i].resistor = "--";
-                        g.GreenPAK.pin[i].type = "PWR";
-                        g.GreenPAK.pin[i].description = "Supply Voltage";
-                        break;
-
-                    case "AGND":
-                        g.GreenPAK.pin[i].name = "AGND";
-                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                        g.GreenPAK.pin[i].resistor = "--";
-                        g.GreenPAK.pin[i].type = "AGND";
-                        g.GreenPAK.pin[i].description = "Analog Ground";
-                        break;
-
-                    case "LDO_IN":
-                        pin_config_name(i);
-                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                        g.GreenPAK.pin[i].resistor = "--";
-                        g.GreenPAK.pin[i].type = "LDO Input";
-                        g.GreenPAK.pin[i].description = "LDO Regulator Input";
-                        break;
-
-                    case "LDO_OUT":
-                        pin_config_name(i);
-                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                        g.GreenPAK.pin[i].resistor = "--";
-                        g.GreenPAK.pin[i].type = "LDO Output";
-                        g.GreenPAK.pin[i].description = "LDO Regulator Output";
-                        break;
-
-                    case "PWR_SW_ON":
-                        pin_config_name(i);
-                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                        g.GreenPAK.pin[i].resistor = "--";
-                        g.GreenPAK.pin[i].type = "FET On";
-                        g.GreenPAK.pin[i].description = "P-FET Power Switch On";
-                        break;
-
-                    case "VIN":
-                        pin_config_name(i);
-                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                        g.GreenPAK.pin[i].resistor = "--";
-                        g.GreenPAK.pin[i].type = "P-FET Input";
-                        g.GreenPAK.pin[i].description = "P-FET Power Switch VIN";
-                        break;
-
-                    case "VOUT":
-                        pin_config_name(i);
-                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                        g.GreenPAK.pin[i].resistor = "--";
-                        g.GreenPAK.pin[i].type = "P-FET Output";
-                        g.GreenPAK.pin[i].description = "P-FET Power Switch VOUT";
-                        break;
-
-                    case "NA":
-                        g.GreenPAK.pin[i].name = "NC";
-                        g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                        g.GreenPAK.pin[i].resistor = "--";
-                        g.GreenPAK.pin[i].type = "--";
-                        g.GreenPAK.pin[i].description = "Keep Floating or Connect to GND";
-                        break;
-
-                    default:
-                        // Look for xml elements called "item" with caption "PIN _" and check if they have textLabel Element
-                        foreach (XElement pin in g.ELEMENT.Descendants("item")
-                            .Where(pin => pin.Attribute("caption").ToString().StartsWith("caption=\"PIN " + i.ToString())))
-                        {
-                            if (pin.Element("graphics").Attribute("hidden").Value.Equals("0") &&
-                                TryGetElementValue(pin, "textLabel") == null)
-                            {
-                                form.backgroundWorker.ReportProgress(0, "Error: Pin" + i.ToString() + " is used but is not labeled!");
-                                e.Cancel = true;
-                                return;
-                            }
-                            if (pin.Element("graphics").Attribute("hidden").Value.Equals("1") &&
-                                TryGetElementValue(pin, "textLabel") != null)
-                            {
-                                form.backgroundWorker.ReportProgress(0, "Error: Pin" + i.ToString() + " is labeled but is not used!");
-                                e.Cancel = true;
-                                return;
-                            }
-
-                            if (pin.Element("textLabel") != null)
-                            {
-                                pin_config(i);
-                                g.GreenPAK.pin[i].name = pin.Element("textLabel").Value;
-                                g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].name;
-                            }
-                            else
-                            {
-                                g.doc.Variables["pin" + i.ToString() + "_label"].Value = "NC";
-                                g.GreenPAK.pin[i].name = "NC";
-                                g.GreenPAK.pin[i].type = "--";
-                                g.GreenPAK.pin[i].description = "Keep Floating or Connect to GND";
-                                g.GreenPAK.pin[i].resistor = "--";
-                            }
-                            break;
-                        }
-                        break;
-                }
-            }
+            g.doc.Variables["pin" + i.ToString() + "_label"].Value = g.GreenPAK.pin[i].label;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2074,30 +2007,29 @@ public static class MainProgram
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(2, "Populating Pin Configuration Table");
 
-        if (g.pin_labels_update || g.pin_settings_update)
+        foreach (Table table in g.doc.Tables)
         {
-            foreach (Table table in g.doc.Tables)
+            if (table.Title == "pin_configuration")
             {
-                if (table.Title == "pin_configuration")
+                while (table.Rows.Count < g.GreenPAK.pin.Length)
                 {
-                    while (table.Rows.Count < g.GreenPAK.pin.Length)
-                    {
-                        table.Rows.Add();
-                    }
-
-                    // Assign values to each cell in the table
-                    for (int i = 1; i < g.GreenPAK.pin.Length; i++)
-                    {
-                        table.Cell(i + 1, 1).Range.Text = i.ToString();
-                        table.Cell(i + 1, 2).Range.Text = g.GreenPAK.pin[i].name;
-                        table.Cell(i + 1, 3).Range.Text = g.GreenPAK.pin[i].type;
-                        table.Cell(i + 1, 4).Range.Text = g.GreenPAK.pin[i].description;
-                        table.Cell(i + 1, 5).Range.Text = g.GreenPAK.pin[i].resistor;
-                    }
-                    table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitContent);
-                    table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
-                    break;
+                    table.Rows.Add();
                 }
+
+                // Assign values to each cell in the table
+                for (int i = 1; i < g.GreenPAK.pin.Length; i++)
+                {
+                    table.Cell(i + 1, 1).Range.Text = i.ToString();
+                    table.Cell(i + 1, 2).Range.Text = g.GreenPAK.pin[i].label;
+                    table.Cell(i + 1, 3).Range.Text = g.GreenPAK.pin[i].type;
+                    table.Cell(i + 1, 4).Range.Text = g.GreenPAK.pin[i].description;
+                    table.Cell(i + 1, 5).Range.Text = g.GreenPAK.pin[i].resistor;
+                }
+                table.AllowAutoFit = true;
+                table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitContent);
+                table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
+                table.UpdateAutoFormat();
+                break;
             }
         }
 
@@ -2118,12 +2050,9 @@ public static class MainProgram
                     int width = (int)shape.Width;
                     int height = (int)shape.Height;
 
-                    //Console.WriteLine("Left: " + left.ToString() + " Top: " + top.ToString());
-                    //Console.ReadLine();
                     shape.Delete();
 
                     g.doc.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToFirst);
-                    //Range r = g.doc.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToAbsolute, 1);
 
                     Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"\Resources\" + g.GreenPAK.package + ".png");
                     newShape.Title = "pinout_diagram";
@@ -2276,7 +2205,7 @@ public static class MainProgram
                 default: break;
             }
         }
-        else if (g.pin_labels_update)
+        else
         {
             int i = 1;
             foreach (Table table in g.doc.Tables)
@@ -2302,123 +2231,123 @@ public static class MainProgram
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(2, "Loading OSC Settings");
 
-        if (g.CNTs_DLYs_update)
+        //if (g.CNTs_DLYs_update)
+        //{
+        //////////////////////////////////////////////////
+        //  GreenPAK5
+        //////////////////////////////////////////////////
+        if (g.GreenPAK.PAK_family.Equals(5))
         {
             //////////////////////////////////////////////////
-            //  GreenPAK5
+            //  OSC0
             //////////////////////////////////////////////////
-            if (g.GreenPAK.PAK_family.Equals(5))
+            switch (g.nvmData[g.GreenPAK.RC_osc_src].ToString())
             {
-                //////////////////////////////////////////////////
-                //  OSC0
-                //////////////////////////////////////////////////
-                switch (g.nvmData[g.GreenPAK.RC_osc_src].ToString())
-                {
-                    case "0": break;
-                    case "1": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq_alt; break;
-                }
-                switch (g.nvmData[g.GreenPAK.RC_osc_pre_div + 1].ToString() +
-                        g.nvmData[g.GreenPAK.RC_osc_pre_div + 0].ToString())
-                {
-                    case "00": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 1; break;
-                    case "01": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 2; break;
-                    case "10": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 4; break;
-                    case "11": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 8; break;
-                }
-
-                //////////////////////////////////////////////////
-                //  OSC1
-                //////////////////////////////////////////////////
-                switch (g.nvmData[g.GreenPAK.RING_osc_pre_div + 1].ToString() +
-                        g.nvmData[g.GreenPAK.RING_osc_pre_div + 0].ToString())
-                {
-                    case "00": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 1; break;
-                    case "01": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 2; break;
-                    case "10": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 4; break;
-                    case "11": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 8; break;
-                }
-
-                switch (g.nvmData[g.GreenPAK.LF_osc_pre_div + 1].ToString() +
-                        g.nvmData[g.GreenPAK.LF_osc_pre_div + 0].ToString())
-                {
-                    case "00": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 1; break;
-                    case "01": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 2; break;
-                    case "10": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 4; break;
-                    case "11": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 16; break;
-                }
+                case "0": break;
+                case "1": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq_alt; break;
+            }
+            switch (g.nvmData[g.GreenPAK.RC_osc_pre_div + 1].ToString() +
+                    g.nvmData[g.GreenPAK.RC_osc_pre_div + 0].ToString())
+            {
+                case "00": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 1; break;
+                case "01": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 2; break;
+                case "10": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 4; break;
+                case "11": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 8; break;
             }
 
             //////////////////////////////////////////////////
-            //  GreenPAK4
+            //  OSC1
             //////////////////////////////////////////////////
-            else if (g.GreenPAK.PAK_family.Equals(4))
+            switch (g.nvmData[g.GreenPAK.RING_osc_pre_div + 1].ToString() +
+                    g.nvmData[g.GreenPAK.RING_osc_pre_div + 0].ToString())
             {
-                //////////////////////////////////////////////////
-                //  LF OSC
-                //////////////////////////////////////////////////
-                switch (g.nvmData[g.GreenPAK.LF_osc_pre_div + 1].ToString() +
-                        g.nvmData[g.GreenPAK.LF_osc_pre_div + 0].ToString())
-                {
-                    case "00": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 1; break;
-                    case "01": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 2; break;
-                    case "10": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 4; break;
-                    case "11": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 16; break;
-                }
-
-                //////////////////////////////////////////////////
-                //  RC OSC
-                //////////////////////////////////////////////////
-                switch (g.nvmData[g.GreenPAK.RC_osc_src].ToString())
-                {
-                    case "0": break;
-                    case "1": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq_alt; break;
-                }
-                switch (g.nvmData[g.GreenPAK.RC_osc_pre_div + 1].ToString() +
-                        g.nvmData[g.GreenPAK.RC_osc_pre_div + 0].ToString())
-                {
-                    case "00": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 1; break;
-                    case "01": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 2; break;
-                    case "10": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 4; break;
-                    case "11": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 8; break;
-                }
-
-                //////////////////////////////////////////////////
-                //  RING OSC
-                //////////////////////////////////////////////////
-                // Pre-divider
-                switch (g.nvmData[g.GreenPAK.RING_osc_pre_div + 1].ToString() +
-                        g.nvmData[g.GreenPAK.RING_osc_pre_div + 0].ToString())
-                {
-                    case "00": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 1; break;
-                    case "01": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 4; break;
-                    case "10": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 8; break;
-                    case "11": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 16; break;
-                }
+                case "00": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 1; break;
+                case "01": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 2; break;
+                case "10": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 4; break;
+                case "11": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 8; break;
             }
 
-            //////////////////////////////////////////////////
-            //  GreenPAK3
-            //////////////////////////////////////////////////
-            else if (g.GreenPAK.PAK_family.Equals(3))
+            switch (g.nvmData[g.GreenPAK.LF_osc_pre_div + 1].ToString() +
+                    g.nvmData[g.GreenPAK.LF_osc_pre_div + 0].ToString())
             {
-                //////////////////////////////////////////////////
-                //  RC OSC
-                //////////////////////////////////////////////////
-                switch (g.nvmData[g.GreenPAK.RC_osc_src].ToString())
-                {
-                    case "0": break;
-                    case "1": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq_alt; break;
-                }
-                switch (g.nvmData[g.GreenPAK.RC_osc_pre_div + 1].ToString() +
-                        g.nvmData[g.GreenPAK.RC_osc_pre_div + 0].ToString())
-                {
-                    case "00": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 1; break;
-                    case "01": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 2; break;
-                    case "10": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 4; break;
-                    case "11": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 8; break;
-                }
+                case "00": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 1; break;
+                case "01": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 2; break;
+                case "10": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 4; break;
+                case "11": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 16; break;
             }
         }
+
+        //////////////////////////////////////////////////
+        //  GreenPAK4
+        //////////////////////////////////////////////////
+        else if (g.GreenPAK.PAK_family.Equals(4))
+        {
+            //////////////////////////////////////////////////
+            //  LF OSC
+            //////////////////////////////////////////////////
+            switch (g.nvmData[g.GreenPAK.LF_osc_pre_div + 1].ToString() +
+                    g.nvmData[g.GreenPAK.LF_osc_pre_div + 0].ToString())
+            {
+                case "00": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 1; break;
+                case "01": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 2; break;
+                case "10": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 4; break;
+                case "11": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 16; break;
+            }
+
+            //////////////////////////////////////////////////
+            //  RC OSC
+            //////////////////////////////////////////////////
+            switch (g.nvmData[g.GreenPAK.RC_osc_src].ToString())
+            {
+                case "0": break;
+                case "1": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq_alt; break;
+            }
+            switch (g.nvmData[g.GreenPAK.RC_osc_pre_div + 1].ToString() +
+                    g.nvmData[g.GreenPAK.RC_osc_pre_div + 0].ToString())
+            {
+                case "00": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 1; break;
+                case "01": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 2; break;
+                case "10": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 4; break;
+                case "11": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 8; break;
+            }
+
+            //////////////////////////////////////////////////
+            //  RING OSC
+            //////////////////////////////////////////////////
+            // Pre-divider
+            switch (g.nvmData[g.GreenPAK.RING_osc_pre_div + 1].ToString() +
+                    g.nvmData[g.GreenPAK.RING_osc_pre_div + 0].ToString())
+            {
+                case "00": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 1; break;
+                case "01": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 4; break;
+                case "10": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 8; break;
+                case "11": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 16; break;
+            }
+        }
+
+        //////////////////////////////////////////////////
+        //  GreenPAK3
+        //////////////////////////////////////////////////
+        else if (g.GreenPAK.PAK_family.Equals(3))
+        {
+            //////////////////////////////////////////////////
+            //  RC OSC
+            //////////////////////////////////////////////////
+            switch (g.nvmData[g.GreenPAK.RC_osc_src].ToString())
+            {
+                case "0": break;
+                case "1": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq_alt; break;
+            }
+            switch (g.nvmData[g.GreenPAK.RC_osc_pre_div + 1].ToString() +
+                    g.nvmData[g.GreenPAK.RC_osc_pre_div + 0].ToString())
+            {
+                case "00": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 1; break;
+                case "01": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 2; break;
+                case "10": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 4; break;
+                case "11": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 8; break;
+            }
+        }
+        //}
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  Counters
@@ -2426,59 +2355,59 @@ public static class MainProgram
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(2, "Loading Counter settings");
 
-        if (g.CNTs_DLYs_update)
+        //if (g.CNTs_DLYs_update)
+        //{
+        for (int i = 0; i < g.GreenPAK.cnt.Length; i++)
         {
-            for (int i = 0; i < g.GreenPAK.cnt.Length; i++)
+            foreach (XElement counter in g.ELEMENT.Descendants("item")
+                .Where(counter => counter.Attribute("caption").Value.Contains("CNT" + i.ToString())))
             {
-                foreach (XElement counter in g.ELEMENT.Descendants("item")
-                    .Where(counter => counter.Attribute("caption").Value.Contains("CNT" + i.ToString())))
+                if (counter.Element("graphics").Attribute("hidden").Value.Equals("0"))
                 {
-                    if (counter.Element("graphics").Attribute("hidden").Value.Equals("0"))
+                    if (g.GreenPAK.PAK_family.Equals(5) &&
+                        g.nvmData[g.GreenPAK.cnt[i].SL].ToString().Equals("1"))
                     {
-                        if (g.GreenPAK.PAK_family.Equals(5) &&
-                            g.nvmData[g.GreenPAK.cnt[i].SL].ToString().Equals("1"))
+                        g.GreenPAK.cnt[i].used = true;
+                        counter_config(i);
+                        break;
+                    }
+                    else if (g.GreenPAK.PAK_family.Equals(4))
+                    {
+                        if (g.GreenPAK.cnt[i].SL == 0)
                         {
                             g.GreenPAK.cnt[i].used = true;
                             counter_config(i);
-                            break;
                         }
-                        else if (g.GreenPAK.PAK_family.Equals(4))
+                        else
                         {
-                            if (g.GreenPAK.cnt[i].SL == 0)
+                            switch (g.nvmData[g.GreenPAK.cnt[i].SL + 1].ToString() +
+                                    g.nvmData[g.GreenPAK.cnt[i].SL + 0].ToString())
                             {
-                                g.GreenPAK.cnt[i].used = true;
-                                counter_config(i);
-                            }
-                            else
-                            {
-                                switch (g.nvmData[g.GreenPAK.cnt[i].SL + 1].ToString() +
-                                        g.nvmData[g.GreenPAK.cnt[i].SL + 0].ToString())
-                                {
-                                    case "00":
-                                    case "01":
-                                        g.GreenPAK.cnt[i].used = true;
-                                        counter_config(i);
-                                        break;
+                                case "00":
+                                case "01":
+                                    g.GreenPAK.cnt[i].used = true;
+                                    counter_config(i);
+                                    break;
 
-                                    case "10": g.GreenPAK.cnt[i].used = false; break;
-                                    case "11": g.GreenPAK.cnt[i].used = false; break;
-                                }
+                                case "10": g.GreenPAK.cnt[i].used = false; break;
+                                case "11": g.GreenPAK.cnt[i].used = false; break;
                             }
-
-                            break;
                         }
-                        else if (g.GreenPAK.PAK_family.Equals(3))
+
+                        break;
+                    }
+                    else if (g.GreenPAK.PAK_family.Equals(3))
+                    {
+                        if (g.GreenPAK.cnt[i].SL == 0 || g.nvmData[g.GreenPAK.cnt[i].SL].ToString().Equals("1"))
                         {
-                            if (g.GreenPAK.cnt[i].SL == 0 || g.nvmData[g.GreenPAK.cnt[i].SL].ToString().Equals("1"))
-                            {
-                                g.GreenPAK.cnt[i].used = true;
-                                counter_config(i);
-                            }
+                            g.GreenPAK.cnt[i].used = true;
+                            counter_config(i);
                         }
                     }
                 }
             }
         }
+        //}
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  ACMPs
@@ -2486,21 +2415,21 @@ public static class MainProgram
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(2, "Loading ACMP settings");
 
-        if (g.ACMPs_update && (g.GreenPAK.acmp.Length > 0))
+        //if (g.ACMPs_update && (g.GreenPAK.acmp.Length > 0))
+        //{
+        for (int i = 0; i < g.GreenPAK.acmp.Length; i++)
         {
-            for (int i = 0; i < g.GreenPAK.acmp.Length; i++)
+            foreach (XElement acmp in g.ELEMENT.Descendants("item")
+                .Where(acmp => acmp.Attribute("caption").Value.Equals("A CMP" + (i).ToString())))
             {
-                foreach (XElement acmp in g.ELEMENT.Descendants("item")
-                    .Where(acmp => acmp.Attribute("caption").Value.Equals("A CMP" + (i).ToString())))
+                if (acmp.Element("graphics").Attribute("hidden").Value.Equals("0"))
                 {
-                    if (acmp.Element("graphics").Attribute("hidden").Value.Equals("0"))
-                    {
-                        g.GreenPAK.acmp[i].used = true;
-                        acmp_config(i);
-                    }
+                    g.GreenPAK.acmp[i].used = true;
+                    acmp_config(i);
                 }
             }
         }
+        //}
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  ASM
@@ -2568,34 +2497,37 @@ public static class MainProgram
             g.VDD_EC[2] = false;
         }
         Console.WriteLine(g.VDD_EC[0].ToString() + " " + g.VDD_EC[1].ToString() + " " + g.VDD_EC[2].ToString());
-        Console.ReadLine();
+        //Console.ReadLine();
 
-        double VDD2_min = Convert.ToDouble(g.GreenPAK.vdd2.min);
-        double VDD2_max = Convert.ToDouble(g.GreenPAK.vdd2.max);
+        if (g.GreenPAK.dual_supply_PAK)
+        {
+            double VDD2_min = Convert.ToDouble(g.GreenPAK.vdd2.min);
+            double VDD2_max = Convert.ToDouble(g.GreenPAK.vdd2.max);
 
-        if (VDD2_min <= 1.8)
-        {
-            g.VDD2_EC[0] = true;
-            g.VDD2_EC[1] = true;
-            g.VDD2_EC[2] = true;
-        }
-        else if (VDD2_min <= 3.3)
-        {
-            g.VDD2_EC[1] = true;
-            g.VDD2_EC[2] = true;
-        }
-        else if (VDD2_min <= 5.0)
-        {
-            g.VDD2_EC[2] = true;
-        }
-        if (VDD2_max < 3.3)
-        {
-            g.VDD2_EC[1] = false;
-            g.VDD2_EC[2] = false;
-        }
-        else if (VDD2_max < 5.0)
-        {
-            g.VDD2_EC[2] = false;
+            if (VDD2_min <= 1.8)
+            {
+                g.VDD2_EC[0] = true;
+                g.VDD2_EC[1] = true;
+                g.VDD2_EC[2] = true;
+            }
+            else if (VDD2_min <= 3.3)
+            {
+                g.VDD2_EC[1] = true;
+                g.VDD2_EC[2] = true;
+            }
+            else if (VDD2_min <= 5.0)
+            {
+                g.VDD2_EC[2] = true;
+            }
+            if (VDD2_max < 3.3)
+            {
+                g.VDD2_EC[1] = false;
+                g.VDD2_EC[2] = false;
+            }
+            else if (VDD2_max < 5.0)
+            {
+                g.VDD2_EC[2] = false;
+            }
         }
 
         g.connection.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=" + g.templatePath + @"\Resources\Base_Die_DB.accdb;";
@@ -2626,176 +2558,176 @@ public static class MainProgram
             if (EC_TABLE.Title == "ec_table")
             {
                 g.table = EC_TABLE;
-                if (g.pin_settings_update || g.temp_vdd_update)
+
+                //if (g.pin_settings_update || g.temp_vdd_update)
+                //{
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                //  VDD2
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (g.GreenPAK.dual_supply_PAK)
                 {
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //  VDD2
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if (g.GreenPAK.dual_supply_PAK)
+                    symbolRow = EC_row_symbol("VDD2");
+                    g.row = symbolRow;
+
+                    g.table.Cell(g.row, 2).Range.Text = "Supply Voltage";
+                    g.table.Cell(g.row, 7).Range.Text = "V";
+
+                    EC_row_populate(g.table, g.row, "VDD2 ≤ VDD",
+                        g.GreenPAK.vdd2.min,
+                        g.GreenPAK.vdd2.typ,
+                        g.GreenPAK.vdd2.max);
+                }
+
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                //  V_IH
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (worker.CancellationPending) { e.Cancel = true; return; }
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_IH");
+
+                if (g.VDD.woSchmitt || g.VDD.wSchmitt || g.VDD.LVDI)
+                {
+                    EC_IH_IL("VIH", g.VDD_EC, g.VDD);
+                }
+                else if (g.VDD2.woSchmitt || g.VDD2.wSchmitt || g.VDD2.LVDI)
+                {
+                    EC_IH_IL("VIH2", g.VDD2_EC, g.VDD2);
+                }
+
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                //  V_IL
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (worker.CancellationPending) { e.Cancel = true; return; }
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_IL");
+
+                if (g.VDD.woSchmitt || g.VDD.wSchmitt || g.VDD.LVDI)
+                {
+                    EC_IH_IL("VIL", g.VDD_EC, g.VDD);
+                }
+                else if (g.VDD2.woSchmitt || g.VDD2.wSchmitt || g.VDD2.LVDI)
+                {
+                    EC_IH_IL("VIL2", g.VDD2_EC, g.VDD2);
+                }
+
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                //  I_IH / I_IL
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (worker.CancellationPending) { e.Cancel = true; return; }
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: I_IH");
+
+                if (g.VDD.woSchmitt || g.VDD.wSchmitt || g.VDD.LVDI ||
+                    g.VDD2.woSchmitt || g.VDD2.wSchmitt || g.VDD2.LVDI)
+                {
+                    symbolRow = EC_row_symbol("IIH");
+                    g.row = symbolRow;
+
+                    g.table.Cell(g.row, 2).Range.Text = "HIGH-Level Input Current";
+                    g.table.Cell(g.row, 7).Range.Text = "µA";
+
+                    EC_row_populate(g.table, g.row, "Logic Input PINs; VIN = VDD",
+                        "-1.0",
+                        "--",
+                        "1.0");
+
+                    symbolRow = EC_row_symbol("IIL");
+                    g.row = symbolRow;
+
+                    g.table.Cell(g.row, 2).Range.Text = "LOW-Level Input Current";
+                    g.table.Cell(g.row, 7).Range.Text = "µA";
+
+                    EC_row_populate(g.table, g.row, "Logic Input PINs; VIN = 0v",
+                        "-1.0",
+                        "--",
+                        "1.0");
+                }
+
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                //  V_HYS
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (worker.CancellationPending) { e.Cancel = true; return; }
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_HYS");
+                if (g.VHYS)
+                {
+                    symbolRow = EC_row_symbol("VHYS");
+                    g.row = symbolRow;
+
+                    g.table.Cell(g.row, 2).Range.Text = "Schmitt Trigger Hysteresis Voltage";
+                    g.table.Cell(g.row, 7).Range.Text = "V";
+                    for (int i = 0; i < 3; i++)
                     {
-                        symbolRow = EC_row_symbol("VDD2");
-                        g.row = symbolRow;
-
-                        g.table.Cell(g.row, 2).Range.Text = "Supply Voltage";
-                        g.table.Cell(g.row, 7).Range.Text = "V";
-
-                        EC_row_populate(g.table, g.row, "VDD2 ≤ VDD",
-                            g.GreenPAK.vdd2.min,
-                            g.GreenPAK.vdd2.typ,
-                            g.GreenPAK.vdd2.max);
-                    }
-
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //  V_IH
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_IH");
-
-                    if (g.VDD.woSchmitt || g.VDD.wSchmitt || g.VDD.LVDI)
-                    {
-                        EC_IH_IL("VIH", g.VDD_EC, g.VDD);
-                    }
-                    else if (g.VDD2.woSchmitt || g.VDD2.wSchmitt || g.VDD2.LVDI)
-                    {
-                        EC_IH_IL("VIH2", g.VDD2_EC, g.VDD2);
-                    }
-
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //  V_IL
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_IL");
-
-                    if (g.VDD.woSchmitt || g.VDD.wSchmitt || g.VDD.LVDI)
-                    {
-                        EC_IH_IL("VIL", g.VDD_EC, g.VDD);
-                    }
-                    else if (g.VDD2.woSchmitt || g.VDD2.wSchmitt || g.VDD2.LVDI)
-                    {
-                        EC_IH_IL("VIL2", g.VDD2_EC, g.VDD2);
-                    }
-
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //  I_IH / I_IL
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: I_IH");
-
-                    if (g.VDD.woSchmitt || g.VDD.wSchmitt || g.VDD.LVDI ||
-                        g.VDD2.woSchmitt || g.VDD2.wSchmitt || g.VDD2.LVDI)
-                    {
-                        symbolRow = EC_row_symbol("IIH");
-                        g.row = symbolRow;
-
-                        g.table.Cell(g.row, 2).Range.Text = "HIGH-Level Input Current";
-                        g.table.Cell(g.row, 7).Range.Text = "µA";
-
-                        EC_row_populate(g.table, g.row, "Logic Input PINs; VIN = VDD",
-                            "-1.0",
-                            "--",
-                            "1.0");
-
-                        symbolRow = EC_row_symbol("IIL");
-                        g.row = symbolRow;
-
-                        g.table.Cell(g.row, 2).Range.Text = "LOW-Level Input Current";
-                        g.table.Cell(g.row, 7).Range.Text = "µA";
-
-                        EC_row_populate(g.table, g.row, "Logic Input PINs; VIN = 0v",
-                            "-1.0",
-                            "--",
-                            "1.0");
-                    }
-
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //  V_HYS
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_HYS");
-                    if (g.VHYS)
-                    {
-                        symbolRow = EC_row_symbol("VHYS");
-                        g.row = symbolRow;
-
-                        g.table.Cell(g.row, 2).Range.Text = "Schmitt Trigger Hysteresis Voltage";
-                        g.table.Cell(g.row, 7).Range.Text = "V";
-                        for (int i = 0; i < 3; i++)
+                        string VDD_DB = null;
+                        string VDD_typ = null;
+                        switch (i)
                         {
-                            string VDD_DB = null;
-                            string VDD_typ = null;
-                            switch (i)
-                            {
-                                case 0: VDD_DB = "1_8"; VDD_typ = " at VDD = 1.8v"; break;
-                                case 1: VDD_DB = "3_3"; VDD_typ = " at VDD = 3.3v"; break;
-                                case 2: VDD_DB = "5_0"; VDD_typ = " at VDD = 5.0v"; break;
-                            }
-
-                            EC_row_populate(g.table, g.row, "Logic Input with Schmitt Trigger" + VDD_typ,
-                                accessQuery(VDD_DB, "VHYS", null, "min"),
-                                accessQuery(VDD_DB, "VHYS", null, "typ"),
-                                accessQuery(VDD_DB, "VHYS", null, "max"));
+                            case 0: VDD_DB = "1_8"; VDD_typ = " at VDD = 1.8v"; break;
+                            case 1: VDD_DB = "3_3"; VDD_typ = " at VDD = 3.3v"; break;
+                            case 2: VDD_DB = "5_0"; VDD_typ = " at VDD = 5.0v"; break;
                         }
-                    }
 
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //  V_OH
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_OH");
+                        EC_row_populate(g.table, g.row, "Logic Input with Schmitt Trigger" + VDD_typ,
+                            accessQuery(VDD_DB, "VHYS", null, "min"),
+                            accessQuery(VDD_DB, "VHYS", null, "typ"),
+                            accessQuery(VDD_DB, "VHYS", null, "max"));
+                    }
+                }
 
-                    if (g.VDD.PP1x > 0 || g.VDD.PP2x > 0 || g.VDD.ODP1x > 0 || g.VDD.ODP2x > 0)
-                    {
-                        EC_OH_OL("VOH", g.VDD_EC, g.VDD);
-                    }
-                    if (g.VDD2.PP1x > 0 || g.VDD2.PP2x > 0 || g.VDD2.ODP1x > 0 || g.VDD2.ODP2x > 0)
-                    {
-                        EC_OH_OL("VOH2", g.VDD2_EC, g.VDD2);
-                    }
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                //  V_OH
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (worker.CancellationPending) { e.Cancel = true; return; }
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_OH");
 
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //  V_OL
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_OL");
+                if (g.VDD.PP1x > 0 || g.VDD.PP2x > 0 || g.VDD.ODP1x > 0 || g.VDD.ODP2x > 0)
+                {
+                    EC_OH_OL("VOH", g.VDD_EC, g.VDD);
+                }
+                if (g.VDD2.PP1x > 0 || g.VDD2.PP2x > 0 || g.VDD2.ODP1x > 0 || g.VDD2.ODP2x > 0)
+                {
+                    EC_OH_OL("VOH2", g.VDD2_EC, g.VDD2);
+                }
 
-                    if (g.VDD.PP1x > 0 || g.VDD.PP2x > 0 || g.VDD.ODN1x > 0 || g.VDD.ODN2x > 0 || g.VDD.ODN4x > 0)
-                    {
-                        EC_OH_OL("VOL", g.VDD_EC, g.VDD);
-                    }
-                    if (g.VDD2.PP1x > 0 || g.VDD2.PP2x > 0 || g.VDD2.ODN1x > 0 || g.VDD2.ODN2x > 0 || g.VDD2.ODN4x > 0)
-                    {
-                        EC_OH_OL("VOL2", g.VDD2_EC, g.VDD2);
-                    }
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                //  V_OL
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (worker.CancellationPending) { e.Cancel = true; return; }
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: V_OL");
 
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //  I_OH
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: I_OH");
+                if (g.VDD.PP1x > 0 || g.VDD.PP2x > 0 || g.VDD.ODN1x > 0 || g.VDD.ODN2x > 0 || g.VDD.ODN4x > 0)
+                {
+                    EC_OH_OL("VOL", g.VDD_EC, g.VDD);
+                }
+                if (g.VDD2.PP1x > 0 || g.VDD2.PP2x > 0 || g.VDD2.ODN1x > 0 || g.VDD2.ODN2x > 0 || g.VDD2.ODN4x > 0)
+                {
+                    EC_OH_OL("VOL2", g.VDD2_EC, g.VDD2);
+                }
 
-                    if (g.VDD.PP1x > 0 || g.VDD.PP2x > 0 || g.VDD.ODP1x > 0 || g.VDD.ODP2x > 0)
-                    {
-                        EC_OH_OL("IOH", g.VDD_EC, g.VDD);
-                    }
-                    if (g.VDD2.PP1x > 0 || g.VDD2.PP2x > 0 || g.VDD2.ODP1x > 0 || g.VDD2.ODP2x > 0)
-                    {
-                        EC_OH_OL("IOH2", g.VDD2_EC, g.VDD2);
-                    }
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                //  I_OH
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (worker.CancellationPending) { e.Cancel = true; return; }
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: I_OH");
 
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //  I_OL
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if (worker.CancellationPending) { e.Cancel = true; return; }
-                    form.backgroundWorker.ReportProgress(2, "Populating EC Table: I_OL");
+                if (g.VDD.PP1x > 0 || g.VDD.PP2x > 0 || g.VDD.ODP1x > 0 || g.VDD.ODP2x > 0)
+                {
+                    EC_OH_OL("IOH", g.VDD_EC, g.VDD);
+                }
+                if (g.VDD2.PP1x > 0 || g.VDD2.PP2x > 0 || g.VDD2.ODP1x > 0 || g.VDD2.ODP2x > 0)
+                {
+                    EC_OH_OL("IOH2", g.VDD2_EC, g.VDD2);
+                }
 
-                    if (g.VDD.PP1x > 0 || g.VDD.PP2x > 0 || g.VDD.ODN1x > 0 || g.VDD.ODN2x > 0 || g.VDD.ODN4x > 0)
-                    {
-                        EC_OH_OL("IOL", g.VDD_EC, g.VDD);
-                    }
-                    if (g.VDD2.PP1x > 0 || g.VDD2.PP2x > 0 || g.VDD2.ODN1x > 0 || g.VDD2.ODN2x > 0 || g.VDD2.ODN4x > 0)
-                    {
-                        EC_OH_OL("IOL2", g.VDD2_EC, g.VDD2);
-                    }
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                //  I_OL
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (worker.CancellationPending) { e.Cancel = true; return; }
+                form.backgroundWorker.ReportProgress(2, "Populating EC Table: I_OL");
+
+                if (g.VDD.PP1x > 0 || g.VDD.PP2x > 0 || g.VDD.ODN1x > 0 || g.VDD.ODN2x > 0 || g.VDD.ODN4x > 0)
+                {
+                    EC_OH_OL("IOL", g.VDD_EC, g.VDD);
+                }
+                if (g.VDD2.PP1x > 0 || g.VDD2.PP2x > 0 || g.VDD2.ODN1x > 0 || g.VDD2.ODN2x > 0 || g.VDD2.ODN4x > 0)
+                {
+                    EC_OH_OL("IOL2", g.VDD2_EC, g.VDD2);
                 }
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2803,30 +2735,32 @@ public static class MainProgram
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 // ### Update this with Access Data at some point
 
+                g.table = EC_TABLE;
+
                 if (worker.CancellationPending) { e.Cancel = true; return; }
                 form.backgroundWorker.ReportProgress(2, "Populating EC Table: CNTs/DLYs");
-                if (g.CNTs_DLYs_update)
+                //if (g.CNTs_DLYs_update)
+                //{
+                for (int i = 0; i < g.GreenPAK.cnt.Length; i++)
                 {
-                    for (int i = 0; i < g.GreenPAK.cnt.Length; i++)
+                    if (g.GreenPAK.cnt[i].used)
                     {
-                        if (g.GreenPAK.cnt[i].used)
-                        {
-                            symbolRow = EC_row_symbol("t" + g.GreenPAK.cnt[i].mode_alt + i.ToString());
-                            g.row = symbolRow;
-                            g.table.Cell(g.row, 2).Range.Text = g.GreenPAK.cnt[i].mode + " " + i.ToString() + " Time";
-                            g.table.Cell(g.row, 7).Range.Text = g.GreenPAK.cnt[i].timeSI;
+                        symbolRow = EC_row_symbol("t" + g.GreenPAK.cnt[i].mode_alt + i.ToString()); //### there's some problem here
+                        g.row = symbolRow;
+                        g.table.Cell(g.row, 2).Range.Text = g.GreenPAK.cnt[i].mode + " " + i.ToString() + " Time";
+                        g.table.Cell(g.row, 7).Range.Text = g.GreenPAK.cnt[i].timeSI;
 
-                            Console.WriteLine(g.GreenPAK.cnt[i].time.typ);
-                            EC_row_populate(g.table, g.row, "At temperature " + g.GreenPAK.temp.typ + "\u00B0C",
-                                "--",
-                                g.GreenPAK.cnt[i].time.typ,
-                                "--");
-                            EC_row_split();
+                        Console.WriteLine(g.GreenPAK.cnt[i].time.typ);
+                        EC_row_populate(g.table, g.row, "At temperature " + g.GreenPAK.temp.typ + "\u00B0C",
+                            "--",
+                            g.GreenPAK.cnt[i].time.typ,
+                            "--");
+                        EC_row_split();
 
-                            EC_row_merge(symbolRow);
-                        }
+                        EC_row_merge(symbolRow);
                     }
                 }
+                //}
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  ACMPs
@@ -2835,58 +2769,60 @@ public static class MainProgram
 
                 if (worker.CancellationPending) { e.Cancel = true; return; }
                 form.backgroundWorker.ReportProgress(2, "Populating EC Table: ACMPs");
-                if (g.ACMPs_update)
+                //if (g.ACMPs_update)
+                //{
+                for (int i = 0; i < g.GreenPAK.acmp.Length; i++)
                 {
-                    for (int i = 0; i < g.GreenPAK.acmp.Length; i++)
+                    if (g.GreenPAK.acmp[i].used)
                     {
-                        if (g.GreenPAK.acmp[i].used)
+                        symbolRow = EC_row_symbol("VACMP" + i.ToString());
+                        g.row = symbolRow;
+                        EC_clearSection();
+                        g.table.Cell(g.row, 2).Range.Text = "Analog Comparator" + i.ToString() + " Threshold Voltage";
+                        g.table.Cell(g.row, 7).Range.Text = "mV";
+
+                        EC_row_populate(g.table, g.row, "Low to High transition at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].acmpVIH, "--");
+                        EC_row_split();
+                        //EC_row_populate(table, row, "Low to High transition at temperature " + g.GreenPAK.temp.min + "\u00B0C" + " to " + g.GreenPAK.temp.max + "\u00B0C", "--", g.GreenPAK.acmp[i].threshold, "--");
+                        //EC_row_split(table, row);
+                        //row++;
+
+                        EC_row_populate(g.table, g.row, "High to Low transition at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].acmpVIL, "--");
+                        EC_row_split();
+                        //EC_row_populate(table, row, "High to Low transition at temperature " + g.GreenPAK.temp.min + "\u00B0C" + " to " + g.GreenPAK.temp.max + "\u00B0C", "--", g.GreenPAK.acmp[i].threshold, "--");
+                        //EC_row_split(table, row);
+                        //row++;
+
+                        EC_row_merge(symbolRow);
+
+                        if (g.GreenPAK.acmp[i].hysteresis != "0")
                         {
-                            symbolRow = EC_row_symbol("VACMP" + i.ToString());
+                            symbolRow = EC_row_symbol("VHYST" + i.ToString());
                             g.row = symbolRow;
                             EC_clearSection();
-                            g.table.Cell(g.row, 2).Range.Text = "Analog Comparator" + i.ToString() + " Threshold Voltage";
+                            g.table.Cell(g.row, 2).Range.Text = "Analog Comparator" + i.ToString() + " Hysteresis Voltage (note 1)";
                             g.table.Cell(g.row, 7).Range.Text = "mV";
 
-                            EC_row_populate(g.table, g.row, "Low to High transition at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].acmpVIH, "--");
+                            EC_row_populate(g.table, g.row, "ACMP" + i.ToString() + " at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].hysteresis, "--");
                             EC_row_split();
-                            //EC_row_populate(table, row, "Low to High transition at temperature " + g.GreenPAK.temp.min + "\u00B0C" + " to " + g.GreenPAK.temp.max + "\u00B0C", "--", g.GreenPAK.acmp[i].threshold, "--");
-                            //EC_row_split(table, row);
-                            //row++;
-
-                            EC_row_populate(g.table, g.row, "High to Low transition at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].acmpVIL, "--");
-                            EC_row_split();
-                            //EC_row_populate(table, row, "High to Low transition at temperature " + g.GreenPAK.temp.min + "\u00B0C" + " to " + g.GreenPAK.temp.max + "\u00B0C", "--", g.GreenPAK.acmp[i].threshold, "--");
+                            //EC_row_populate(table, row, "ACMP" + i.ToString() + " at temperature " + g.GreenPAK.temp.min + "\u00B0C" + " to " + g.GreenPAK.temp.max + "\u00B0C", "--", g.GreenPAK.acmp[i].hysteresis, "--");
                             //EC_row_split(table, row);
                             //row++;
 
                             EC_row_merge(symbolRow);
-
-                            if (g.GreenPAK.acmp[i].hysteresis != "0")
-                            {
-                                symbolRow = EC_row_symbol("VHYST" + i.ToString());
-                                g.row = symbolRow;
-                                EC_clearSection();
-                                g.table.Cell(g.row, 2).Range.Text = "Analog Comparator" + i.ToString() + " Hysteresis Voltage (note 1)";
-                                g.table.Cell(g.row, 7).Range.Text = "mV";
-
-                                EC_row_populate(g.table, g.row, "ACMP" + i.ToString() + " at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].hysteresis, "--");
-                                EC_row_split();
-                                //EC_row_populate(table, row, "ACMP" + i.ToString() + " at temperature " + g.GreenPAK.temp.min + "\u00B0C" + " to " + g.GreenPAK.temp.max + "\u00B0C", "--", g.GreenPAK.acmp[i].hysteresis, "--");
-                                //EC_row_split(table, row);
-                                //row++;
-
-                                EC_row_merge(symbolRow);
-                            }
                         }
                     }
                 }
+                //}
+
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  TSU / PONTHR / POFFTHR
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (worker.CancellationPending) { e.Cancel = true; return; }
                 form.backgroundWorker.ReportProgress(2, "Populating EC Table: T_SU / P_ONTHR / P_OFFTHR");
 
-                if (g.temp_vdd_update || g.new_part_update)
+                //if (g.temp_vdd_update || g.new_part_update)
+                if (g.new_part_update)
                 {
                     symbolRow = EC_row_symbol("TSU");
                     g.row = symbolRow;
@@ -2924,13 +2860,16 @@ public static class MainProgram
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (worker.CancellationPending) { e.Cancel = true; return; }
                 form.backgroundWorker.ReportProgress(2, "Populating EC Table: ASM");
-                if (g.asm_used && (g.new_part_update || g.temp_vdd_update))
+
+                if (g.asm_used)
                 {
                     g.row = EC_row_symbol("tst_delay");
                     g.table.Cell(g.row, 2).Range.Text = "State Machine Output Delay";
                     g.table.Cell(g.row, 7).Range.Text = "ns";
                     for (int i = 0; i < 3; i++)
                     {
+                        if (g.VDD_EC[i] == false) continue;
+
                         string VDD_DB = null;
                         string VDD_typ = null;
                         switch (i)
@@ -2951,6 +2890,8 @@ public static class MainProgram
                     g.table.Cell(g.row, 7).Range.Text = "ns";
                     for (int i = 0; i < 3; i++)
                     {
+                        if (g.VDD_EC[i] == false) continue;
+
                         string VDD_DB = null;
                         string VDD_typ = null;
                         switch (i)
@@ -2971,6 +2912,8 @@ public static class MainProgram
                     g.table.Cell(g.row, 7).Range.Text = "ns";
                     for (int i = 0; i < 3; i++)
                     {
+                        if (g.VDD_EC[i] == false) continue;
+
                         string VDD_DB = null;
                         string VDD_typ = null;
                         switch (i)
@@ -2991,6 +2934,8 @@ public static class MainProgram
                     g.table.Cell(g.row, 7).Range.Text = "ns";
                     for (int i = 0; i < 3; i++)
                     {
+                        if (g.VDD_EC[i] == false) continue;
+
                         string VDD_DB = null;
                         string VDD_typ = null;
                         switch (i)
@@ -3055,45 +3000,9 @@ public static class MainProgram
                 if (worker.CancellationPending) { e.Cancel = true; return; }
                 form.backgroundWorker.ReportProgress(2, "Populating EC Table: Fixing Subscripts");
 
-                if (g.new_part_update || g.pin_settings_update || g.temp_vdd_update)
+                if (g.new_part_update || g.pin_settings_update)
                 {
                     EC_subscripts2();
-                    //if (worker.CancellationPending) { e.Cancel = true; return; }
-                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOH Subscripts");
-                    //EC_subscripts("V", "OH");
-                    //if (worker.CancellationPending) { e.Cancel = true; return; }
-                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOH2 Subscripts");
-                    //EC_subscripts("V", "OH2");
-                    //if (worker.CancellationPending) { e.Cancel = true; return; }
-                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOL Subscripts");
-                    //EC_subscripts("V", "OL");
-                    //if (worker.CancellationPending) { e.Cancel = true; return; }
-                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: VOL2 Subscripts");
-                    //EC_subscripts("V", "OL2");
-                    //if (worker.CancellationPending) { e.Cancel = true; return; }
-                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOH Subscripts");
-                    //EC_subscripts("I", "OH");
-                    //if (worker.CancellationPending) { e.Cancel = true; return; }
-                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOH2 Subscripts");
-                    //EC_subscripts("I", "OH2");
-                    //if (worker.CancellationPending) { e.Cancel = true; return; }
-                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOL Subscripts");
-                    //EC_subscripts("I", "OL");
-                    //if (worker.CancellationPending) { e.Cancel = true; return; }
-                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: IOL2 Subscripts");
-                    //EC_subscripts("I", "OL2");
-                    //if (worker.CancellationPending) { e.Cancel = true; return; }
-                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: VDD Subscripts");
-                    //EC_subscripts("V", "DD");
-                    //if (worker.CancellationPending) { e.Cancel = true; return; }
-                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: VDD2 Subscripts");
-                    //EC_subscripts("V", "DD2");
-                    //if (worker.CancellationPending) { e.Cancel = true; return; }
-                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: PONTHR Subscripts");
-                    //EC_subscripts("PON", "THR");
-                    //if (worker.CancellationPending) { e.Cancel = true; return; }
-                    //form.backgroundWorker.ReportProgress(2, "Populating EC Table: POFFTHR Subscripts");
-                    //EC_subscripts("POFF", "THR");
                 }
 
                 g.connection.Close();
@@ -3149,21 +3058,18 @@ public static class MainProgram
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(2, "Populating Datasheet Revision History table");
 
-        if (g.DRH_update)
+        foreach (Table table in g.doc.Tables)
         {
-            foreach (Table table in g.doc.Tables)
+            if (table.Title == "DRH")
             {
-                if (table.Title == "DRH")
-                {
-                    table.Rows.Add();
-                    int DRH_row = table.Rows.Count - 1;
+                table.Rows.Add();
+                int DRH_row = table.Rows.Count - 1;
 
-                    table.Cell(DRH_row, 1).Range.Text = DateTime.Now.ToString("MM/dd/yyyy");
-                    table.Cell(DRH_row, 2).Range.Text = g.DS_rev.Insert(1, ".");
-                    table.Cell(DRH_row, 3).Range.Text = g.DRH_text;
+                table.Cell(DRH_row, 1).Range.Text = DateTime.Now.ToString("MM/dd/yyyy");
+                table.Cell(DRH_row, 2).Range.Text = g.DS_rev.Insert(1, ".");
+                table.Cell(DRH_row, 3).Range.Text = g.DRH_text;
 
-                    break;
-                }
+                break;
             }
         }
 
