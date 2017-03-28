@@ -417,23 +417,24 @@ namespace SilegoForm
                 {
                     error_label.Visible = true;
                     error_label.Text = "Warning: New Part is selected.";
-                    //MainProgram.g.DataSheet_File = files[i];
-                    //DS_file_textbox.Text = files[i].Substring(files[i].LastIndexOf("\\"));
-                    //DS_file_textbox.Text = files[i];
                 }
                 else if (files[i].EndsWith(".docx") || files[i].EndsWith(".doc"))
                 {
                     error_label.Visible = false;
-                    //MainProgram.g.DataSheet_File = files[i];
-                    //DS_file_textbox.Text = files[i].Substring(files[i].LastIndexOf("\\"));
                     DS_file_textbox.Text = files[i];
                 }
                 else if (files[i].EndsWith(".gp6") || files[i].EndsWith(".gp5") || files[i].EndsWith(".gp4") || files[i].EndsWith(".gp3"))
                 {
                     error_label.Visible = false;
-                    //MainProgram.g.GreenPAK_File = files[i];
-                    //GP_file_textbox.Text = files[i].Substring(files[i].LastIndexOf("\\"));
-                    GP_file_textbox.Text = files[i];
+
+                    if (GP_file_textbox.Text == files[i])
+                    {
+                        GP_file_textbox_TextChanged(this, EventArgs.Empty);
+                    }
+                    else
+                    {
+                        GP_file_textbox.Text = files[i];
+                    }
                 }
                 else
                 {
