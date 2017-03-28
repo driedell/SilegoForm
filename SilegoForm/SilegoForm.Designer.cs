@@ -275,7 +275,7 @@ namespace SilegoForm
             this.help_checkbox.TabIndex = 49;
             this.help_checkbox.Text = "Help";
             this.help_checkbox.UseVisualStyleBackColor = true;
-            this.help_checkbox.CheckedChanged += new System.EventHandler(this.help_CheckedChanged);
+            this.help_checkbox.CheckedChanged += new System.EventHandler(this.help_checkbox_CheckedChanged);
             // 
             // help_textbox
             // 
@@ -835,6 +835,7 @@ namespace SilegoForm
             this.DS_rev_combobox.Name = "DS_rev_combobox";
             this.DS_rev_combobox.Size = new System.Drawing.Size(150, 21);
             this.DS_rev_combobox.TabIndex = 7;
+            this.DS_rev_combobox.SelectedIndexChanged += new System.EventHandler(this.DS_rev_combobox_SelectedIndexChanged);
             // 
             // DRH_textbox
             // 
@@ -843,6 +844,7 @@ namespace SilegoForm
             this.DRH_textbox.Name = "DRH_textbox";
             this.DRH_textbox.Size = new System.Drawing.Size(150, 40);
             this.DRH_textbox.TabIndex = 8;
+            this.DRH_textbox.TextChanged += new System.EventHandler(this.DRH_textbox_TextChanged);
             // 
             // label4
             // 
@@ -900,6 +902,7 @@ namespace SilegoForm
             this.CNTs_DLYs_checkbox.TabIndex = 11;
             this.CNTs_DLYs_checkbox.Text = "CNTs/DLYs";
             this.CNTs_DLYs_checkbox.UseVisualStyleBackColor = true;
+            this.CNTs_DLYs_checkbox.CheckedChanged += new System.EventHandler(this.CNTs_DLYs_checkbox_CheckedChanged);
             // 
             // ACMPs_checkbox
             // 
@@ -910,6 +913,7 @@ namespace SilegoForm
             this.ACMPs_checkbox.TabIndex = 12;
             this.ACMPs_checkbox.Text = "ACMPs";
             this.ACMPs_checkbox.UseVisualStyleBackColor = true;
+            this.ACMPs_checkbox.CheckedChanged += new System.EventHandler(this.ACMPs_checkbox_CheckedChanged);
             // 
             // pin_labels_checkbox
             // 
@@ -920,6 +924,7 @@ namespace SilegoForm
             this.pin_labels_checkbox.TabIndex = 9;
             this.pin_labels_checkbox.Text = "Pin Labels";
             this.pin_labels_checkbox.UseVisualStyleBackColor = true;
+            this.pin_labels_checkbox.CheckedChanged += new System.EventHandler(this.pin_labels_checkbox_CheckedChanged);
             // 
             // pin_settings_checkbox
             // 
@@ -930,6 +935,7 @@ namespace SilegoForm
             this.pin_settings_checkbox.TabIndex = 10;
             this.pin_settings_checkbox.Text = "Pin Settings";
             this.pin_settings_checkbox.UseVisualStyleBackColor = true;
+            this.pin_settings_checkbox.CheckedChanged += new System.EventHandler(this.pin_settings_checkbox_CheckedChanged);
             // 
             // TM_Part_Code_checkbox
             // 

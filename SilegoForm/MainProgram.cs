@@ -948,6 +948,11 @@ public static class MainProgram
             }
             catch { Console.WriteLine("Error occured in EC_row_symbol()"); }
         }
+
+        if (symbol.StartsWith("tcnt") || symbol.StartsWith("tdly"))
+        {
+        }
+
         int new_row;
         if (symbol.Equals("VDD2"))
         {
@@ -1885,6 +1890,12 @@ public static class MainProgram
         g.doc.Variables["Date"].Value = DateTime.Now.ToString("MM/dd/yyyy");
         g.doc.Variables["Date_long"].Value = DateTime.Now.ToString("MMMM dd, yyyy");
 
+        if (g.new_part_update)
+        {
+            g.doc.Variables["I_Q"].Value = "--";
+            g.doc.Variables["I_Q_condition"].Value = "--";
+        }
+
         if (g.I_Q_update)
         {
             g.doc.Variables["I_Q"].Value = g.I_Q;
@@ -2002,38 +2013,6 @@ public static class MainProgram
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        //  Pin Configuration Table
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(2, "Populating Pin Configuration Table");
-
-        foreach (Table table in g.doc.Tables)
-        {
-            if (table.Title == "pin_configuration")
-            {
-                while (table.Rows.Count < g.GreenPAK.pin.Length)
-                {
-                    table.Rows.Add();
-                }
-
-                // Assign values to each cell in the table
-                for (int i = 1; i < g.GreenPAK.pin.Length; i++)
-                {
-                    table.Cell(i + 1, 1).Range.Text = i.ToString();
-                    table.Cell(i + 1, 2).Range.Text = g.GreenPAK.pin[i].label;
-                    table.Cell(i + 1, 3).Range.Text = g.GreenPAK.pin[i].type;
-                    table.Cell(i + 1, 4).Range.Text = g.GreenPAK.pin[i].description;
-                    table.Cell(i + 1, 5).Range.Text = g.GreenPAK.pin[i].resistor;
-                }
-                table.AllowAutoFit = true;
-                table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitContent);
-                table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
-                table.UpdateAutoFormat();
-                break;
-            }
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  First Page Pinout Diagram
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
@@ -2045,24 +2024,44 @@ public static class MainProgram
             {
                 if (shape.Title == "pinout_diagram")
                 {
-                    int left = (int)shape.Left;
-                    int top = (int)shape.Top;
-                    int width = (int)shape.Width;
-                    int height = (int)shape.Height;
-
-                    shape.Delete();
-
                     g.doc.GoTo(WdGoToItem.wdGoToPage, WdGoToDirection.wdGoToFirst);
 
-                    Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"\Resources\" + g.GreenPAK.package + ".png");
-                    newShape.Title = "pinout_diagram";
-                    newShape.RelativeHorizontalPosition = WdRelativeHorizontalPosition.wdRelativeHorizontalPositionPage;
-                    newShape.RelativeVerticalPosition = WdRelativeVerticalPosition.wdRelativeVerticalPositionPage;
-                    newShape.Left = left;
-                    newShape.Top = top;
-                    newShape.Width = width;
-                    newShape.Height = height;
+                    //shape.RelativeHorizontalPosition = WdRelativeHorizontalPosition.wdRelativeHorizontalPositionPage;
+                    //shape.RelativeVerticalPosition = WdRelativeVerticalPosition.wdRelativeVerticalPositionPage;
 
+                    Console.WriteLine(shape.LeftRelative);
+
+                    float width = shape.Width;
+                    float height = shape.Height;
+                    float left = shape.Left;
+                    float top = shape.Top;
+
+                    Console.WriteLine("left: " + left.ToString());
+                    Console.WriteLine("top: " + top.ToString());
+                    Console.WriteLine("width: " + width.ToString());
+                    Console.WriteLine("height: " + height.ToString());
+
+                    //shape.Delete();
+
+                    Shape newShape = g.doc.Shapes.AddPicture(g.templatePath + @"\Resources\" + g.GreenPAK.package + ".png",
+                        oMissing,
+                        oMissing,
+                        left,
+                        top,
+                        width,
+                        height);
+                    newShape.Title = "pinout_diagram";
+
+                    //newShape.RelativeHorizontalPosition = WdRelativeHorizontalPosition.wdRelativeHorizontalPositionPage;
+                    //newShape.RelativeVerticalPosition = WdRelativeVerticalPosition.wdRelativeVerticalPositionPage;
+
+                    //newShape.LockAnchor = 1;
+                    //newShape.Width = width;
+                    //newShape.Height = height;
+                    //newShape.Left = left;
+                    //newShape.Top = top;             //### come back to this
+
+                    shape.Delete();
                     break;
                 }
             }
@@ -2226,188 +2225,287 @@ public static class MainProgram
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  Pin Configuration Table
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (worker.CancellationPending) { e.Cancel = true; return; }
+        form.backgroundWorker.ReportProgress(2, "Populating Pin Configuration Table");
+
+        foreach (Table table in g.doc.Tables)
+        {
+            if (table.Title == "pin_configuration")
+            {
+                while (table.Rows.Count < g.GreenPAK.pin.Length)
+                {
+                    table.Rows.Add();
+                }
+
+                // Assign values to each cell in the table
+                for (int i = 1; i < g.GreenPAK.pin.Length; i++)
+                {
+                    table.Cell(i + 1, 1).Range.Text = i.ToString();
+                    table.Cell(i + 1, 2).Range.Text = g.GreenPAK.pin[i].label;
+                    table.Cell(i + 1, 3).Range.Text = g.GreenPAK.pin[i].type;
+                    table.Cell(i + 1, 4).Range.Text = g.GreenPAK.pin[i].description;
+                    table.Cell(i + 1, 5).Range.Text = g.GreenPAK.pin[i].resistor;
+                }
+                //table.AllowAutoFit = true;
+                //table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitContent);
+                //table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
+                //table.UpdateAutoFormat();
+                break;
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //  Lock Status
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (g.new_part_update)
+        {
+            foreach (Table table in g.doc.Tables)
+            {
+                if (table.Title == "lock_table")
+                {
+                    if (g.GreenPAK.PAK_family.Equals(5))
+                    {
+                        while (table.Rows.Count < 6)
+                        {
+                            table.Rows.Add();
+                        }
+
+                        table.Cell(1, 2).Range.Text = "Unlocked";
+                        table.Cell(2, 2).Range.Text = "Locked for read, bits <0:1535> ";
+                        table.Cell(3, 2).Range.Text = "Locked for write, bits <0:1535>";
+                        table.Cell(4, 2).Range.Text = "Locked for write, bits <0:2047>";
+                        table.Cell(5, 2).Range.Text = "Locked for read and write, bits <0:1535>";
+                        table.Cell(6, 2).Range.Text = "Locked for read, bits <0:1535>, locked for write, bits <0:2047>";
+
+                        for (int i = 0; i < table.Rows.Count; i++)
+                        {
+                            table.Cell(i, 1).Range.Text = "";
+                        }
+
+                        switch (g.nvmData[g.GreenPAK.lock_read].ToString() +
+                                g.nvmData[g.GreenPAK.lock_write_0].ToString() +
+                                g.nvmData[g.GreenPAK.lock_write_1].ToString())
+                        {
+                            case "000": table.Cell(1, 1).Range.Text = "√"; break;
+                            case "001": table.Cell(4, 1).Range.Text = "√"; break;
+                            case "010": table.Cell(3, 1).Range.Text = "√"; break;
+                            case "011": table.Cell(4, 1).Range.Text = "√"; break;   // Superfluous
+                            case "100": table.Cell(2, 1).Range.Text = "√"; break;
+                            case "101": table.Cell(6, 1).Range.Text = "√"; break;
+                            case "110": table.Cell(5, 1).Range.Text = "√"; break;
+                            case "111": table.Cell(6, 1).Range.Text = "√"; break;   // Superfluous
+                        }
+
+                        break;
+                    }
+                    else if (g.GreenPAK.PAK_family.Equals(4) ||
+                             g.GreenPAK.PAK_family.Equals(3))
+                    {
+                        foreach (Paragraph p in g.doc.Paragraphs)
+                        {
+                            if (p.Range.Text.StartsWith("Lock coverage "))
+                            {
+                                Console.WriteLine("Found lock coverage");
+                                p.Range.Select();
+                                g.app.Selection.Delete();
+                                p.Range.Select();
+                                g.app.Selection.Delete();
+                                break;
+                            }
+                        }
+
+                        table.Delete();
+                        break;
+                    }
+                }
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  Oscillators
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         if (worker.CancellationPending) { e.Cancel = true; return; }
         form.backgroundWorker.ReportProgress(2, "Loading OSC Settings");
 
-        //if (g.CNTs_DLYs_update)
-        //{
-        //////////////////////////////////////////////////
-        //  GreenPAK5
-        //////////////////////////////////////////////////
-        if (g.GreenPAK.PAK_family.Equals(5))
+        if (g.CNTs_DLYs_update)
         {
             //////////////////////////////////////////////////
-            //  OSC0
+            //  GreenPAK5
             //////////////////////////////////////////////////
-            switch (g.nvmData[g.GreenPAK.RC_osc_src].ToString())
+            if (g.GreenPAK.PAK_family.Equals(5))
             {
-                case "0": break;
-                case "1": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq_alt; break;
-            }
-            switch (g.nvmData[g.GreenPAK.RC_osc_pre_div + 1].ToString() +
-                    g.nvmData[g.GreenPAK.RC_osc_pre_div + 0].ToString())
-            {
-                case "00": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 1; break;
-                case "01": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 2; break;
-                case "10": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 4; break;
-                case "11": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 8; break;
-            }
-
-            //////////////////////////////////////////////////
-            //  OSC1
-            //////////////////////////////////////////////////
-            switch (g.nvmData[g.GreenPAK.RING_osc_pre_div + 1].ToString() +
-                    g.nvmData[g.GreenPAK.RING_osc_pre_div + 0].ToString())
-            {
-                case "00": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 1; break;
-                case "01": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 2; break;
-                case "10": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 4; break;
-                case "11": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 8; break;
-            }
-
-            switch (g.nvmData[g.GreenPAK.LF_osc_pre_div + 1].ToString() +
-                    g.nvmData[g.GreenPAK.LF_osc_pre_div + 0].ToString())
-            {
-                case "00": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 1; break;
-                case "01": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 2; break;
-                case "10": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 4; break;
-                case "11": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 16; break;
-            }
-        }
-
-        //////////////////////////////////////////////////
-        //  GreenPAK4
-        //////////////////////////////////////////////////
-        else if (g.GreenPAK.PAK_family.Equals(4))
-        {
-            //////////////////////////////////////////////////
-            //  LF OSC
-            //////////////////////////////////////////////////
-            switch (g.nvmData[g.GreenPAK.LF_osc_pre_div + 1].ToString() +
-                    g.nvmData[g.GreenPAK.LF_osc_pre_div + 0].ToString())
-            {
-                case "00": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 1; break;
-                case "01": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 2; break;
-                case "10": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 4; break;
-                case "11": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 16; break;
-            }
-
-            //////////////////////////////////////////////////
-            //  RC OSC
-            //////////////////////////////////////////////////
-            switch (g.nvmData[g.GreenPAK.RC_osc_src].ToString())
-            {
-                case "0": break;
-                case "1": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq_alt; break;
-            }
-            switch (g.nvmData[g.GreenPAK.RC_osc_pre_div + 1].ToString() +
-                    g.nvmData[g.GreenPAK.RC_osc_pre_div + 0].ToString())
-            {
-                case "00": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 1; break;
-                case "01": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 2; break;
-                case "10": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 4; break;
-                case "11": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 8; break;
-            }
-
-            //////////////////////////////////////////////////
-            //  RING OSC
-            //////////////////////////////////////////////////
-            // Pre-divider
-            switch (g.nvmData[g.GreenPAK.RING_osc_pre_div + 1].ToString() +
-                    g.nvmData[g.GreenPAK.RING_osc_pre_div + 0].ToString())
-            {
-                case "00": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 1; break;
-                case "01": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 4; break;
-                case "10": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 8; break;
-                case "11": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 16; break;
-            }
-        }
-
-        //////////////////////////////////////////////////
-        //  GreenPAK3
-        //////////////////////////////////////////////////
-        else if (g.GreenPAK.PAK_family.Equals(3))
-        {
-            //////////////////////////////////////////////////
-            //  RC OSC
-            //////////////////////////////////////////////////
-            switch (g.nvmData[g.GreenPAK.RC_osc_src].ToString())
-            {
-                case "0": break;
-                case "1": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq_alt; break;
-            }
-            switch (g.nvmData[g.GreenPAK.RC_osc_pre_div + 1].ToString() +
-                    g.nvmData[g.GreenPAK.RC_osc_pre_div + 0].ToString())
-            {
-                case "00": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 1; break;
-                case "01": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 2; break;
-                case "10": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 4; break;
-                case "11": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 8; break;
-            }
-        }
-        //}
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        //  Counters
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (worker.CancellationPending) { e.Cancel = true; return; }
-        form.backgroundWorker.ReportProgress(2, "Loading Counter settings");
-
-        //if (g.CNTs_DLYs_update)
-        //{
-        for (int i = 0; i < g.GreenPAK.cnt.Length; i++)
-        {
-            foreach (XElement counter in g.ELEMENT.Descendants("item")
-                .Where(counter => counter.Attribute("caption").Value.Contains("CNT" + i.ToString())))
-            {
-                if (counter.Element("graphics").Attribute("hidden").Value.Equals("0"))
+                //////////////////////////////////////////////////
+                //  OSC0
+                //////////////////////////////////////////////////
+                switch (g.nvmData[g.GreenPAK.RC_osc_src].ToString())
                 {
-                    if (g.GreenPAK.PAK_family.Equals(5) &&
-                        g.nvmData[g.GreenPAK.cnt[i].SL].ToString().Equals("1"))
+                    case "0": break;
+                    case "1": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq_alt; break;
+                }
+                switch (g.nvmData[g.GreenPAK.RC_osc_pre_div + 1].ToString() +
+                        g.nvmData[g.GreenPAK.RC_osc_pre_div + 0].ToString())
+                {
+                    case "00": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 1; break;
+                    case "01": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 2; break;
+                    case "10": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 4; break;
+                    case "11": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 8; break;
+                }
+
+                //////////////////////////////////////////////////
+                //  OSC1
+                //////////////////////////////////////////////////
+                switch (g.nvmData[g.GreenPAK.RING_osc_pre_div + 1].ToString() +
+                        g.nvmData[g.GreenPAK.RING_osc_pre_div + 0].ToString())
+                {
+                    case "00": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 1; break;
+                    case "01": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 2; break;
+                    case "10": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 4; break;
+                    case "11": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 8; break;
+                }
+
+                switch (g.nvmData[g.GreenPAK.LF_osc_pre_div + 1].ToString() +
+                        g.nvmData[g.GreenPAK.LF_osc_pre_div + 0].ToString())
+                {
+                    case "00": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 1; break;
+                    case "01": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 2; break;
+                    case "10": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 4; break;
+                    case "11": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 16; break;
+                }
+            }
+
+            //////////////////////////////////////////////////
+            //  GreenPAK4
+            //////////////////////////////////////////////////
+            else if (g.GreenPAK.PAK_family.Equals(4))
+            {
+                //////////////////////////////////////////////////
+                //  LF OSC
+                //////////////////////////////////////////////////
+                switch (g.nvmData[g.GreenPAK.LF_osc_pre_div + 1].ToString() +
+                        g.nvmData[g.GreenPAK.LF_osc_pre_div + 0].ToString())
+                {
+                    case "00": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 1; break;
+                    case "01": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 2; break;
+                    case "10": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 4; break;
+                    case "11": g.GreenPAK.LF_osc_freq = g.GreenPAK.LF_osc_freq / 16; break;
+                }
+
+                //////////////////////////////////////////////////
+                //  RC OSC
+                //////////////////////////////////////////////////
+                switch (g.nvmData[g.GreenPAK.RC_osc_src].ToString())
+                {
+                    case "0": break;
+                    case "1": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq_alt; break;
+                }
+                switch (g.nvmData[g.GreenPAK.RC_osc_pre_div + 1].ToString() +
+                        g.nvmData[g.GreenPAK.RC_osc_pre_div + 0].ToString())
+                {
+                    case "00": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 1; break;
+                    case "01": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 2; break;
+                    case "10": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 4; break;
+                    case "11": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 8; break;
+                }
+
+                //////////////////////////////////////////////////
+                //  RING OSC
+                //////////////////////////////////////////////////
+                // Pre-divider
+                switch (g.nvmData[g.GreenPAK.RING_osc_pre_div + 1].ToString() +
+                        g.nvmData[g.GreenPAK.RING_osc_pre_div + 0].ToString())
+                {
+                    case "00": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 1; break;
+                    case "01": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 4; break;
+                    case "10": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 8; break;
+                    case "11": g.GreenPAK.RING_osc_freq = g.GreenPAK.RING_osc_freq / 16; break;
+                }
+            }
+
+            //////////////////////////////////////////////////
+            //  GreenPAK3
+            //////////////////////////////////////////////////
+            else if (g.GreenPAK.PAK_family.Equals(3))
+            {
+                //////////////////////////////////////////////////
+                //  RC OSC
+                //////////////////////////////////////////////////
+                switch (g.nvmData[g.GreenPAK.RC_osc_src].ToString())
+                {
+                    case "0": break;
+                    case "1": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq_alt; break;
+                }
+                switch (g.nvmData[g.GreenPAK.RC_osc_pre_div + 1].ToString() +
+                        g.nvmData[g.GreenPAK.RC_osc_pre_div + 0].ToString())
+                {
+                    case "00": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 1; break;
+                    case "01": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 2; break;
+                    case "10": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 4; break;
+                    case "11": g.GreenPAK.RC_osc_freq = g.GreenPAK.RC_osc_freq / 8; break;
+                }
+            }
+            //}
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            //  Counters
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (worker.CancellationPending) { e.Cancel = true; return; }
+            form.backgroundWorker.ReportProgress(2, "Loading Counter settings");
+
+            //if (g.CNTs_DLYs_update)
+            //{
+            for (int i = 0; i < g.GreenPAK.cnt.Length; i++)
+            {
+                foreach (XElement counter in g.ELEMENT.Descendants("item")
+                    .Where(counter => counter.Attribute("caption").Value.Contains("CNT" + i.ToString())))
+                {
+                    if (counter.Element("graphics").Attribute("hidden").Value.Equals("0"))
                     {
-                        g.GreenPAK.cnt[i].used = true;
-                        counter_config(i);
-                        break;
-                    }
-                    else if (g.GreenPAK.PAK_family.Equals(4))
-                    {
-                        if (g.GreenPAK.cnt[i].SL == 0)
+                        if (g.GreenPAK.PAK_family.Equals(5) &&
+                            g.nvmData[g.GreenPAK.cnt[i].SL].ToString().Equals("1"))
                         {
                             g.GreenPAK.cnt[i].used = true;
                             counter_config(i);
+                            break;
                         }
-                        else
+                        else if (g.GreenPAK.PAK_family.Equals(4))
                         {
-                            switch (g.nvmData[g.GreenPAK.cnt[i].SL + 1].ToString() +
-                                    g.nvmData[g.GreenPAK.cnt[i].SL + 0].ToString())
+                            if (g.GreenPAK.cnt[i].SL == 0)
                             {
-                                case "00":
-                                case "01":
-                                    g.GreenPAK.cnt[i].used = true;
-                                    counter_config(i);
-                                    break;
-
-                                case "10": g.GreenPAK.cnt[i].used = false; break;
-                                case "11": g.GreenPAK.cnt[i].used = false; break;
+                                g.GreenPAK.cnt[i].used = true;
+                                counter_config(i);
                             }
-                        }
+                            else
+                            {
+                                switch (g.nvmData[g.GreenPAK.cnt[i].SL + 1].ToString() +
+                                        g.nvmData[g.GreenPAK.cnt[i].SL + 0].ToString())
+                                {
+                                    case "00":
+                                    case "01":
+                                        g.GreenPAK.cnt[i].used = true;
+                                        counter_config(i);
+                                        break;
 
-                        break;
-                    }
-                    else if (g.GreenPAK.PAK_family.Equals(3))
-                    {
-                        if (g.GreenPAK.cnt[i].SL == 0 || g.nvmData[g.GreenPAK.cnt[i].SL].ToString().Equals("1"))
+                                    case "10": g.GreenPAK.cnt[i].used = false; break;
+                                    case "11": g.GreenPAK.cnt[i].used = false; break;
+                                }
+                            }
+
+                            break;
+                        }
+                        else if (g.GreenPAK.PAK_family.Equals(3))
                         {
-                            g.GreenPAK.cnt[i].used = true;
-                            counter_config(i);
+                            if (g.GreenPAK.cnt[i].SL == 0 || g.nvmData[g.GreenPAK.cnt[i].SL].ToString().Equals("1"))
+                            {
+                                g.GreenPAK.cnt[i].used = true;
+                                counter_config(i);
+                            }
                         }
                     }
                 }
             }
         }
-        //}
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         //  ACMPs
@@ -2731,36 +2829,34 @@ public static class MainProgram
                 }
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
-                //  CNTs/DLYs
+                //  CNTs/DLYs Counters/Delays
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 // ### Update this with Access Data at some point
 
-                g.table = EC_TABLE;
-
                 if (worker.CancellationPending) { e.Cancel = true; return; }
                 form.backgroundWorker.ReportProgress(2, "Populating EC Table: CNTs/DLYs");
-                //if (g.CNTs_DLYs_update)
-                //{
-                for (int i = 0; i < g.GreenPAK.cnt.Length; i++)
+                if (g.CNTs_DLYs_update)
                 {
-                    if (g.GreenPAK.cnt[i].used)
+                    for (int i = 0; i < g.GreenPAK.cnt.Length; i++)
                     {
-                        symbolRow = EC_row_symbol("t" + g.GreenPAK.cnt[i].mode_alt + i.ToString()); //### there's some problem here
-                        g.row = symbolRow;
-                        g.table.Cell(g.row, 2).Range.Text = g.GreenPAK.cnt[i].mode + " " + i.ToString() + " Time";
-                        g.table.Cell(g.row, 7).Range.Text = g.GreenPAK.cnt[i].timeSI;
+                        if (g.GreenPAK.cnt[i].used)
+                        {
+                            symbolRow = EC_row_symbol("t" + g.GreenPAK.cnt[i].mode_alt + i.ToString());
+                            g.row = symbolRow;
+                            g.table.Cell(g.row, 2).Range.Text = g.GreenPAK.cnt[i].mode + " " + i.ToString() + " Time";
+                            g.table.Cell(g.row, 7).Range.Text = g.GreenPAK.cnt[i].timeSI;
 
-                        Console.WriteLine(g.GreenPAK.cnt[i].time.typ);
-                        EC_row_populate(g.table, g.row, "At temperature " + g.GreenPAK.temp.typ + "\u00B0C",
-                            "--",
-                            g.GreenPAK.cnt[i].time.typ,
-                            "--");
-                        EC_row_split();
+                            Console.WriteLine(g.GreenPAK.cnt[i].time.typ);
+                            EC_row_populate(g.table, g.row, "At temperature " + g.GreenPAK.temp.typ + "\u00B0C",
+                                "--",
+                                g.GreenPAK.cnt[i].time.typ,
+                                "--");
+                            EC_row_split();
 
-                        EC_row_merge(symbolRow);
+                            EC_row_merge(symbolRow);
+                        }
                     }
                 }
-                //}
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  ACMPs

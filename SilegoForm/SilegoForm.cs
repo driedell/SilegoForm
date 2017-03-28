@@ -18,7 +18,7 @@ namespace SilegoForm
             initialize_pin_boxes();                     //### move this later?
         }
 
-        private void ACMPs_CheckedChanged(object sender, EventArgs e)
+        private void ACMPs_checkbox_CheckedChanged(object sender, EventArgs e)
         {
             if (ACMPs_checkbox.Checked) MainProgram.g.ACMPs_update = true;
             else MainProgram.g.ACMPs_update = false;
@@ -53,61 +53,76 @@ namespace SilegoForm
                 status_label.Text = "Operation cancelled.";
                 MainProgram.closeDontSave();
 
+                new_part_checkbox.Enabled = true;
+
                 GP_button.Enabled = true;
                 DS_button.Enabled = true;
-                I_Q_textBox.ReadOnly = false;
-                TM_Part_Code_textbox.ReadOnly = false;
-                TM_Revision_textbox.ReadOnly = false;
-                DS_rev_combobox.Enabled = true;
-                start_button.Enabled = true;
-                start_button.Visible = true;
-                cancel_button.Visible = false;
-                cancel_button.Enabled = false;
 
-                new_part_checkbox.Enabled = true;
-                pin_labels_checkbox.Enabled = true;
-                CNTs_DLYs_checkbox.Enabled = true;
-                ACMPs_checkbox.Enabled = true;
-                pin_settings_checkbox.Enabled = true;
-                //DS_rev_checkbox.Enabled = true;
+                part_number_textbox.ReadOnly = false;
+                customer_name_textbox.ReadOnly = false;
+                project_name_textbox.ReadOnly = false;
+
                 I_Q_checkbox.Enabled = true;
-                TM_Part_Code_checkbox.Enabled = true;
-                TM_Revision_checkbox.Enabled = true;
+                I_Q_condition_checkbox.Enabled = true;
+
+                DS_rev_combobox.Enabled = true;
                 DRH_textbox.ReadOnly = false;
 
-                progressBar.Visible = false;
+                pin_labels_checkbox.Enabled = true;
+                pin_settings_checkbox.Enabled = true;
+                CNTs_DLYs_checkbox.Enabled = true;
+                ACMPs_checkbox.Enabled = true;
+                TM_Part_Code_checkbox.Enabled = true;
+                TM_Part_Code_textbox.ReadOnly = false;
+                TM_Revision_checkbox.Enabled = true;
+                TM_Revision_textbox.ReadOnly = false;
+
+                start_button.Enabled = true;
+                start_button.Visible = true;
+                cancel_button.Enabled = false;
+                cancel_button.Visible = false;
+                error_label.Visible = true;
+                status_label.Visible = true;
+                progressBar.Visible = true;
                 progressBar.Value = 0;
             }
             else
             {
-                //Close();
-
+                error_label.Text = status_label.Text;
                 status_label.Text = "Done!";
                 MainProgram.closeDontSave();
 
+                new_part_checkbox.Enabled = true;
+
                 GP_button.Enabled = true;
                 DS_button.Enabled = true;
-                I_Q_textBox.ReadOnly = false;
-                TM_Part_Code_textbox.ReadOnly = false;
-                TM_Revision_textbox.ReadOnly = false;
-                DS_rev_combobox.Enabled = true;
-                start_button.Enabled = true;
-                start_button.Visible = true;
-                cancel_button.Visible = false;
-                cancel_button.Enabled = false;
 
-                new_part_checkbox.Enabled = true;
-                pin_labels_checkbox.Enabled = true;
-                CNTs_DLYs_checkbox.Enabled = true;
-                ACMPs_checkbox.Enabled = true;
-                pin_settings_checkbox.Enabled = true;
-                //DS_rev_checkbox.Enabled = true;
+                part_number_textbox.ReadOnly = false;
+                customer_name_textbox.ReadOnly = false;
+                project_name_textbox.ReadOnly = false;
+
                 I_Q_checkbox.Enabled = true;
-                TM_Part_Code_checkbox.Enabled = true;
-                TM_Revision_checkbox.Enabled = true;
+                I_Q_condition_checkbox.Enabled = true;
+
+                DS_rev_combobox.Enabled = true;
                 DRH_textbox.ReadOnly = false;
 
-                progressBar.Visible = false;
+                pin_labels_checkbox.Enabled = true;
+                pin_settings_checkbox.Enabled = true;
+                CNTs_DLYs_checkbox.Enabled = true;
+                ACMPs_checkbox.Enabled = true;
+                TM_Part_Code_checkbox.Enabled = true;
+                TM_Part_Code_textbox.ReadOnly = false;
+                TM_Revision_checkbox.Enabled = true;
+                TM_Revision_textbox.ReadOnly = false;
+
+                start_button.Enabled = true;
+                start_button.Visible = true;
+                cancel_button.Enabled = false;
+                cancel_button.Visible = false;
+                error_label.Visible = true;
+                status_label.Visible = true;
+                progressBar.Visible = true;
                 progressBar.Value = 100;
             }
         }
@@ -122,7 +137,7 @@ namespace SilegoForm
             backgroundWorker.CancelAsync();
         }
 
-        private void CNTs_DLYs_CheckedChanged(object sender, EventArgs e)
+        private void CNTs_DLYs_checkbox_CheckedChanged(object sender, EventArgs e)
         {
             if (CNTs_DLYs_checkbox.Checked) MainProgram.g.CNTs_DLYs_update = true;
             else MainProgram.g.CNTs_DLYs_update = false;
@@ -165,6 +180,7 @@ namespace SilegoForm
         private void DS_rev_combobox_SelectedIndexChanged(object sender, EventArgs e)
         {
             MainProgram.g.DS_rev = DS_rev_combobox.Text;
+            Console.WriteLine(MainProgram.g.DS_rev);
         }
 
         private void GP_file_textbox_TextChanged(object sender, EventArgs e)
@@ -231,7 +247,7 @@ namespace SilegoForm
             PinTableLayoutPanel.Controls.Add(Pin_boxes[i], 0, i - 1);
         }
 
-        private void help_CheckedChanged(object sender, EventArgs e)
+        private void help_checkbox_CheckedChanged(object sender, EventArgs e)
         {
             if (help_checkbox.Checked)
             {
@@ -300,7 +316,11 @@ namespace SilegoForm
                 pin_settings_checkbox.Checked = true;
                 CNTs_DLYs_checkbox.Checked = true;
                 ACMPs_checkbox.Checked = true;
-                //DRH_textbox.Text = "New Design for " + MainProgram.g.GreenPAK.base_die + ".";
+
+                if (GP_file_textbox.Text != "Drop GP File")
+                {
+                    DRH_textbox.Text = "New Design for " + MainProgram.g.GreenPAK.base_die + ".";
+                }
 
                 status_label.Visible = true;
                 status_label.Text = "New Part. Loaded New_DS_Template.docx";
@@ -317,7 +337,7 @@ namespace SilegoForm
                 pin_settings_checkbox.Checked = false;
                 CNTs_DLYs_checkbox.Checked = false;
                 ACMPs_checkbox.Checked = false;
-                //DRH_textbox.Text = "";
+                DRH_textbox.Text = "";
 
                 status_label.Visible = false;
                 status_label.Text = "";
@@ -331,13 +351,13 @@ namespace SilegoForm
             MainProgram.g.part_number = part_number_textbox.Text;
         }
 
-        private void pin_labels_CheckedChanged(object sender, EventArgs e)
+        private void pin_labels_checkbox_CheckedChanged(object sender, EventArgs e)
         {
             if (pin_labels_checkbox.Checked) MainProgram.g.pin_labels_update = true;
             else MainProgram.g.pin_labels_update = false;
         }
 
-        private void pin_settings_CheckedChanged(object sender, EventArgs e)
+        private void pin_settings_checkbox_CheckedChanged(object sender, EventArgs e)
         {
             if (pin_settings_checkbox.Checked) MainProgram.g.pin_settings_update = true;
             else MainProgram.g.pin_settings_update = false;
@@ -444,34 +464,68 @@ namespace SilegoForm
                 error_label.Text = "Select DS Rev";
                 return;
             }
+            if (DRH_textbox.Text == "")
+            {
+                error_label.Show();
+                error_label.Text = "Add DS Rev History";
+                return;
+            }
+            if (part_number_textbox.Text == "")
+            {
+                error_label.Show();
+                error_label.Text = "Add Part Number";
+                return;
+            }
+            if (customer_name_textbox.Text == "")
+            {
+                error_label.Show();
+                error_label.Text = "Add Customer Name";
+                return;
+            }
+            if (project_name_textbox.Text == "")
+            {
+                error_label.Show();
+                error_label.Text = "Add Project Name";
+                return;
+            }
+
+            new_part_checkbox.Enabled = false;
 
             GP_button.Enabled = false;
             DS_button.Enabled = false;
-            I_Q_textBox.ReadOnly = true;
-            TM_Part_Code_textbox.ReadOnly = true;
-            TM_Revision_textbox.ReadOnly = true;
-            DS_rev_combobox.Enabled = false;
-            start_button.Enabled = false;
-            start_button.Visible = false;
-            cancel_button.Visible = true;
-            cancel_button.Enabled = true;
-            error_label.Visible = false;
-            error_label.Text = "";
 
-            new_part_checkbox.Enabled = false;
-            pin_labels_checkbox.Enabled = false;
-            CNTs_DLYs_checkbox.Enabled = false;
-            ACMPs_checkbox.Enabled = false;
-            pin_settings_checkbox.Enabled = false;
-            //DS_rev_checkbox.Enabled = false;
+            part_number_textbox.ReadOnly = true;
+            customer_name_textbox.ReadOnly = true;
+            project_name_textbox.ReadOnly = true;
+
             I_Q_checkbox.Enabled = false;
-            TM_Part_Code_checkbox.Enabled = false;
-            TM_Revision_checkbox.Enabled = false;
+            I_Q_textBox.ReadOnly = true;
+            I_Q_condition_checkbox.Enabled = false;
+            I_Q_condition_textbox.ReadOnly = true;
+
+            DS_rev_combobox.Enabled = false;
             DRH_textbox.ReadOnly = true;
 
+            pin_labels_checkbox.Enabled = false;
+            pin_settings_checkbox.Enabled = false;
+            CNTs_DLYs_checkbox.Enabled = false;
+            ACMPs_checkbox.Enabled = false;
+            TM_Part_Code_checkbox.Enabled = false;
+            TM_Part_Code_textbox.ReadOnly = true;
+            TM_Revision_checkbox.Enabled = false;
+            TM_Revision_textbox.ReadOnly = true;
+
+            start_button.Enabled = false;
+            start_button.Visible = false;
+            cancel_button.Enabled = true;
+            cancel_button.Visible = true;
+            error_label.Visible = false;
+            error_label.Text = "";
+            status_label.Visible = true;
+            status_label.Text = "";
             progressBar.Visible = true;
             progressBar.Value = 0;
-            status_label.Visible = true;
+
             backgroundWorker.RunWorkerAsync();
         }
 
