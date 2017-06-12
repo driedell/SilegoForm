@@ -54,8 +54,8 @@ public static class MainProgram
         public static string DRH_text = null;
         public static string Date = null;
         public static string part_number = "SLG~~~~~";
-        public static string project_name = "";
-        public static string customer_name = "";
+        public static string project_name = " ";
+        public static string customer_name = " ";
         public static int ext_clk_freq = 0;
 
         public static PAK GreenPAK;
@@ -936,6 +936,8 @@ public static class MainProgram
         // Searches the EC table for the symbol. If the symbol is present, return its row index.
         // If the symbol is not already present, add it.
 
+        int new_row = 1;
+
         for (int i = 1; i <= g.table.Rows.Count; i++)
         {
             // if the cell doesn't exist skip it
@@ -949,12 +951,15 @@ public static class MainProgram
             catch { Console.WriteLine("Error occured in EC_row_symbol()"); }
         }
 
-        if (symbol.StartsWith("tcnt") || symbol.StartsWith("tdly"))
+        if (symbol.StartsWith("tcnt") || symbol.StartsWith("tdly") ||
+            symbol.StartsWith("VACMP") || symbol.StartsWith("VHYST"))
         {
+            g.table.Rows.Add(g.table.Rows[g.row]);
+            g.row++;
+            Console.WriteLine("g.row: " + g.row.ToString());
+            new_row = g.row;
         }
-
-        int new_row;
-        if (symbol.Equals("VDD2"))
+        else if (symbol.Equals("VDD2"))
         {
             g.table.Rows.Add(g.table.Rows[3]);
             new_row = 3;
@@ -990,9 +995,24 @@ public static class MainProgram
         //Console.WriteLine("row count1 = " + g.table.Rows.Count);
         try
         {
-            g.table.Rows[g.row].Range.Cells.Split(2, 1);
+            //g.table.Rows[g.row].Range.Cells.Split(2, 1);
+            g.table.Rows.Add(g.table.Rows[g.row]);
+            //g.table.Rows[g.row].Range.Split(2, 1);
+            
+            //g.table.Cell(g.row, 1).Split(2, 1);
+            //g.table.Cell(g.row, 2).Split(2, 1);
+            //g.table.Cell(g.row, 3).Split(2, 1);
+            //g.table.Cell(g.row, 4).Split(2, 1);
+            //g.table.Cell(g.row, 5).Split(2, 1);
+            //g.table.Cell(g.row, 6).Split(2, 1);
+            //g.table.Cell(g.row, 7).Split(2, 1);
+
         }
-        catch { Console.WriteLine("Error occured in EC_row_split()"); }
+        catch (Exception e)
+        {
+           //MessageBox.Show(e.ToString());
+            Console.WriteLine("Error occured in EC_row_split()");
+        }
         //Console.WriteLine("row count2 = " + g.table.Rows.Count);
 
         //for (int i = 1; i <= g.table.Columns.Count; i++)
@@ -1013,6 +1033,8 @@ public static class MainProgram
         //g.table.Cell(g.row, 5).Merge(g.table.Cell(g.row - 1, 5));
         //g.table.Cell(g.row, 6).Merge(g.table.Cell(g.row - 1, 6));
         //g.table.Cell(g.row, 7).Merge(g.table.Cell(symbolRow, 7));
+
+        Console.WriteLine("Entered EC_row_merge()");
     }
 
     private static void EC_cleanup1()
@@ -1083,12 +1105,12 @@ public static class MainProgram
 
         if (symbol.StartsWith("VIH"))
         {
-            g.table.Cell(g.row, 2).Range.Text = "HIGH-Level Output Voltage";
+            g.table.Cell(g.row, 2).Range.Text = "HIGH-Level Input Voltage";
             g.table.Cell(g.row, 7).Range.Text = "V";
         }
         if (symbol.StartsWith("VIL"))
         {
-            g.table.Cell(g.row, 2).Range.Text = "LOW-Level Output Voltage";
+            g.table.Cell(g.row, 2).Range.Text = "LOW-Level Input Voltage";
             g.table.Cell(g.row, 7).Range.Text = "V";
         }
 
@@ -1267,7 +1289,21 @@ public static class MainProgram
                 }
             }
         }
-        EC_row_merge(symbolRow);
+        //EC_row_merge(symbolRow);
+    }
+
+    private static void EC_print_symbols(string fromHere)
+    {
+        Console.WriteLine("\n" + fromHere);
+        for (int i = 1; i <= g.table.Rows.Count; i++)
+        {
+            try
+            {
+                Console.WriteLine(i.ToString() + ": " + g.table.Cell(i, 1).Range.Text);
+            }
+            catch { Console.WriteLine(i.ToString() + " nope"); }
+        }
+        Console.ReadLine();
     }
 
     private static g.symbols[] symbolArray;
@@ -1618,7 +1654,8 @@ public static class MainProgram
         //g.doc.Variables["Customer_Part_Number"].Value = g.part_number;
 
         // Pattern ID
-        string pattern = Reverse(g.nvmData.Substring(g.GreenPAK.pattern_id_address, 8));
+        string pattern = null;
+        pattern = Reverse(g.nvmData.Substring(g.GreenPAK.pattern_id_address, 8));
         g.GreenPAK.pattern_id = Convert.ToInt32(pattern, 2).ToString().PadLeft(3, '0');
 
         // Locked/Unlocked
@@ -1890,16 +1927,15 @@ public static class MainProgram
         g.doc.Variables["Date"].Value = DateTime.Now.ToString("MM/dd/yyyy");
         g.doc.Variables["Date_long"].Value = DateTime.Now.ToString("MMMM dd, yyyy");
 
-        if (g.new_part_update)
-        {
-            g.doc.Variables["I_Q"].Value = "--";
-            g.doc.Variables["I_Q_condition"].Value = "--";
-        }
-
         if (g.I_Q_update)
         {
             g.doc.Variables["I_Q"].Value = g.I_Q;
             g.doc.Variables["I_Q_condition"].Value = g.I_Q_condition;
+        }
+        else if (g.new_part_update)
+        {
+            g.doc.Variables["I_Q"].Value = "--";
+            g.doc.Variables["I_Q_condition"].Value = "--";
         }
 
         g.doc.Variables["DS_rev"].Value = g.DS_rev;
@@ -2248,10 +2284,8 @@ public static class MainProgram
                     table.Cell(i + 1, 4).Range.Text = g.GreenPAK.pin[i].description;
                     table.Cell(i + 1, 5).Range.Text = g.GreenPAK.pin[i].resistor;
                 }
-                //table.AllowAutoFit = true;
-                //table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitContent);
-                //table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
-                //table.UpdateAutoFormat();
+                table.AllowAutoFit = true;
+                table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
                 break;
             }
         }
@@ -2594,8 +2628,14 @@ public static class MainProgram
         {
             g.VDD_EC[2] = false;
         }
-        Console.WriteLine(g.VDD_EC[0].ToString() + " " + g.VDD_EC[1].ToString() + " " + g.VDD_EC[2].ToString());
+        Console.WriteLine("1.8v: " + g.VDD_EC[0].ToString() + " 3.3v: " + g.VDD_EC[1].ToString() + " 5.0v: " + g.VDD_EC[2].ToString());
         //Console.ReadLine();
+        if (g.VDD_EC[0] == false && g.VDD_EC[1] == false && g.VDD_EC[2] == false)
+        {
+            e.Cancel = true;
+            form.backgroundWorker.ReportProgress(0, "Error: VDD range does not include 1.8, 3.3, or 5.0");
+            return;
+        }
 
         if (g.GreenPAK.dual_supply_PAK)
         {
@@ -2675,6 +2715,7 @@ public static class MainProgram
                         g.GreenPAK.vdd2.typ,
                         g.GreenPAK.vdd2.max);
                 }
+                //EC_print_symbols("VDD2");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  V_IH
@@ -2690,6 +2731,7 @@ public static class MainProgram
                 {
                     EC_IH_IL("VIH2", g.VDD2_EC, g.VDD2);
                 }
+                //EC_print_symbols("VIH/VIH2");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  V_IL
@@ -2705,6 +2747,7 @@ public static class MainProgram
                 {
                     EC_IH_IL("VIL2", g.VDD2_EC, g.VDD2);
                 }
+                //EC_print_symbols("VIL/VIL2");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  I_IH / I_IL
@@ -2737,6 +2780,7 @@ public static class MainProgram
                         "--",
                         "1.0");
                 }
+                //EC_print_symbols("IIH/IIL");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  V_HYS
@@ -2767,6 +2811,7 @@ public static class MainProgram
                             accessQuery(VDD_DB, "VHYS", null, "max"));
                     }
                 }
+                //EC_print_symbols("VHYS");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  V_OH
@@ -2782,6 +2827,7 @@ public static class MainProgram
                 {
                     EC_OH_OL("VOH2", g.VDD2_EC, g.VDD2);
                 }
+                //EC_print_symbols("VOH/VOH2");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  V_OL
@@ -2797,6 +2843,7 @@ public static class MainProgram
                 {
                     EC_OH_OL("VOL2", g.VDD2_EC, g.VDD2);
                 }
+                //EC_print_symbols("VOL/VOL2");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  I_OH
@@ -2812,6 +2859,7 @@ public static class MainProgram
                 {
                     EC_OH_OL("IOH2", g.VDD2_EC, g.VDD2);
                 }
+                //EC_print_symbols("IOH/IOH2");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  I_OL
@@ -2827,36 +2875,69 @@ public static class MainProgram
                 {
                     EC_OH_OL("IOL2", g.VDD2_EC, g.VDD2);
                 }
+                //EC_print_symbols("IOL/IOL2");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  CNTs/DLYs Counters/Delays
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 // ### Update this with Access Data at some point
 
+                //### reorganize so that all counters are in order directly after IOL
+
                 if (worker.CancellationPending) { e.Cancel = true; return; }
                 form.backgroundWorker.ReportProgress(2, "Populating EC Table: CNTs/DLYs");
+
                 if (g.CNTs_DLYs_update)
                 {
+                    // Get rid of all counter info from the EC table
+                    for (int i = 1; i < g.table.Rows.Count; i++)
+                    {
+                        try
+                        {
+                            if (g.table.Cell(i, 1).Range.Text.Contains("tcnt") ||
+                                g.table.Cell(i, 1).Range.Text.Contains("tdly"))
+                            {
+                                g.table.Rows[i].Range.Text = "";
+
+                                //g.table.Cell(i - 1, 1).Merge(g.table.Cell(i, 1));
+                                //g.table.Cell(i - 1, 2).Merge(g.table.Cell(i, 2));
+                                //g.table.Cell(i - 1, 3).Merge(g.table.Cell(i, 3));
+                                //g.table.Cell(i - 1, 4).Merge(g.table.Cell(i, 4));
+                                //g.table.Cell(i - 1, 5).Merge(g.table.Cell(i, 5));
+                                //g.table.Cell(i - 1, 6).Merge(g.table.Cell(i, 6));
+                                //g.table.Cell(i - 1, 7).Merge(g.table.Cell(i, 7));
+                            }
+                        }
+                        catch { Console.WriteLine("Could not delete row " + i); }
+                    }
+                    //EC_print_symbols("deleted cnt/delays");
+
+
                     for (int i = 0; i < g.GreenPAK.cnt.Length; i++)
                     {
                         if (g.GreenPAK.cnt[i].used)
                         {
-                            symbolRow = EC_row_symbol("t" + g.GreenPAK.cnt[i].mode_alt + i.ToString());
-                            g.row = symbolRow;
+                            //symbolRow = EC_row_symbol("t" + g.GreenPAK.cnt[i].mode_alt + i.ToString());
+                            //g.row = symbolRow;
+                            EC_row_symbol("t" + g.GreenPAK.cnt[i].mode_alt + i.ToString());
+
                             g.table.Cell(g.row, 2).Range.Text = g.GreenPAK.cnt[i].mode + " " + i.ToString() + " Time";
                             g.table.Cell(g.row, 7).Range.Text = g.GreenPAK.cnt[i].timeSI;
 
-                            Console.WriteLine(g.GreenPAK.cnt[i].time.typ);
+                            //Console.WriteLine(g.GreenPAK.cnt[i].time.typ);
                             EC_row_populate(g.table, g.row, "At temperature " + g.GreenPAK.temp.typ + "\u00B0C",
                                 "--",
                                 g.GreenPAK.cnt[i].time.typ,
                                 "--");
+                            Console.WriteLine("g.row: " + g.row.ToString());
+
                             EC_row_split();
 
-                            EC_row_merge(symbolRow);
+                            //EC_row_merge(symbolRow);
                         }
                     }
                 }
+                //EC_print_symbols("COUNTERS");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  ACMPs
@@ -2874,7 +2955,7 @@ public static class MainProgram
                         symbolRow = EC_row_symbol("VACMP" + i.ToString());
                         g.row = symbolRow;
                         EC_clearSection();
-                        g.table.Cell(g.row, 2).Range.Text = "Analog Comparator" + i.ToString() + " Threshold Voltage";
+                        g.table.Cell(g.row, 2).Range.Text = "Analog Comparator " + i.ToString() + " Threshold Voltage";
                         g.table.Cell(g.row, 7).Range.Text = "mV";
 
                         EC_row_populate(g.table, g.row, "Low to High transition at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].acmpVIH, "--");
@@ -2896,7 +2977,7 @@ public static class MainProgram
                             symbolRow = EC_row_symbol("VHYST" + i.ToString());
                             g.row = symbolRow;
                             EC_clearSection();
-                            g.table.Cell(g.row, 2).Range.Text = "Analog Comparator" + i.ToString() + " Hysteresis Voltage (note 1)";
+                            g.table.Cell(g.row, 2).Range.Text = "Analog Comparator " + i.ToString() + " Hysteresis Voltage (note 1)";
                             g.table.Cell(g.row, 7).Range.Text = "mV";
 
                             EC_row_populate(g.table, g.row, "ACMP" + i.ToString() + " at temperature 25\u00B0C", "--", g.GreenPAK.acmp[i].hysteresis, "--");
@@ -2910,6 +2991,7 @@ public static class MainProgram
                     }
                 }
                 //}
+                //EC_print_symbols("ACMPs");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  TSU / PONTHR / POFFTHR
@@ -2950,6 +3032,7 @@ public static class MainProgram
                         accessQuery("1_8", "POFFTHR", null, "typ"),
                         accessQuery("1_8", "POFFTHR", null, "max"));
                 }
+                //EC_print_symbols("TSU / PONTHR / POFFTHR");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  ASM Asynchronous State Machine
@@ -3047,6 +3130,7 @@ public static class MainProgram
                         EC_row_split();
                     }
                 }
+                //EC_print_symbols("ASM");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  PowerPAK Specs
@@ -3089,6 +3173,7 @@ public static class MainProgram
                     //    }
                     //}
                 }
+                //EC_print_symbols("POWERPAK");
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 //  Format EC table subscripts and exit EC table
@@ -3100,15 +3185,23 @@ public static class MainProgram
                 {
                     EC_subscripts2();
                 }
+                //EC_print_symbols("EC_subscripts2");
+
 
                 g.connection.Close();
 
                 form.backgroundWorker.ReportProgress(2, "Populating EC Table: Formatting for prettiness 1");
                 EC_cleanup1();
+                //EC_print_symbols("EC_cleanup1");
+
                 form.backgroundWorker.ReportProgress(0, "Populating EC Table: Formatting for prettiness 2");
                 EC_cleanup2();
+                //EC_print_symbols("EC_cleanup2");
+
                 form.backgroundWorker.ReportProgress(0, "Populating EC Table: Formatting for prettiness 3");
                 EC_cleanup3();
+                //EC_print_symbols("EC_cleanup3");
+
                 break;
             }
         }

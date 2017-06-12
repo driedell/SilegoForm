@@ -180,7 +180,7 @@ namespace SilegoForm
         private void DS_rev_combobox_SelectedIndexChanged(object sender, EventArgs e)
         {
             MainProgram.g.DS_rev = DS_rev_combobox.Text;
-            Console.WriteLine(MainProgram.g.DS_rev);
+            Console.WriteLine("DS Rev: " + MainProgram.g.DS_rev);
         }
 
         private void GP_file_textbox_TextChanged(object sender, EventArgs e)
@@ -270,13 +270,13 @@ namespace SilegoForm
             if (I_Q_checkbox.Checked)
             {
                 MainProgram.g.I_Q_update = true;
-                I_Q_textBox.ReadOnly = false;
-                I_Q_textBox.Focus();
+                I_Q_textbox.ReadOnly = false;
+                I_Q_textbox.Focus();
             }
             else
             {
                 MainProgram.g.I_Q_update = false;
-                I_Q_textBox.ReadOnly = true;
+                I_Q_textbox.ReadOnly = true;
             }
         }
 
@@ -300,9 +300,9 @@ namespace SilegoForm
             MainProgram.g.I_Q_condition = I_Q_condition_textbox.Text;
         }
 
-        private void I_Q_TextBox_TextChanged(object sender, EventArgs e)
+        private void I_Q_textbox_TextChanged(object sender, EventArgs e)
         {
-            MainProgram.g.I_Q = I_Q_textBox.Text;
+            MainProgram.g.I_Q = I_Q_textbox.Text;
         }
 
         private void new_part_checkbox_CheckedChanged(object sender, EventArgs e)
@@ -500,7 +500,7 @@ namespace SilegoForm
             project_name_textbox.ReadOnly = true;
 
             I_Q_checkbox.Enabled = false;
-            I_Q_textBox.ReadOnly = true;
+            I_Q_textbox.ReadOnly = true;
             I_Q_condition_checkbox.Enabled = false;
             I_Q_condition_textbox.ReadOnly = true;
 

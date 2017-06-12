@@ -91,7 +91,7 @@ namespace SilegoForm
             this.I_Q_condition_textbox = new System.Windows.Forms.TextBox();
             this.I_Q_checkbox = new System.Windows.Forms.CheckBox();
             this.I_Q_condition_checkbox = new System.Windows.Forms.CheckBox();
-            this.I_Q_textBox = new System.Windows.Forms.TextBox();
+            this.I_Q_textbox = new System.Windows.Forms.TextBox();
             this.DS_Rev_box = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.DS_Rev_label = new System.Windows.Forms.Label();
@@ -699,7 +699,7 @@ namespace SilegoForm
             this.tableLayoutPanel4.Controls.Add(this.I_Q_condition_textbox, 1, 1);
             this.tableLayoutPanel4.Controls.Add(this.I_Q_checkbox, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.I_Q_condition_checkbox, 0, 1);
-            this.tableLayoutPanel4.Controls.Add(this.I_Q_textBox, 1, 0);
+            this.tableLayoutPanel4.Controls.Add(this.I_Q_textbox, 1, 0);
             this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 16);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 2;
@@ -740,16 +740,18 @@ namespace SilegoForm
             this.I_Q_condition_checkbox.UseVisualStyleBackColor = true;
             this.I_Q_condition_checkbox.CheckedChanged += new System.EventHandler(this.I_Q_condition_checkbox_CheckedChanged);
             // 
-            // I_Q_textBox
+            // I_Q_textbox
             // 
-            this.I_Q_textBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.I_Q_textbox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.I_Q_textBox.Location = new System.Drawing.Point(102, 3);
-            this.I_Q_textBox.Name = "I_Q_textBox";
-            this.I_Q_textBox.ReadOnly = true;
-            this.I_Q_textBox.Size = new System.Drawing.Size(125, 20);
-            this.I_Q_textBox.TabIndex = 4;
+            this.I_Q_textbox.Location = new System.Drawing.Point(102, 3);
+            this.I_Q_textbox.Name = "I_Q_textbox";
+            this.I_Q_textbox.ReadOnly = true;
+            this.I_Q_textbox.Size = new System.Drawing.Size(125, 20);
+            this.I_Q_textbox.TabIndex = 4;
+            this.I_Q_textbox.TextChanged += new System.EventHandler(this.I_Q_textbox_TextChanged);
+
             // 
             // DS_Rev_box
             // 
@@ -1169,7 +1171,7 @@ namespace SilegoForm
         public TextBox customer_name_textbox;
         private Label part_number_label;
         public TextBox part_number_textbox;
-        private TextBox I_Q_textBox;
+        private TextBox I_Q_textbox;
         private TextBox temp_max_textbox;
         private TextBox temp_typ_textbox;
         private TextBox temp_min_textbox;
